@@ -3,7 +3,7 @@ I have baked a custom integration for Kia Uvo / Hyundai Bluelink, this will be w
 Warning ahead; this is pre-alpha phase, please do not expect something fully functional, I will improve the integration by time.
 
 ## Installation ##
-You can install this either manually copying files or using HACS. Configuration can be done on UI, you need to enter your username and password, (I know, translations are missing!). 
+You can install this either manually copying files or using HACS. Configuration can be done on UI, you need to enter your username and password, (I know, translations are missing!)
 
 - Region support has been added, you can test initial set of functionality for Canada and USA regions and share your findings.
 - It will only fetch values for the first car, I am not sure if there are people outside using Kia Uvo / Hyundai Bluelink with multiple cars :)
