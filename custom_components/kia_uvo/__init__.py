@@ -1,59 +1,37 @@
 import logging
 
-import asyncio
 import voluptuous as vol
-from datetime import datetime, timezone, timedelta
+import asyncio
+from datetime import datetime, timedelta
 
-from homeassistant import bootstrap
-from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
+from homeassistant.config_entries import ConfigEntry
+from homeassistant.helpers.typing import ConfigType
 from homeassistant.const import (
     CONF_PASSWORD,
     CONF_USERNAME,
-    CONF_UNIT_OF_MEASUREMENT,
-    CONF_REGION,
-)
-from homeassistant.helpers.dispatcher import (
-    async_dispatcher_connect,
-    async_dispatcher_send,
 )
 import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers.event import async_track_time_interval
 from homeassistant.util import dt as dt_util
-
-from .utils import DEFAULT_DISTANCE_UNIT_ARRAY, get_default_distance_unit
-
 from .const import (
     DOMAIN,
+    PLATFORMS,
     DATA_VEHICLE_INSTANCE,
     DATA_CONFIG_UPDATE_LISTENER,
     DATA_VEHICLE_LISTENER,
-    DEFAULT_BRAND,
-    DEFAULT_PIN,
-    DEFAULT_REGION,
     DEFAULT_SCAN_INTERVAL,
-    DEFAULT_USE_EMAIL_WITH_GEOCODE_API,
-    CONF_BRAND,
-    CONF_ENABLE_GEOLOCATION_ENTITY,
     CONF_FORCE_SCAN_INTERVAL,
-    CONF_PIN,
     CONF_NO_FORCE_SCAN_HOUR_FINISH,
     CONF_NO_FORCE_SCAN_HOUR_START,
     CONF_SCAN_INTERVAL,
     CONF_STORED_CREDENTIALS,
-    DISTANCE_UNITS,
     DEFAULT_NO_FORCE_SCAN_HOUR_FINISH,
     DEFAULT_NO_FORCE_SCAN_HOUR_START,
     DEFAULT_FORCE_SCAN_INTERVAL,
-    DEFAULT_ENABLE_GEOLOCATION_ENTITY,
-    DEFAULT_USE_EMAIL_WITH_GEOCODE_API,
-    CONF_USE_EMAIL_WITH_GEOCODE_API,
-    PLATFORMS,
 )
-from .KiaUvoApiImpl import KiaUvoApiImpl
-from .Token import Token
-from .utils import get_implementation_by_region_brand
-from .Vehicle import Vehicle
+from .api_cloud import ApiCloud
+from .vehicle import Vehicle
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -70,47 +48,48 @@ CONFIG_SCHEMA = vol.Schema(
 )
 
 
-async def async_setup(hass: HomeAssistant, config_entry: ConfigEntry):
+async def async_setup(hass: HomeAssistant, config_entry: ConfigType) -> bool:
     if DOMAIN not in hass.data:
         hass.data[DOMAIN] = {}
 
-    async def async_handle_force_update(call):
-        vehicle: Vehicle = hass.data[DOMAIN][DATA_VEHICLE_INSTANCE]
-        await vehicle.force_update()
+    async def async_handle_request_sync(call):
+        hass_vehicle: Vehicle = hass.data[DOMAIN][DATA_VEHICLE_INSTANCE]
+        await hass.async_create_task(hass_vehicle.request_sync())
 
-    async def async_handle_update(call):
-        vehicle: Vehicle = hass.data[DOMAIN][DATA_VEHICLE_INSTANCE]
-        await vehicle.update()
+    async def async_handle_refresh(call):
+        hass_vehicle: Vehicle = hass.data[DOMAIN][DATA_VEHICLE_INSTANCE]
+        await hass.async_create_task(hass_vehicle.refresh())
 
     async def async_handle_start_climate(call):
         set_temp = call.data.get("Temperature")
-        duration = call.data.get("Duration")
         defrost = call.data.get("Defrost")
         climate = call.data.get("Climate")
         heating = call.data.get("Heating")
-        vehicle: Vehicle = hass.data[DOMAIN][DATA_VEHICLE_INSTANCE]
-        await vehicle.start_climate(set_temp, duration, defrost, climate, heating)
+        hass_vehicle: Vehicle = hass.data[DOMAIN][DATA_VEHICLE_INSTANCE]
+        await hass.async_create_task(
+            hass_vehicle.start_climate(set_temp, defrost, climate, heating)
+        )
 
     async def async_handle_stop_climate(call):
-        vehicle: Vehicle = hass.data[DOMAIN][DATA_VEHICLE_INSTANCE]
-        await vehicle.stop_climate()
+        hass_vehicle: Vehicle = hass.data[DOMAIN][DATA_VEHICLE_INSTANCE]
+        await hass.async_create_task(hass_vehicle.stop_climate())
 
     async def async_handle_start_charge(call):
-        vehicle: Vehicle = hass.data[DOMAIN][DATA_VEHICLE_INSTANCE]
-        await vehicle.start_charge()
+        hass_vehicle: Vehicle = hass.data[DOMAIN][DATA_VEHICLE_INSTANCE]
+        await hass.async_create_task(hass_vehicle.start_charge())
 
     async def async_handle_stop_charge(call):
-        vehicle: Vehicle = hass.data[DOMAIN][DATA_VEHICLE_INSTANCE]
-        await vehicle.stop_charge()
+        hass_vehicle: Vehicle = hass.data[DOMAIN][DATA_VEHICLE_INSTANCE]
+        await hass.async_create_task(hass_vehicle.stop_charge())
 
     async def async_handle_set_charge_limits(call):
         ac_limit = call.data.get("ac_limit")
         dc_limit = call.data.get("dc_limit")
-        vehicle: Vehicle = hass.data[DOMAIN][DATA_VEHICLE_INSTANCE]
-        await vehicle.set_charge_limits(ac_limit, dc_limit)
+        hass_vehicle: Vehicle = hass.data[DOMAIN][DATA_VEHICLE_INSTANCE]
+        await hass.async_create_task(hass_vehicle.set_charge_limits(ac_limit, dc_limit))
 
-    hass.services.async_register(DOMAIN, "force_update", async_handle_force_update)
-    hass.services.async_register(DOMAIN, "update", async_handle_update)
+    hass.services.async_register(DOMAIN, "request_sync", async_handle_request_sync)
+    hass.services.async_register(DOMAIN, "refresh", async_handle_refresh)
     hass.services.async_register(DOMAIN, "start_climate", async_handle_start_climate)
     hass.services.async_register(DOMAIN, "stop_climate", async_handle_stop_climate)
     hass.services.async_register(DOMAIN, "start_charge", async_handle_start_charge)
@@ -123,25 +102,9 @@ async def async_setup(hass: HomeAssistant, config_entry: ConfigEntry):
 
 
 async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry):
-    _LOGGER.debug(f"{DOMAIN} - async_setup_entry started - {config_entry}")
     username = config_entry.data.get(CONF_USERNAME)
     password = config_entry.data.get(CONF_PASSWORD)
-    pin = config_entry.data.get(CONF_PIN, DEFAULT_PIN)
-    region = config_entry.data.get(CONF_REGION, DEFAULT_REGION)
-    brand = config_entry.data.get(CONF_BRAND, DEFAULT_BRAND)
-    credentials = config_entry.data.get(CONF_STORED_CREDENTIALS)
 
-    if len(DEFAULT_DISTANCE_UNIT_ARRAY) == 0:
-        system_default_distance_unit = hass.config.as_dict()["unit_system"]["length"]
-        DEFAULT_DISTANCE_UNIT_ARRAY.append(
-            list(DISTANCE_UNITS.keys())[
-                list(DISTANCE_UNITS.values()).index(system_default_distance_unit)
-            ]
-        )
-
-    unit_of_measurement = DISTANCE_UNITS[
-        config_entry.options.get(CONF_UNIT_OF_MEASUREMENT, get_default_distance_unit())
-    ]
     no_force_scan_hour_start = config_entry.options.get(
         CONF_NO_FORCE_SCAN_HOUR_START, DEFAULT_NO_FORCE_SCAN_HOUR_START
     )
@@ -156,62 +119,37 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry):
             CONF_FORCE_SCAN_INTERVAL, DEFAULT_FORCE_SCAN_INTERVAL
         )
     )
-    enable_geolocation_entity = config_entry.options.get(
-        CONF_ENABLE_GEOLOCATION_ENTITY, DEFAULT_ENABLE_GEOLOCATION_ENTITY
-    )
-    use_email_with_geocode_api = config_entry.options.get(
-        CONF_USE_EMAIL_WITH_GEOCODE_API, DEFAULT_USE_EMAIL_WITH_GEOCODE_API
-    )
 
-    kia_uvo_api: KiaUvoApiImpl = get_implementation_by_region_brand(
-        region, brand, username, password, use_email_with_geocode_api, pin
-    )
-    vehicle: Vehicle = Vehicle(
-        hass,
-        config_entry,
-        Token(credentials),
-        kia_uvo_api,
-        unit_of_measurement,
-        enable_geolocation_entity,
-        region,
-    )
+    hass_vehicle: Vehicle = await ApiCloud(
+        username=username, password=password
+    ).get_vehicle()
 
     data = {
-        DATA_VEHICLE_INSTANCE: vehicle,
+        DATA_VEHICLE_INSTANCE: hass_vehicle,
         DATA_VEHICLE_LISTENER: None,
         DATA_CONFIG_UPDATE_LISTENER: None,
     }
 
-    async def refresh_config_entry():
-        is_token_updated = await vehicle.refresh_token()
-        if is_token_updated:
-            new_data = config_entry.data.copy()
-            new_data[CONF_STORED_CREDENTIALS] = vars(vehicle.token)
-            hass.config_entries.async_update_entry(
-                config_entry, data=new_data, options=config_entry.options
-            )
-
     async def update(event_time_utc: datetime):
-        await refresh_config_entry()
-        await vehicle.refresh_token()
-        local_timezone = vehicle.kia_uvo_api.get_timezone_by_region()
+        local_timezone = dt_util.UTC
         event_time_local = event_time_utc.astimezone(local_timezone)
-        await vehicle.update()
+        await hass_vehicle.refresh()
         call_force_update = False
 
         if (
-            event_time_local.hour < no_force_scan_hour_start
-            and event_time_local.hour >= no_force_scan_hour_finish
+            no_force_scan_hour_start
+            > event_time_local.hour
+            >= no_force_scan_hour_finish
         ):
             if (
-                datetime.now(local_timezone) - vehicle.last_updated
+                datetime.now(local_timezone) - hass_vehicle.last_updated
                 > force_scan_interval
             ):
                 call_force_update = True
 
-        if call_force_update == True:
+        if call_force_update:
             try:
-                await vehicle.force_update()
+                await hass_vehicle.request_sync()
             except Exception as ex:
                 _LOGGER.error(f"{DOMAIN} - Exception in force update : %s", str(ex))
 
@@ -245,6 +183,10 @@ async def async_unload_entry(hass: HomeAssistant, config_entry: ConfigEntry):
         )
     )
     if unload_ok:
+        hass_vehicle = hass.data[DOMAIN][DATA_VEHICLE_INSTANCE]
+        if hass_vehicle is not None:
+            await hass_vehicle.cleanup()
+
         vehicle_topic_listener = hass.data[DOMAIN][DATA_VEHICLE_LISTENER]
         vehicle_topic_listener()
 
