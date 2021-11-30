@@ -66,7 +66,9 @@ async def async_setup(hass: HomeAssistant, config_entry: ConfigType) -> bool:
         climate = call.data.get("Climate")
         heating = call.data.get("Heating")
         hass_vehicle: Vehicle = hass.data[DOMAIN][DATA_VEHICLE_INSTANCE]
-        await hass.async_create_task(hass_vehicle.start_climate(set_temp, defrost, climate, heating))
+        await hass.async_create_task(
+            hass_vehicle.start_climate(set_temp, defrost, climate, heating)
+        )
 
     async def async_handle_stop_climate(call):
         hass_vehicle: Vehicle = hass.data[DOMAIN][DATA_VEHICLE_INSTANCE]
@@ -118,7 +120,9 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry):
         )
     )
 
-    hass_vehicle: Vehicle = await ApiCloud(username=username, password=password).get_vehicle()
+    hass_vehicle: Vehicle = await ApiCloud(
+        username=username, password=password
+    ).get_vehicle()
 
     data = {
         DATA_VEHICLE_INSTANCE: hass_vehicle,
@@ -133,7 +137,9 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry):
         call_force_update = False
 
         if (
-            no_force_scan_hour_start > event_time_local.hour >= no_force_scan_hour_finish
+            no_force_scan_hour_start
+            > event_time_local.hour
+            >= no_force_scan_hour_finish
         ):
             if (
                 datetime.now(local_timezone) - hass_vehicle.last_updated

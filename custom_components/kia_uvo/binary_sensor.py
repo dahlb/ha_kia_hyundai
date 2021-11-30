@@ -19,7 +19,9 @@ from .const import DOMAIN, DATA_VEHICLE_INSTANCE
 _LOGGER = logging.getLogger(__name__)
 
 
-async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigType, async_add_entities):
+async def async_setup_entry(
+    hass: HomeAssistant, config_entry: ConfigType, async_add_entities
+):
     vehicle: Vehicle = hass.data[DOMAIN][DATA_VEHICLE_INSTANCE]
 
     binary_instruments = [
@@ -134,7 +136,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigType, async
             "mdi:power-plug",
             "mdi:power-plug-off",
             DEVICE_CLASS_PLUG,
-        )
+        ),
     ]
 
     binary_sensors = []
@@ -249,6 +251,4 @@ class APIActionInProgress(KiaUvoEntity):
 
     @property
     def is_on(self) -> bool:
-        return (
-            not not self._vehicle and self._vehicle.api_cloud.action_in_progress()
-        )
+        return not not self._vehicle and self._vehicle.api_cloud.action_in_progress()

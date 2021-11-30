@@ -15,7 +15,9 @@ from .const import (
 _LOGGER = logging.getLogger(__name__)
 
 
-async def async_setup_entry(hass: HomeAssistant, _config_entry: ConfigType, async_add_entities):
+async def async_setup_entry(
+    hass: HomeAssistant, _config_entry: ConfigType, async_add_entities
+):
     vehicle: Vehicle = hass.data[DOMAIN][DATA_VEHICLE_INSTANCE]
     async_add_entities([Lock(vehicle)], True)
 
@@ -38,7 +40,11 @@ class Lock(KiaUvoEntity, LockEntity):
         return "mdi:lock" if self.is_locked else "mdi:lock-open-variant"
 
     async def async_lock(self):
-        await self.hass.async_create_task(self._vehicle.lock_action(VEHICLE_LOCK_ACTION.LOCK))
+        await self.hass.async_create_task(
+            self._vehicle.lock_action(VEHICLE_LOCK_ACTION.LOCK)
+        )
 
     async def async_unlock(self):
-        await self.hass.async_create_task(self._vehicle.lock_action(VEHICLE_LOCK_ACTION.UNLOCK))
+        await self.hass.async_create_task(
+            self._vehicle.lock_action(VEHICLE_LOCK_ACTION.UNLOCK)
+        )

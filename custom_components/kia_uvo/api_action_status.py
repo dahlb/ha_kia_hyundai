@@ -7,10 +7,7 @@ class ApiActionStatus:
     xid = None
     _completed = False
 
-    def __init__(
-        self,
-        name: str
-    ):
+    def __init__(self, name: str):
         self.name = name
         self.start_time = time.time()
 

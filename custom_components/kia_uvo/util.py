@@ -2,7 +2,9 @@ import re
 from datetime import datetime, tzinfo
 
 
-def convert_last_updated_str_to_datetime(last_updated_str: str, timezone_of_str: tzinfo):
+def convert_last_updated_str_to_datetime(
+    last_updated_str: str, timezone_of_str: tzinfo
+):
     m = re.match(
         r"(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})",
         last_updated_str,

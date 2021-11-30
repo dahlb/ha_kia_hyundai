@@ -44,11 +44,7 @@ class Vehicle(CallbacksMixin):
     ev_max_ac_charge_level: int = None
     tire_all_on: bool = None
 
-    def __init__(
-            self,
-            api_cloud,
-            identifier: str
-    ):
+    def __init__(self, api_cloud, identifier: str):
         self.api_cloud = api_cloud
         self.identifier = identifier
         self.last_updated: datetime = datetime.min
@@ -57,13 +53,15 @@ class Vehicle(CallbacksMixin):
         old_vehicle_status: dict = self.__repr__()
         await self.api_cloud.refresh(vehicle=self)
         if (
-                not self.engine_on
-                and old_vehicle_status["engine_on"] is not None
-                and not old_vehicle_status["engine_on"]
-                and self.ev_battery_level == 0
-                and old_vehicle_status["ev_battery_level"] != 0
+            not self.engine_on
+            and old_vehicle_status["engine_on"] is not None
+            and not old_vehicle_status["engine_on"]
+            and self.ev_battery_level == 0
+            and old_vehicle_status["ev_battery_level"] != 0
         ):
-            _LOGGER.debug(f"zero battery api error, force_update started to correct data")
+            _LOGGER.debug(
+                f"zero battery api error, force_update started to correct data"
+            )
             await self.request_sync()
         self.publish_updates()
 
@@ -82,7 +80,13 @@ class Vehicle(CallbacksMixin):
             climate = True
         if heating is None:
             heating = False
-        await self.api_cloud.start_climate(vehicle=self, set_temp=set_temp, defrost=defrost, climate=climate, heating=heating)
+        await self.api_cloud.start_climate(
+            vehicle=self,
+            set_temp=set_temp,
+            defrost=defrost,
+            climate=climate,
+            heating=heating,
+        )
 
     async def stop_climate(self):
         await self.api_cloud.stop_climate(vehicle=self)
@@ -98,7 +102,9 @@ class Vehicle(CallbacksMixin):
             ac_limit = 90
         if dc_limit is None:
             dc_limit = 90
-        await self.api_cloud.set_charge_limits(vehicle=self, ac_limit=ac_limit, dc_limit=dc_limit)
+        await self.api_cloud.set_charge_limits(
+            vehicle=self, ac_limit=ac_limit, dc_limit=dc_limit
+        )
 
     def __repr__(self):
         return {
@@ -107,9 +113,7 @@ class Vehicle(CallbacksMixin):
             "key": self.key,
             "model": self.model,
             "name": self.name,
-
             "last_updated": self.last_updated,
-
             "odometer_value": self.odometer_value,
             "odometer_unit": self.odometer_unit,
             "battery_level": self.battery_level,
@@ -138,7 +142,7 @@ class Vehicle(CallbacksMixin):
             "ev_remaining_range_unit": self.ev_remaining_range_unit,
             "ev_max_dc_charge_level": self.ev_max_dc_charge_level,
             "ev_max_ac_charge_level": self.ev_max_ac_charge_level,
-            "tire_all_on": self.tire_all_on
+            "tire_all_on": self.tire_all_on,
         }
 
     def __str__(self):

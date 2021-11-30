@@ -24,64 +24,76 @@ from .const import (
 _LOGGER = logging.getLogger(__name__)
 
 
-async def async_setup_entry(hass: HomeAssistant, _config_entry: ConfigType, async_add_entities):
+async def async_setup_entry(
+    hass: HomeAssistant, _config_entry: ConfigType, async_add_entities
+):
     vehicle: Vehicle = hass.data[DOMAIN][DATA_VEHICLE_INSTANCE]
 
-    instruments = [(
-        "EV Battery",
-        "ev_battery_level",
-        PERCENTAGE,
-        "mdi:car-electric",
-        DEVICE_CLASS_BATTERY,
-    ), (
-        "Range by EV",
-        "ev_remaining_range_value",
-        LENGTH_MILES,
-        "mdi:road-variant",
-        None,
-    ), (
-        "Estimated Current Charge Duration",
-        "ev_charge_remaining_time",
-        TIME_MINUTES,
-        "mdi:ev-station",
-        None,
-    ), (
-        "Target Capacity of Charge AC",
-        "ev_max_ac_charge_level",
-        PERCENTAGE,
-        "mdi:car-electric",
-        None,
-    ), (
-        "Target Capacity of Charge DC",
-        "ev_max_dc_charge_level",
-        PERCENTAGE,
-        "mdi:car-electric",
-        None,
-    ), (
-        "Odometer",
-        "odometer_value",
-        LENGTH_MILES,
-        "mdi:speedometer",
-        None,
-    ), (
-        "Car Battery",
-        "battery_level",
-        PERCENTAGE,
-        "mdi:car-battery",
-        DEVICE_CLASS_BATTERY,
-    ), (
-        "Set Temperature",
-        "climate_temperature_value",
-        TEMP_FAHRENHEIT,
-        None,
-        DEVICE_CLASS_TEMPERATURE,
-    ), (
-        "Last Update",
-        "last_updated",
-        None,
-        "mdi:update",
-        DEVICE_CLASS_TIMESTAMP,
-    )]
+    instruments = [
+        (
+            "EV Battery",
+            "ev_battery_level",
+            PERCENTAGE,
+            "mdi:car-electric",
+            DEVICE_CLASS_BATTERY,
+        ),
+        (
+            "Range by EV",
+            "ev_remaining_range_value",
+            LENGTH_MILES,
+            "mdi:road-variant",
+            None,
+        ),
+        (
+            "Estimated Current Charge Duration",
+            "ev_charge_remaining_time",
+            TIME_MINUTES,
+            "mdi:ev-station",
+            None,
+        ),
+        (
+            "Target Capacity of Charge AC",
+            "ev_max_ac_charge_level",
+            PERCENTAGE,
+            "mdi:car-electric",
+            None,
+        ),
+        (
+            "Target Capacity of Charge DC",
+            "ev_max_dc_charge_level",
+            PERCENTAGE,
+            "mdi:car-electric",
+            None,
+        ),
+        (
+            "Odometer",
+            "odometer_value",
+            LENGTH_MILES,
+            "mdi:speedometer",
+            None,
+        ),
+        (
+            "Car Battery",
+            "battery_level",
+            PERCENTAGE,
+            "mdi:car-battery",
+            DEVICE_CLASS_BATTERY,
+        ),
+        (
+            "Set Temperature",
+            "climate_temperature_value",
+            TEMP_FAHRENHEIT,
+            None,
+            DEVICE_CLASS_TEMPERATURE,
+        ),
+        (
+            "Last Update",
+            "last_updated",
+            None,
+            "mdi:update",
+            DEVICE_CLASS_TIMESTAMP,
+        ),
+    ]
 
     sensors = []
 
