@@ -73,7 +73,7 @@ class Vehicle(CallbacksMixin):
 
     async def start_climate(self, set_temp, defrost, climate, heating):
         if set_temp is None:
-            set_temp = 21
+            set_temp = 76
         if defrost is None:
             defrost = False
         if climate is None:
