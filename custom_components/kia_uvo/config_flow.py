@@ -96,7 +96,9 @@ class KiaUvoConfigFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
             password = user_input[CONF_PASSWORD]
 
             try:
-                await ApiCloud(username=username, password=password).login()
+                api_cloud = ApiCloud(username=username, password=password)
+                await api_cloud.login()
+                await api_cloud.cleanup()
                 return self.async_create_entry(
                     title=username,
                     data={

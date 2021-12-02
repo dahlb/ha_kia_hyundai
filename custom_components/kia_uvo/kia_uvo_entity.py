@@ -1,21 +1,13 @@
 from homeassistant.helpers.entity import Entity
+from homeassistant.helpers.update_coordinator import (
+    CoordinatorEntity,
+)
 
 from .const import DOMAIN
 from .vehicle import Vehicle
 
 
-class KiaUvoEntity(Entity):
-    _attr_should_poll = False
-
-    def __init__(self, vehicle: Vehicle):
-        self._vehicle = vehicle
-
-    async def async_added_to_hass(self) -> None:
-        self._vehicle.register_callback(self.async_write_ha_state)
-
-    async def async_will_remove_from_hass(self) -> None:
-        self._vehicle.remove_callback(self.async_write_ha_state)
-
+class DeviceInfoMixin:
     @property
     def device_info(self):
         return {
@@ -26,6 +18,10 @@ class KiaUvoEntity(Entity):
             "via_device": (DOMAIN, self._vehicle.identifier),
         }
 
-    @property
-    def available(self) -> bool:
-        return self._vehicle.battery_level is not None
+
+class KiaUvoEntity(CoordinatorEntity[Vehicle], DeviceInfoMixin, Entity):
+    _attr_should_poll = False
+
+    def __init__(self, vehicle: Vehicle):
+        super().__init__(vehicle.coordinator)
+        self._vehicle = vehicle

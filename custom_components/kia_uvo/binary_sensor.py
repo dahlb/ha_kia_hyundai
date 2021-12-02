@@ -1,6 +1,7 @@
 import logging
 
 from homeassistant.core import callback, HomeAssistant
+from homeassistant.helpers.entity import Entity
 from homeassistant.helpers.typing import ConfigType
 from homeassistant.components.binary_sensor import (
     DEVICE_CLASS_BATTERY_CHARGING,
@@ -13,10 +14,11 @@ from homeassistant.components.binary_sensor import (
 )
 
 from .vehicle import Vehicle
-from .kia_uvo_entity import KiaUvoEntity
+from .kia_uvo_entity import KiaUvoEntity, DeviceInfoMixin
 from .const import DOMAIN, DATA_VEHICLE_INSTANCE
 
 _LOGGER = logging.getLogger(__name__)
+PARALLEL_UPDATES: int = 1
 
 
 async def async_setup_entry(
@@ -183,16 +185,17 @@ class InstrumentSensor(KiaUvoEntity):
 
     @property
     def is_on(self) -> bool:
-        value = False
-        if hasattr(self._vehicle, self._key):
-            value = getattr(self._vehicle, self._key)
-        return value
+        return getattr(self._vehicle, self._key)
 
     @property
     def state(self):
         if self._attr_device_class == DEVICE_CLASS_LOCK:
             return "off" if self.is_on else "on"
         return "on" if self.is_on else "off"
+
+    @property
+    def available(self) -> bool:
+        return super() and getattr(self._vehicle, self._key) is not None
 
 
 class VehicleEntity(KiaUvoEntity):
@@ -217,9 +220,11 @@ class VehicleEntity(KiaUvoEntity):
         }
 
 
-class APIActionInProgress(KiaUvoEntity):
+class APIActionInProgress(DeviceInfoMixin, Entity):
+    _attr_should_poll = False
+
     def __init__(self, vehicle: Vehicle):
-        super().__init__(vehicle)
+        self._vehicle = vehicle
         self._attr_unique_id = f"{DOMAIN}-API-action-in-progress"
         self._attr_device_class = DEVICE_CLASS_CONNECTIVITY
         self._attr_available = False
