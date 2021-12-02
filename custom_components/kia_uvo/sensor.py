@@ -18,11 +18,10 @@ from .const import (
     DOMAIN,
     USA_TEMP_RANGE,
     DATA_VEHICLE_INSTANCE,
-    NOT_APPLICABLE,
-    PARALLEL_UPDATES,
 )
 
 _LOGGER = logging.getLogger(__name__)
+PARALLEL_UPDATES: int = 1
 
 
 async def async_setup_entry(

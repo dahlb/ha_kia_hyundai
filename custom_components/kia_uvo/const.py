@@ -23,7 +23,6 @@ TIME_ZONE_EUROPE = tz.gettz("America/New_york")
 ACTION_LOCK_TIMEOUT_IN_SECONDS = 5 * 60
 
 # Integration Setting Constants
-PARALLEL_UPDATES: int = 1
 CONFIG_FLOW_VERSION: int = 1
 PLATFORMS = ["binary_sensor", "sensor", "lock"]
 
@@ -42,7 +41,6 @@ RECHECK_STATUS_DELAY_AFTER_COMMAND: int = 10
 ACTION_LOCK_TIMEOUT_IN_SECONDS: int = 5 * 60
 
 # Sensor Specific Constants
-NOT_APPLICABLE: str = "Not Applicable"
 DATE_FORMAT: str = "%Y-%m-%d %H:%M:%S.%f"
 
 USA_TEMP_RANGE = range(62, 82)

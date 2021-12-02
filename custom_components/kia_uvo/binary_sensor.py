@@ -14,10 +14,11 @@ from homeassistant.components.binary_sensor import (
 )
 
 from .vehicle import Vehicle
-from .kia_uvo_entity import KiaUvoEntity
-from .const import DOMAIN, DATA_VEHICLE_INSTANCE, PARALLEL_UPDATES
+from .kia_uvo_entity import KiaUvoEntity, DeviceInfoMixin
+from .const import DOMAIN, DATA_VEHICLE_INSTANCE
 
 _LOGGER = logging.getLogger(__name__)
+PARALLEL_UPDATES: int = 1
 
 
 async def async_setup_entry(
@@ -219,7 +220,7 @@ class VehicleEntity(KiaUvoEntity):
         }
 
 
-class APIActionInProgress(Entity):
+class APIActionInProgress(DeviceInfoMixin, Entity):
     _attr_should_poll = False
 
     def __init__(self, vehicle: Vehicle):
@@ -230,16 +231,6 @@ class APIActionInProgress(Entity):
         self._attr_name = None
 
         self._is_on = False
-
-    @property
-    def device_info(self):
-        return {
-            "identifiers": {(DOMAIN, self._vehicle.identifier)},
-            "name": self._vehicle.name,
-            "manufacturer": "Kia",
-            "model": self._vehicle.model,
-            "via_device": (DOMAIN, self._vehicle.identifier),
-        }
 
     async def async_added_to_hass(self) -> None:
         self._vehicle.api_cloud.register_callback(self.async_write_ha_state)

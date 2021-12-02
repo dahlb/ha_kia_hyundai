@@ -7,13 +7,7 @@ from .const import DOMAIN
 from .vehicle import Vehicle
 
 
-class KiaUvoEntity(CoordinatorEntity[Vehicle], Entity):
-    _attr_should_poll = False
-
-    def __init__(self, vehicle: Vehicle):
-        super().__init__(vehicle.coordinator)
-        self._vehicle = vehicle
-
+class DeviceInfoMixin:
     @property
     def device_info(self):
         return {
@@ -23,3 +17,11 @@ class KiaUvoEntity(CoordinatorEntity[Vehicle], Entity):
             "model": self._vehicle.model,
             "via_device": (DOMAIN, self._vehicle.identifier),
         }
+
+
+class KiaUvoEntity(CoordinatorEntity[Vehicle], DeviceInfoMixin, Entity):
+    _attr_should_poll = False
+
+    def __init__(self, vehicle: Vehicle):
+        super().__init__(vehicle.coordinator)
+        self._vehicle = vehicle
