@@ -19,6 +19,7 @@ from .const import (
     USA_TEMP_RANGE,
     DATA_VEHICLE_INSTANCE,
     NOT_APPLICABLE,
+    PARALLEL_UPDATES,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -148,8 +149,15 @@ class InstrumentSensor(KiaUvoEntity):
             if value == "0xHIGH":
                 return USA_TEMP_RANGE[-1]
         if value is None:
+            _LOGGER.debug(f"missing value for {self._key}; success?:{self.coordinator.last_update_success}")
             value = NOT_APPLICABLE
         else:
             if isinstance(value, float):
                 value = round(value, 1)
         return value
+
+    @property
+    def available(self) -> bool:
+        """Return if entity is available."""
+        return super() and getattr(self._vehicle, self._key) is not None
+

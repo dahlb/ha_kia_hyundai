@@ -1,13 +1,15 @@
 import logging
 from datetime import datetime
 
-from .callbacks import CallbacksMixin
+from homeassistant.util import dt as dt_util
+from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
+
 from .const import VEHICLE_LOCK_ACTION
 
 _LOGGER = logging.getLogger(__name__)
 
 
-class Vehicle(CallbacksMixin):
+class Vehicle:
     identifier: str
     vin: str = None
     key: str = None
@@ -49,9 +51,29 @@ class Vehicle(CallbacksMixin):
         self.identifier = identifier
         self.last_updated: datetime = datetime.min
 
+        async def async_update_data():
+            await self._refresh()
+
+        self.coordinator: DataUpdateCoordinator = DataUpdateCoordinator(
+            api_cloud.hass,
+            _LOGGER,
+            name=f"Vehicle {identifier}",
+            update_method=async_update_data,
+            update_interval=api_cloud.update_internal,
+        )
+
     async def refresh(self):
+        await self.coordinator.async_refresh()
+        _LOGGER.debug(f"Vehicle:{self.__repr__()}")
+        return self
+
+    async def _refresh(self):
         old_vehicle_status: dict = self.__repr__()
+        local_timezone = dt_util.UTC
+        event_time_local = dt_util.utcnow().astimezone(local_timezone)
         await self.api_cloud.refresh(vehicle=self)
+
+        call_force_update = False
         if (
             not self.engine_on
             and old_vehicle_status["engine_on"] is not None
@@ -62,11 +84,25 @@ class Vehicle(CallbacksMixin):
             _LOGGER.debug(
                 f"zero battery api error, force_update started to correct data"
             )
-            await self.request_sync()
-        self.publish_updates()
+            call_force_update = True
+        elif (
+            self.api_cloud.no_force_scan_hour_start
+            > event_time_local.hour
+            >= self.api_cloud.no_force_scan_hour_finish
+        ):
+            if (
+                datetime.now(local_timezone) - self.last_updated
+                > self.api_cloud.force_scan_interval
+            ):
+                call_force_update = True
+
+        if call_force_update:
+            await self.api_cloud.request_sync(vehicle=self)
+            await self.api_cloud.refresh(vehicle=self)
 
     async def request_sync(self):
         await self.api_cloud.request_sync(vehicle=self)
+        await self.refresh()
 
     async def lock_action(self, action: VEHICLE_LOCK_ACTION):
         await self.api_cloud.lock(vehicle=self, action=action)

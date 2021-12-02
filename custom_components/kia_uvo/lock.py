@@ -10,6 +10,7 @@ from .const import (
     DOMAIN,
     DATA_VEHICLE_INSTANCE,
     VEHICLE_LOCK_ACTION,
+    PARALLEL_UPDATES,
 )
 
 _LOGGER = logging.getLogger(__name__)

@@ -2,7 +2,7 @@ import logging
 
 import voluptuous as vol
 import asyncio
-from datetime import datetime, timedelta
+from datetime import timedelta
 
 from homeassistant.core import HomeAssistant
 from homeassistant.config_entries import ConfigEntry
@@ -12,8 +12,6 @@ from homeassistant.const import (
     CONF_USERNAME,
 )
 import homeassistant.helpers.config_validation as cv
-from homeassistant.helpers.event import async_track_time_interval
-from homeassistant.util import dt as dt_util
 from .const import (
     DOMAIN,
     PLATFORMS,
@@ -121,7 +119,12 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry):
     )
 
     hass_vehicle: Vehicle = await ApiCloud(
-        username=username, password=password
+        username=username, password=password,
+        hass=hass,
+        update_interval=scan_interval,
+        force_scan_interval=force_scan_interval,
+        no_force_scan_hour_start=no_force_scan_hour_start,
+        no_force_scan_hour_finish=no_force_scan_hour_finish
     ).get_vehicle()
 
     data = {
@@ -130,37 +133,13 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry):
         DATA_CONFIG_UPDATE_LISTENER: None,
     }
 
-    async def update(event_time_utc: datetime):
-        local_timezone = dt_util.UTC
-        event_time_local = event_time_utc.astimezone(local_timezone)
-        await hass_vehicle.refresh()
-        call_force_update = False
-
-        if (
-            no_force_scan_hour_start
-            > event_time_local.hour
-            >= no_force_scan_hour_finish
-        ):
-            if (
-                datetime.now(local_timezone) - hass_vehicle.last_updated
-                > force_scan_interval
-            ):
-                call_force_update = True
-
-        if call_force_update:
-            try:
-                await hass_vehicle.request_sync()
-            except Exception as ex:
-                _LOGGER.error(f"{DOMAIN} - Exception in force update : %s", str(ex))
-
-    await update(dt_util.utcnow())
+    hass_vehicle.coordinator.async_config_entry_first_refresh()
 
     for platform in PLATFORMS:
         hass.async_create_task(
             hass.config_entries.async_forward_entry_setup(config_entry, platform)
         )
 
-    data[DATA_VEHICLE_LISTENER] = async_track_time_interval(hass, update, scan_interval)
     data[DATA_CONFIG_UPDATE_LISTENER] = config_entry.add_update_listener(
         async_update_options
     )
@@ -186,9 +165,6 @@ async def async_unload_entry(hass: HomeAssistant, config_entry: ConfigEntry):
         hass_vehicle = hass.data[DOMAIN][DATA_VEHICLE_INSTANCE]
         if hass_vehicle is not None:
             await hass_vehicle.cleanup()
-
-        vehicle_topic_listener = hass.data[DOMAIN][DATA_VEHICLE_LISTENER]
-        vehicle_topic_listener()
 
         config_update_listener = hass.data[DOMAIN][DATA_CONFIG_UPDATE_LISTENER]
         config_update_listener()

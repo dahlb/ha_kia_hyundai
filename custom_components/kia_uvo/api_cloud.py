@@ -1,6 +1,8 @@
 import logging
 
+from datetime import timedelta
 from homeassistant.util import dt as dt_util
+from homeassistant.core import HomeAssistant
 import asyncio
 
 from .util import convert_last_updated_str_to_datetime
@@ -47,7 +49,17 @@ class ApiCloud(CallbacksMixin):
         self,
         username: str,
         password: str,
+        hass: HomeAssistant = None,
+        update_interval: timedelta = None,
+        force_scan_interval: timedelta = None,
+        no_force_scan_hour_start: int = None,
+        no_force_scan_hour_finish: int = None,
     ):
+        self.hass = hass
+        self.update_internal: timedelta = update_interval
+        self.force_scan_interval = force_scan_interval
+        self.no_force_scan_hour_start = no_force_scan_hour_start
+        self.no_force_scan_hour_finish = no_force_scan_hour_finish
         self.username: str = username
         self.password: str = password
 
@@ -152,7 +164,6 @@ class ApiCloud(CallbacksMixin):
     async def request_sync(self, vehicle: Vehicle):
         session_id = await self.get_session_id()
         await self.api.request_vehicle_data_sync(session_id, vehicle.key)
-        await vehicle.refresh()
 
     @request_with_active_session
     async def lock(self, vehicle: Vehicle, action: VEHICLE_LOCK_ACTION):
