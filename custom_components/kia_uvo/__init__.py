@@ -119,12 +119,13 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry):
     )
 
     hass_vehicle: Vehicle = await ApiCloud(
-        username=username, password=password,
+        username=username,
+        password=password,
         hass=hass,
         update_interval=scan_interval,
         force_scan_interval=force_scan_interval,
         no_force_scan_hour_start=no_force_scan_hour_start,
-        no_force_scan_hour_finish=no_force_scan_hour_finish
+        no_force_scan_hour_finish=no_force_scan_hour_finish,
     ).get_vehicle()
 
     data = {

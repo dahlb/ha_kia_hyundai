@@ -149,7 +149,9 @@ class InstrumentSensor(KiaUvoEntity):
             if value == "0xHIGH":
                 return USA_TEMP_RANGE[-1]
         if value is None:
-            _LOGGER.debug(f"missing value for {self._key}; success?:{self.coordinator.last_update_success}")
+            _LOGGER.debug(
+                f"missing value for {self._key}; success?:{self.coordinator.last_update_success}"
+            )
             value = NOT_APPLICABLE
         else:
             if isinstance(value, float):
@@ -160,4 +162,3 @@ class InstrumentSensor(KiaUvoEntity):
     def available(self) -> bool:
         """Return if entity is available."""
         return super() and getattr(self._vehicle, self._key) is not None
-
