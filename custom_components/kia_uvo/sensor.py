@@ -137,25 +137,13 @@ class InstrumentSensor(KiaUvoEntity):
         if self._key == "last_updated":
             return dt_util.as_local(self._vehicle.last_updated).isoformat()
 
-        value = None
-        if hasattr(self._vehicle, self._key):
-            value = getattr(self._vehicle, self._key)
-        else:
-            _LOGGER.debug(f"missing key:#{self._key}")
+        value = getattr(self._vehicle, self._key)
 
         if self._attr_unit_of_measurement == TEMP_FAHRENHEIT:
             if value == "0xLOW":
                 return USA_TEMP_RANGE[0]
             if value == "0xHIGH":
                 return USA_TEMP_RANGE[-1]
-        if value is None:
-            _LOGGER.debug(
-                f"missing value for {self._key}; success?:{self.coordinator.last_update_success}"
-            )
-            value = NOT_APPLICABLE
-        else:
-            if isinstance(value, float):
-                value = round(value, 1)
         return value
 
     @property
