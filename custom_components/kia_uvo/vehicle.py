@@ -75,14 +75,18 @@ class Vehicle:
             interval = False
         else:
             age_of_last_refresh = datetime.now(local_timezone) - self.last_refreshed
-            _LOGGER.debug(f"age_of_last_refresh:{age_of_last_refresh}; last refreshed:{self.last_refreshed}; now:{event_time_local}") # 5 hours ahead of local
+            _LOGGER.debug(
+                f"age_of_last_refresh:{age_of_last_refresh}; last refreshed:{self.last_refreshed}; now:{event_time_local}"
+            )  # 5 hours ahead of local
         force_scan_internal = self.api_cloud.force_scan_interval
         if not interval or age_of_last_refresh > self.api_cloud.update_interval:
             await self.coordinator.async_refresh()
         else:
             _LOGGER.debug(f"refresh happened within update_interval, skipping refresh")
         age_of_last_sync = datetime.now(local_timezone) - self.last_updated
-        _LOGGER.debug(f"age_of_last_sync:{age_of_last_sync}; last updated:{self.last_updated}; now:{event_time_local}")
+        _LOGGER.debug(
+            f"age_of_last_sync:{age_of_last_sync}; last updated:{self.last_updated}; now:{event_time_local}"
+        )
 
         if self.climate_hvac_on is not None and self.climate_hvac_on:
             _LOGGER.debug(f"HVAC on, changing staleness max age to 5 minutes")
@@ -95,7 +99,9 @@ class Vehicle:
             and self.ev_battery_level == 0
             and old_vehicle_status["ev_battery_level"] != 0
         ):
-            _LOGGER.debug(f"zero battery api error, force_update started to correct data")
+            _LOGGER.debug(
+                f"zero battery api error, force_update started to correct data"
+            )
             call_force_update = True
         elif (
             self.ev_max_dc_charge_level is not None
@@ -104,7 +110,9 @@ class Vehicle:
             self.ev_max_ac_charge_level is not None
             and self.ev_max_ac_charge_level > 100
         ):
-            _LOGGER.debug(f"max charge levels api error, force_update started to correct data")
+            _LOGGER.debug(
+                f"max charge levels api error, force_update started to correct data"
+            )
             call_force_update = True
         elif (
             self.api_cloud.no_force_scan_hour_start

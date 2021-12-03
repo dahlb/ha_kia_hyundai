@@ -148,7 +148,9 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry):
         _LOGGER.debug(f"Interval Firing")
         await hass_vehicle.refresh(interval=True)
 
-    data[DATA_VEHICLE_LISTENER] = async_track_time_interval(hass, update, timedelta(minutes=1))
+    data[DATA_VEHICLE_LISTENER] = async_track_time_interval(
+        hass, update, timedelta(minutes=1)
+    )
     data[DATA_CONFIG_UPDATE_LISTENER] = config_entry.add_update_listener(
         async_update_options
     )
