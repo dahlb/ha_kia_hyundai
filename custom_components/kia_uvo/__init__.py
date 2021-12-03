@@ -175,7 +175,7 @@ async def async_unload_entry(hass: HomeAssistant, config_entry: ConfigEntry):
     if unload_ok:
         hass_vehicle = hass.data[DOMAIN][DATA_VEHICLE_INSTANCE]
         if hass_vehicle is not None:
-            await hass_vehicle.cleanup()
+            await hass_vehicle.api_cloud.cleanup()
 
         vehicle_topic_listener = hass.data[DOMAIN][DATA_VEHICLE_LISTENER]
         vehicle_topic_listener()

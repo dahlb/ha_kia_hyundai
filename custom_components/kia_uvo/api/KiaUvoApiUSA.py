@@ -26,8 +26,9 @@ def request_with_logging(func):
         else:
             _LOGGER.debug(f"sending {url} request")
         response = await func(*args, **kwargs)
+        _LOGGER.debug(f"response headers:{response.headers}")
         response_text = await response.text()
-        _LOGGER.debug(f"got response {response_text}")
+        _LOGGER.debug(f"response text:{response_text}")
         response_json = await response.json()
         if response_json["status"]["statusCode"] == 0:
             return response

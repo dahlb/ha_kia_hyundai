@@ -17,6 +17,7 @@ class Vehicle:
 
     last_updated: datetime = None
     last_refreshed: datetime = None
+    last_sync_requested: datetime = None
 
     odometer_value: float = None
     odometer_unit: int = None
@@ -119,18 +120,25 @@ class Vehicle:
             > event_time_local.hour
             >= self.api_cloud.no_force_scan_hour_finish
         ):
-            _LOGGER.debug(f"data stale, requesting a sync based on scan interval")
             if age_of_last_sync > force_scan_internal:
+                _LOGGER.debug(f"data stale, requesting a sync based on scan interval")
                 call_force_update = True
 
         if call_force_update:
             _LOGGER.debug(f"requesting data sync and refresh")
             await self.api_cloud.request_sync(vehicle=self)
             await self.coordinator.async_refresh()
+        else:
+            _LOGGER.debug(f"no request for data sync deemed needed")
 
     async def request_sync(self):
+        local_timezone = dt_util.UTC
+        event_time_local = dt_util.utcnow().astimezone(local_timezone)
+        self.last_sync_requested = event_time_local
+        previous_syn_datetime = self.last_refreshed
         await self.api_cloud.request_sync(vehicle=self)
-        await self.refresh()
+        if previous_syn_datetime == self.last_refreshed:
+            raise RuntimeError("sync requested but not completed!")
 
     async def lock_action(self, action: VEHICLE_LOCK_ACTION):
         await self.api_cloud.lock(vehicle=self, action=action)

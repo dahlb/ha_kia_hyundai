@@ -165,6 +165,7 @@ class ApiCloud(CallbacksMixin):
     async def request_sync(self, vehicle: Vehicle):
         session_id = await self.get_session_id()
         await self.api.request_vehicle_data_sync(session_id, vehicle.key)
+        await vehicle.refresh()
 
     @request_with_active_session
     async def lock(self, vehicle: Vehicle, action: VEHICLE_LOCK_ACTION):
