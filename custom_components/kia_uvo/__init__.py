@@ -2,10 +2,11 @@ import logging
 
 import voluptuous as vol
 import asyncio
-from datetime import timedelta
+from datetime import datetime, timedelta
 
 from homeassistant.core import HomeAssistant
 from homeassistant.config_entries import ConfigEntry
+from homeassistant.helpers.event import async_track_time_interval
 from homeassistant.helpers.typing import ConfigType
 from homeassistant.const import (
     CONF_PASSWORD,
@@ -134,13 +135,20 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry):
         DATA_CONFIG_UPDATE_LISTENER: None,
     }
 
-    hass_vehicle.coordinator.async_config_entry_first_refresh()
+    _LOGGER.debug("first refresh start")
+    await hass_vehicle.coordinator.async_config_entry_first_refresh()
+    _LOGGER.debug("first refresh finished")
 
     for platform in PLATFORMS:
         hass.async_create_task(
             hass.config_entries.async_forward_entry_setup(config_entry, platform)
         )
 
+    async def update(_event_time_utc: datetime):
+        _LOGGER.debug(f"Interval Firing")
+        await hass_vehicle.refresh(interval=True)
+
+    data[DATA_VEHICLE_LISTENER] = async_track_time_interval(hass, update, timedelta(minutes=1))
     data[DATA_CONFIG_UPDATE_LISTENER] = config_entry.add_update_listener(
         async_update_options
     )
@@ -166,6 +174,9 @@ async def async_unload_entry(hass: HomeAssistant, config_entry: ConfigEntry):
         hass_vehicle = hass.data[DOMAIN][DATA_VEHICLE_INSTANCE]
         if hass_vehicle is not None:
             await hass_vehicle.cleanup()
+
+        vehicle_topic_listener = hass.data[DOMAIN][DATA_VEHICLE_LISTENER]
+        vehicle_topic_listener()
 
         config_update_listener = hass.data[DOMAIN][DATA_CONFIG_UPDATE_LISTENER]
         config_update_listener()

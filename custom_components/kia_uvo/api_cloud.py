@@ -49,14 +49,14 @@ class ApiCloud(CallbacksMixin):
         self,
         username: str,
         password: str,
-        hass: HomeAssistant = None,
+        hass: HomeAssistant,
         update_interval: timedelta = None,
         force_scan_interval: timedelta = None,
         no_force_scan_hour_start: int = None,
         no_force_scan_hour_finish: int = None,
     ):
         self.hass = hass
-        self.update_internal: timedelta = update_interval
+        self.update_interval: timedelta = update_interval
         self.force_scan_interval = force_scan_interval
         self.no_force_scan_hour_start = no_force_scan_hour_start
         self.no_force_scan_hour_finish = no_force_scan_hour_finish
@@ -159,6 +159,7 @@ class ApiCloud(CallbacksMixin):
         vehicle.ev_max_dc_charge_level = ev_status["targetSOC"][0]["targetSOClevel"]
         vehicle.ev_max_ac_charge_level = ev_status["targetSOC"][1]["targetSOClevel"]
         vehicle.tire_all_on = bool(vehicle_status["tirePressure"]["all"])
+        return vehicle
 
     @request_with_active_session
     async def request_sync(self, vehicle: Vehicle):

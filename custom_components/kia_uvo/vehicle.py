@@ -1,6 +1,5 @@
 import logging
 from datetime import datetime
-
 from homeassistant.util import dt as dt_util
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
@@ -15,6 +14,9 @@ class Vehicle:
     key: str = None
     model: str = None
     name: str = None
+
+    last_updated: datetime = None
+    last_refreshed: datetime = None
 
     odometer_value: float = None
     odometer_unit: int = None
@@ -49,30 +51,42 @@ class Vehicle:
     def __init__(self, api_cloud, identifier: str):
         self.api_cloud = api_cloud
         self.identifier = identifier
-        self.last_updated: datetime = datetime.min
 
         async def async_update_data():
-            await self._refresh()
+            await self.api_cloud.refresh(vehicle=self)
+            local_timezone = dt_util.UTC
+            event_time_local = dt_util.utcnow().astimezone(local_timezone)
+            self.last_refreshed = event_time_local
 
         self.coordinator: DataUpdateCoordinator = DataUpdateCoordinator(
             api_cloud.hass,
             _LOGGER,
             name=f"Vehicle {identifier}",
             update_method=async_update_data,
-            update_interval=api_cloud.update_internal,
         )
 
-    async def refresh(self):
-        await self.coordinator.async_refresh()
+    async def refresh(self, interval: bool = False):
         _LOGGER.debug(f"Vehicle:{self.__repr__()}")
-        return self
-
-    async def _refresh(self):
         old_vehicle_status: dict = self.__repr__()
         local_timezone = dt_util.UTC
         event_time_local = dt_util.utcnow().astimezone(local_timezone)
-        await self.api_cloud.refresh(vehicle=self)
+        if self.last_updated is None:
+            _LOGGER.debug(f"last updated is None!")
+            interval = False
+        else:
+            age_of_last_refresh = datetime.now(local_timezone) - self.last_refreshed
+            _LOGGER.debug(f"age_of_last_refresh:{age_of_last_refresh}; last refreshed:{self.last_refreshed}; now:{event_time_local}") # 5 hours ahead of local
+        force_scan_internal = self.api_cloud.force_scan_interval
+        if not interval or age_of_last_refresh > self.api_cloud.update_interval:
+            await self.coordinator.async_refresh()
+        else:
+            _LOGGER.debug(f"refresh happened within update_interval, skipping refresh")
+        age_of_last_sync = datetime.now(local_timezone) - self.last_updated
+        _LOGGER.debug(f"age_of_last_sync:{age_of_last_sync}; last updated:{self.last_updated}; now:{event_time_local}")
 
+        if self.climate_hvac_on is not None and self.climate_hvac_on:
+            _LOGGER.debug(f"HVAC on, changing staleness max age to 5 minutes")
+            force_scan_internal = 5
         call_force_update = False
         if (
             not self.engine_on
@@ -81,24 +95,30 @@ class Vehicle:
             and self.ev_battery_level == 0
             and old_vehicle_status["ev_battery_level"] != 0
         ):
-            _LOGGER.debug(
-                f"zero battery api error, force_update started to correct data"
-            )
+            _LOGGER.debug(f"zero battery api error, force_update started to correct data")
+            call_force_update = True
+        elif (
+            self.ev_max_dc_charge_level is not None
+            and self.ev_max_dc_charge_level > 100
+        ) or (
+            self.ev_max_ac_charge_level is not None
+            and self.ev_max_ac_charge_level > 100
+        ):
+            _LOGGER.debug(f"max charge levels api error, force_update started to correct data")
             call_force_update = True
         elif (
             self.api_cloud.no_force_scan_hour_start
             > event_time_local.hour
             >= self.api_cloud.no_force_scan_hour_finish
         ):
-            if (
-                datetime.now(local_timezone) - self.last_updated
-                > self.api_cloud.force_scan_interval
-            ):
+            _LOGGER.debug(f"data stale, requesting a sync based on scan interval")
+            if age_of_last_sync > force_scan_internal:
                 call_force_update = True
 
         if call_force_update:
+            _LOGGER.debug(f"requesting data sync and refresh")
             await self.api_cloud.request_sync(vehicle=self)
-            await self.api_cloud.refresh(vehicle=self)
+            await self.coordinator.async_refresh()
 
     async def request_sync(self):
         await self.api_cloud.request_sync(vehicle=self)
