@@ -146,7 +146,9 @@ class InstrumentSensor(KiaUvoEntity):
         if self._key == "sync_age":
             local_timezone = dt_util.UTC
             age_of_last_sync = datetime.now(local_timezone) - self._vehicle.last_updated
-            _LOGGER.debug(f"Sync Age, {datetime.now(local_timezone)} - {self._vehicle.last_updated} = {age_of_last_sync}")
+            _LOGGER.debug(
+                f"Sync Age, {datetime.now(local_timezone)} - {self._vehicle.last_updated} = {age_of_last_sync}"
+            )
             return int(age_of_last_sync.total_seconds() / 60)
 
         value = getattr(self._vehicle, self._key)
