@@ -8,6 +8,7 @@ from homeassistant.const import (
     LENGTH_MILES,
     TIME_MINUTES,
     TEMP_FAHRENHEIT,
+    DEVICE_CLASS_DATE,
 )
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.typing import ConfigType
@@ -99,7 +100,7 @@ async def async_setup_entry(
             "sync_age",
             TIME_MINUTES,
             "mdi:update",
-            DEVICE_CLASS_TIMESTAMP,
+            DEVICE_CLASS_DATE,
         ),
     ]
 
