@@ -16,7 +16,7 @@ class Vehicle:
     name: str = None
 
     last_updated: datetime = None
-    last_refreshed: datetime = None
+    last_refreshed: datetime = None # in local time zone
     last_sync_requested: datetime = None
 
     odometer_value: float = None

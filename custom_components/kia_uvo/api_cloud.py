@@ -14,6 +14,7 @@ from .const import (
     INITIAL_STATUS_DELAY_AFTER_COMMAND,
     RECHECK_STATUS_DELAY_AFTER_COMMAND,
     VEHICLE_LOCK_ACTION,
+    USA_TEMP_RANGE,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -134,6 +135,11 @@ class ApiCloud(CallbacksMixin):
         vehicle.climate_hvac_on = bool(climate_data["airCtrl"])
         vehicle.climate_defrost_on = bool(climate_data["defrost"])
         vehicle.climate_temperature_value = int(climate_data["airTemp"]["value"])
+        if vehicle.climate_temperature_value == "0xLOW":
+            vehicle.climate_temperature_value = USA_TEMP_RANGE[0]
+        elif vehicle.climate_temperature_value == "0xHIGH":
+            vehicle.climate_temperature_value = USA_TEMP_RANGE[-1]
+
         vehicle.climate_temperature_unit = climate_data["airTemp"]["unit"]
         vehicle.climate_heated_steering_wheel_on = bool(
             climate_data["heatingAccessory"]["steeringWheel"]

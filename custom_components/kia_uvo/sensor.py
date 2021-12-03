@@ -12,11 +12,12 @@ from homeassistant.const import (
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.typing import ConfigType
 import homeassistant.util.dt as dt_util
+from datetime import datetime
+
 from .vehicle import Vehicle
 from .kia_uvo_entity import KiaUvoEntity
 from .const import (
     DOMAIN,
-    USA_TEMP_RANGE,
     DATA_VEHICLE_INSTANCE,
 )
 
@@ -93,6 +94,13 @@ async def async_setup_entry(
             "mdi:update",
             DEVICE_CLASS_TIMESTAMP,
         ),
+        (
+            "Sync Age",
+            "sync_age",
+            TIME_MINUTES,
+            "mdi:update",
+            DEVICE_CLASS_TIMESTAMP,
+        ),
     ]
 
     sensors = []
@@ -135,17 +143,19 @@ class InstrumentSensor(KiaUvoEntity):
     def state(self):
         if self._key == "last_updated":
             return dt_util.as_local(self._vehicle.last_updated).isoformat()
+        if self._key == "sync_age":
+            local_timezone = dt_util.UTC
+            age_of_last_sync = datetime.now(local_timezone) - self._vehicle.last_updated
+            _LOGGER.debug(f"Sync Age, {datetime.now(local_timezone)} - {self._vehicle.last_updated} = {age_of_last_sync}")
+            return int(age_of_last_sync.total_seconds() / 60)
 
         value = getattr(self._vehicle, self._key)
-
-        if self._attr_unit_of_measurement == TEMP_FAHRENHEIT:
-            if value == "0xLOW":
-                return USA_TEMP_RANGE[0]
-            if value == "0xHIGH":
-                return USA_TEMP_RANGE[-1]
         return value
 
     @property
     def available(self) -> bool:
         """Return if entity is available."""
-        return super() and getattr(self._vehicle, self._key) is not None
+        key_to_check = self._key
+        if self._key == "sync_age":
+            key_to_check = "last_updated"
+        return super() and getattr(self._vehicle, key_to_check) is not None
