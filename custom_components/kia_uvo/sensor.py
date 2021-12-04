@@ -89,8 +89,8 @@ async def async_setup_entry(
             DEVICE_CLASS_TEMPERATURE,
         ),
         (
-            "Last Update",
-            "last_updated",
+            "Last Synced To Cloud",
+            "last_synced_to_cloud",
             None,
             "mdi:update",
             DEVICE_CLASS_TIMESTAMP,
@@ -142,14 +142,11 @@ class InstrumentSensor(KiaUvoEntity):
 
     @property
     def state(self):
-        if self._key == "last_updated":
-            return dt_util.as_local(self._vehicle.last_updated).isoformat()
+        if self._key == "last_synced_to_cloud":
+            return dt_util.as_local(self._vehicle.last_synced_to_cloud).isoformat()
         if self._key == "sync_age":
             local_timezone = dt_util.UTC
-            age_of_last_sync = datetime.now(local_timezone) - self._vehicle.last_updated
-            _LOGGER.debug(
-                f"Sync Age, {datetime.now(local_timezone)} - {self._vehicle.last_updated} = {age_of_last_sync}"
-            )
+            age_of_last_sync = datetime.now(local_timezone) - self._vehicle.last_synced_to_cloud
             return int(age_of_last_sync.total_seconds() / 60)
 
         value = getattr(self._vehicle, self._key)
@@ -160,5 +157,5 @@ class InstrumentSensor(KiaUvoEntity):
         """Return if entity is available."""
         key_to_check = self._key
         if self._key == "sync_age":
-            key_to_check = "last_updated"
+            key_to_check = "last_synced_to_cloud"
         return super() and getattr(self._vehicle, key_to_check) is not None

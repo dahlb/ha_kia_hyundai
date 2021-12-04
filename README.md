@@ -21,10 +21,11 @@ You can install this either manually copying files or using HACS. Configuration 
 - Locking and Unlocking
 - Engine Status
 - Odometer, EV Range
-- Latest Sync Time
+- Last Updated from Cloud: Timestamp this integration last attempted to retrieve data from the cloud
+- Sync Age: Minutes since car synced to cloud during last update
 
 ## Supported services ##
-- refresh: get latest **cached** vehicle data
+- update: get latest **cached** vehicle data
 - request_sync: this will make a call to your vehicle to get its latest data, do not overuse this!
 - start_climate / stop_climate: Control the HVAC car services
 - start_charge / stop_charge: You can control your charging using these services

@@ -100,7 +100,7 @@ class ApiCloud(CallbacksMixin):
         return vehicles
 
     @request_with_active_session
-    async def refresh(self, vehicle: Vehicle):
+    async def update(self, vehicle: Vehicle):
         session_id = await self.get_session_id()
         api_vehicle_status = await self.api.get_cached_vehicle_status(
             session_id, vehicle.key
@@ -111,7 +111,7 @@ class ApiCloud(CallbacksMixin):
         climate_data = vehicle_status["climate"]
         ev_status = vehicle_status["evStatus"]
         ev_status["targetSOC"].sort(key=lambda x: x["plugType"])
-        vehicle.last_updated = convert_last_updated_str_to_datetime(
+        vehicle.last_synced_to_cloud = convert_last_updated_str_to_datetime(
             last_updated_str=vehicle_status["syncDate"]["utc"],
             timezone_of_str=dt_util.UTC,
         )
@@ -171,7 +171,7 @@ class ApiCloud(CallbacksMixin):
     async def request_sync(self, vehicle: Vehicle):
         session_id = await self.get_session_id()
         await self.api.request_vehicle_data_sync(session_id, vehicle.key)
-        await vehicle.refresh()
+        await vehicle.update()
 
     @request_with_active_session
     async def lock(self, vehicle: Vehicle, action: VEHICLE_LOCK_ACTION):
@@ -259,7 +259,7 @@ class ApiCloud(CallbacksMixin):
         finally:
             self._current_action.complete()
             self.publish_updates()
-        await vehicle.refresh()
+        await vehicle.update()
 
     def action_in_progress(self):
         return not (

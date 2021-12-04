@@ -55,9 +55,9 @@ async def async_setup(hass: HomeAssistant, config_entry: ConfigType) -> bool:
         hass_vehicle: Vehicle = hass.data[DOMAIN][DATA_VEHICLE_INSTANCE]
         await hass.async_create_task(hass_vehicle.request_sync())
 
-    async def async_handle_refresh(call):
+    async def async_handle_update(call):
         hass_vehicle: Vehicle = hass.data[DOMAIN][DATA_VEHICLE_INSTANCE]
-        await hass.async_create_task(hass_vehicle.refresh())
+        await hass.async_create_task(hass_vehicle.update())
 
     async def async_handle_start_climate(call):
         set_temp = call.data.get("Temperature")
@@ -88,7 +88,7 @@ async def async_setup(hass: HomeAssistant, config_entry: ConfigType) -> bool:
         await hass.async_create_task(hass_vehicle.set_charge_limits(ac_limit, dc_limit))
 
     hass.services.async_register(DOMAIN, "request_sync", async_handle_request_sync)
-    hass.services.async_register(DOMAIN, "refresh", async_handle_refresh)
+    hass.services.async_register(DOMAIN, "update", async_handle_update)
     hass.services.async_register(DOMAIN, "start_climate", async_handle_start_climate)
     hass.services.async_register(DOMAIN, "stop_climate", async_handle_stop_climate)
     hass.services.async_register(DOMAIN, "start_charge", async_handle_start_charge)
@@ -135,9 +135,9 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry):
         DATA_CONFIG_UPDATE_LISTENER: None,
     }
 
-    _LOGGER.debug("first refresh start")
+    _LOGGER.debug("first update start")
     await hass_vehicle.coordinator.async_config_entry_first_refresh()
-    _LOGGER.debug("first refresh finished")
+    _LOGGER.debug("first update finished")
 
     for platform in PLATFORMS:
         hass.async_create_task(
@@ -146,7 +146,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry):
 
     async def update(_event_time_utc: datetime):
         _LOGGER.debug(f"Interval Firing")
-        await hass_vehicle.refresh(interval=True)
+        await hass_vehicle.update(interval=True)
 
     data[DATA_VEHICLE_LISTENER] = async_track_time_interval(
         hass, update, timedelta(minutes=1)

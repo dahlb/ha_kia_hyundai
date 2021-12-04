@@ -15,8 +15,9 @@ class Vehicle:
     model: str = None
     name: str = None
 
-    last_updated: datetime = None
-    last_refreshed: datetime = None  # in local time zone
+    # in API based time zone ...
+    last_synced_to_cloud: datetime = None
+    last_updated_from_cloud: datetime = None
     last_sync_requested: datetime = None
 
     odometer_value: float = None
@@ -54,10 +55,10 @@ class Vehicle:
         self.identifier = identifier
 
         async def async_update_data():
-            await self.api_cloud.refresh(vehicle=self)
+            await self.api_cloud.update(vehicle=self)
             local_timezone = dt_util.UTC
             event_time_local = dt_util.utcnow().astimezone(local_timezone)
-            self.last_refreshed = event_time_local
+            self.last_updated_from_cloud = event_time_local
 
         self.coordinator: DataUpdateCoordinator = DataUpdateCoordinator(
             api_cloud.hass,
@@ -66,32 +67,33 @@ class Vehicle:
             update_method=async_update_data,
         )
 
-    async def refresh(self, interval: bool = False):
+    async def update(self, interval: bool = False):
         _LOGGER.debug(f"Vehicle:{self.__repr__()}")
         old_vehicle_status: dict = self.__repr__()
-        local_timezone = dt_util.UTC
-        event_time_local = dt_util.utcnow().astimezone(local_timezone)
-        if self.last_updated is None:
-            _LOGGER.debug(f"last updated is None!")
+        api_timezone = dt_util.UTC
+        event_time_api = dt_util.utcnow().astimezone(api_timezone)
+        event_time_local = dt_util.as_local(dt_util.utcnow())
+        if self.last_updated_from_cloud is None:
+            _LOGGER.debug(f"last updated from cloud is None!")
             interval = False
         else:
-            age_of_last_refresh = datetime.now(local_timezone) - self.last_refreshed
+            age_of_last_update_from_cloud = datetime.now(api_timezone) - self.last_updated_from_cloud
             _LOGGER.debug(
-                f"age_of_last_refresh:{age_of_last_refresh}; last refreshed:{self.last_refreshed}; now:{event_time_local}"
-            )  # 5 hours ahead of local
-        force_scan_internal = self.api_cloud.force_scan_interval
-        if not interval or age_of_last_refresh > self.api_cloud.update_interval:
+                f"age_of_last_update_from_cloud:{age_of_last_update_from_cloud}; last updated from cloud:{self.last_updated_from_cloud}; now:{event_time_api}"
+            )
+        if not interval or age_of_last_update_from_cloud > self.api_cloud.update_interval:
             await self.coordinator.async_refresh()
         else:
-            _LOGGER.debug(f"refresh happened within update_interval, skipping refresh")
-        age_of_last_sync = datetime.now(local_timezone) - self.last_updated
+            _LOGGER.debug(f"update happened within update_interval, skipping interval update")
+        age_of_last_sync = datetime.now(api_timezone) - self.last_synced_to_cloud
         _LOGGER.debug(
-            f"age_of_last_sync:{age_of_last_sync}; last updated:{self.last_updated}; now:{event_time_local}"
+            f"age_of_last_sync:{age_of_last_sync}; last synced:{self.last_synced_to_cloud}; now:{event_time_api}"
         )
 
+        force_scan_interval = self.api_cloud.force_scan_interval
         if self.climate_hvac_on is not None and self.climate_hvac_on:
             _LOGGER.debug(f"HVAC on, changing staleness max age to 5 minutes")
-            force_scan_internal = 5
+            force_scan_interval = 5
         call_force_update = False
         if (
             not self.engine_on
@@ -120,24 +122,28 @@ class Vehicle:
             > event_time_local.hour
             >= self.api_cloud.no_force_scan_hour_finish
         ):
-            if age_of_last_sync > force_scan_internal:
+            if age_of_last_sync > force_scan_interval:
                 _LOGGER.debug(f"data stale, requesting a sync based on scan interval")
                 call_force_update = True
+            else:
+                _LOGGER.debug(f"last sync within force scan interval: age_of_last_sync:{age_of_last_sync}, force_scan_interval: {force_scan_interval}")
+        else:
+            _LOGGER.debug(f"skipping sync request because of no scan settings, setting start:{self.api_cloud.no_force_scan_hour_start}, finish:{self.api_cloud.no_force_scan_hour_finish}; now:{event_time_local.hour}")
 
         if call_force_update:
-            _LOGGER.debug(f"requesting data sync and refresh")
+            _LOGGER.debug(f"requesting data sync and update")
             await self.api_cloud.request_sync(vehicle=self)
-            await self.coordinator.async_refresh()
+            await self.update()
         else:
             _LOGGER.debug(f"no request for data sync deemed needed")
 
     async def request_sync(self):
-        local_timezone = dt_util.UTC
-        event_time_local = dt_util.utcnow().astimezone(local_timezone)
-        self.last_sync_requested = event_time_local
-        previous_syn_datetime = self.last_refreshed
+        api_timezone = dt_util.UTC
+        event_time_api = dt_util.utcnow().astimezone(api_timezone)
+        self.last_sync_requested = event_time_api
+        previous_last_synced_to_cloud = self.last_synced_to_cloud
         await self.api_cloud.request_sync(vehicle=self)
-        if previous_syn_datetime == self.last_refreshed:
+        if previous_last_synced_to_cloud == self.last_synced_to_cloud:
             raise RuntimeError("sync requested but not completed!")
 
     async def lock_action(self, action: VEHICLE_LOCK_ACTION):
@@ -185,7 +191,7 @@ class Vehicle:
             "key": self.key,
             "model": self.model,
             "name": self.name,
-            "last_updated": self.last_updated,
+            "last_updated": self.last_synced_to_cloud,
             "odometer_value": self.odometer_value,
             "odometer_unit": self.odometer_unit,
             "battery_level": self.battery_level,
