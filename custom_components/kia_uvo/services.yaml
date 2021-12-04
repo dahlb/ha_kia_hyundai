@@ -1,7 +1,7 @@
 request_sync:
   description: Request your vehicle to sync its data to cloud
-refresh:
-  description: Refresh vehicle data from cloud cache
+update:
+  description: Update vehicle data from cloud cache
 start_climate:
   description: Start car climate. Not all items available for all cars.  Refer to Kia app for which are supported for your car.
   fields:

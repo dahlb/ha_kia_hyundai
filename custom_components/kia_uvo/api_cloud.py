@@ -14,6 +14,7 @@ from .const import (
     INITIAL_STATUS_DELAY_AFTER_COMMAND,
     RECHECK_STATUS_DELAY_AFTER_COMMAND,
     VEHICLE_LOCK_ACTION,
+    USA_TEMP_RANGE,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -49,14 +50,14 @@ class ApiCloud(CallbacksMixin):
         self,
         username: str,
         password: str,
-        hass: HomeAssistant = None,
+        hass: HomeAssistant,
         update_interval: timedelta = None,
         force_scan_interval: timedelta = None,
         no_force_scan_hour_start: int = None,
         no_force_scan_hour_finish: int = None,
     ):
         self.hass = hass
-        self.update_internal: timedelta = update_interval
+        self.update_interval: timedelta = update_interval
         self.force_scan_interval = force_scan_interval
         self.no_force_scan_hour_start = no_force_scan_hour_start
         self.no_force_scan_hour_finish = no_force_scan_hour_finish
@@ -99,7 +100,7 @@ class ApiCloud(CallbacksMixin):
         return vehicles
 
     @request_with_active_session
-    async def refresh(self, vehicle: Vehicle):
+    async def update(self, vehicle: Vehicle):
         session_id = await self.get_session_id()
         api_vehicle_status = await self.api.get_cached_vehicle_status(
             session_id, vehicle.key
@@ -110,7 +111,7 @@ class ApiCloud(CallbacksMixin):
         climate_data = vehicle_status["climate"]
         ev_status = vehicle_status["evStatus"]
         ev_status["targetSOC"].sort(key=lambda x: x["plugType"])
-        vehicle.last_updated = convert_last_updated_str_to_datetime(
+        vehicle.last_synced_to_cloud = convert_last_updated_str_to_datetime(
             last_updated_str=vehicle_status["syncDate"]["utc"],
             timezone_of_str=dt_util.UTC,
         )
@@ -134,6 +135,11 @@ class ApiCloud(CallbacksMixin):
         vehicle.climate_hvac_on = bool(climate_data["airCtrl"])
         vehicle.climate_defrost_on = bool(climate_data["defrost"])
         vehicle.climate_temperature_value = int(climate_data["airTemp"]["value"])
+        if vehicle.climate_temperature_value == "0xLOW":
+            vehicle.climate_temperature_value = USA_TEMP_RANGE[0]
+        elif vehicle.climate_temperature_value == "0xHIGH":
+            vehicle.climate_temperature_value = USA_TEMP_RANGE[-1]
+
         vehicle.climate_temperature_unit = climate_data["airTemp"]["unit"]
         vehicle.climate_heated_steering_wheel_on = bool(
             climate_data["heatingAccessory"]["steeringWheel"]
@@ -159,11 +165,13 @@ class ApiCloud(CallbacksMixin):
         vehicle.ev_max_dc_charge_level = ev_status["targetSOC"][0]["targetSOClevel"]
         vehicle.ev_max_ac_charge_level = ev_status["targetSOC"][1]["targetSOClevel"]
         vehicle.tire_all_on = bool(vehicle_status["tirePressure"]["all"])
+        return vehicle
 
     @request_with_active_session
     async def request_sync(self, vehicle: Vehicle):
         session_id = await self.get_session_id()
         await self.api.request_vehicle_data_sync(session_id, vehicle.key)
+        await vehicle.update()
 
     @request_with_active_session
     async def lock(self, vehicle: Vehicle, action: VEHICLE_LOCK_ACTION):
@@ -251,7 +259,7 @@ class ApiCloud(CallbacksMixin):
         finally:
             self._current_action.complete()
             self.publish_updates()
-        await vehicle.refresh()
+        await vehicle.update()
 
     def action_in_progress(self):
         return not (

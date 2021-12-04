@@ -1,3 +1,4 @@
+import logging
 from homeassistant.helpers.entity import Entity
 from homeassistant.helpers.update_coordinator import (
     CoordinatorEntity,
@@ -5,6 +6,8 @@ from homeassistant.helpers.update_coordinator import (
 
 from .const import DOMAIN
 from .vehicle import Vehicle
+
+_LOGGER = logging.getLogger(__name__)
 
 
 class DeviceInfoMixin:
@@ -20,8 +23,12 @@ class DeviceInfoMixin:
 
 
 class KiaUvoEntity(CoordinatorEntity[Vehicle], DeviceInfoMixin, Entity):
-    _attr_should_poll = False
-
     def __init__(self, vehicle: Vehicle):
         super().__init__(vehicle.coordinator)
         self._vehicle = vehicle
+
+    async def async_update(self) -> None:
+        """
+        disable generic update method ...
+        """
+        pass

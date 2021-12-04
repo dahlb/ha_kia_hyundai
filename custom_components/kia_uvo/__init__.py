@@ -2,10 +2,11 @@ import logging
 
 import voluptuous as vol
 import asyncio
-from datetime import timedelta
+from datetime import datetime, timedelta
 
 from homeassistant.core import HomeAssistant
 from homeassistant.config_entries import ConfigEntry
+from homeassistant.helpers.event import async_track_time_interval
 from homeassistant.helpers.typing import ConfigType
 from homeassistant.const import (
     CONF_PASSWORD,
@@ -54,9 +55,9 @@ async def async_setup(hass: HomeAssistant, config_entry: ConfigType) -> bool:
         hass_vehicle: Vehicle = hass.data[DOMAIN][DATA_VEHICLE_INSTANCE]
         await hass.async_create_task(hass_vehicle.request_sync())
 
-    async def async_handle_refresh(call):
+    async def async_handle_update(call):
         hass_vehicle: Vehicle = hass.data[DOMAIN][DATA_VEHICLE_INSTANCE]
-        await hass.async_create_task(hass_vehicle.refresh())
+        await hass.async_create_task(hass_vehicle.update())
 
     async def async_handle_start_climate(call):
         set_temp = call.data.get("Temperature")
@@ -87,7 +88,7 @@ async def async_setup(hass: HomeAssistant, config_entry: ConfigType) -> bool:
         await hass.async_create_task(hass_vehicle.set_charge_limits(ac_limit, dc_limit))
 
     hass.services.async_register(DOMAIN, "request_sync", async_handle_request_sync)
-    hass.services.async_register(DOMAIN, "refresh", async_handle_refresh)
+    hass.services.async_register(DOMAIN, "update", async_handle_update)
     hass.services.async_register(DOMAIN, "start_climate", async_handle_start_climate)
     hass.services.async_register(DOMAIN, "stop_climate", async_handle_stop_climate)
     hass.services.async_register(DOMAIN, "start_charge", async_handle_start_charge)
@@ -134,13 +135,22 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry):
         DATA_CONFIG_UPDATE_LISTENER: None,
     }
 
-    hass_vehicle.coordinator.async_config_entry_first_refresh()
+    _LOGGER.debug("first update start")
+    await hass_vehicle.coordinator.async_config_entry_first_refresh()
+    _LOGGER.debug("first update finished")
 
     for platform in PLATFORMS:
         hass.async_create_task(
             hass.config_entries.async_forward_entry_setup(config_entry, platform)
         )
 
+    async def update(_event_time_utc: datetime):
+        _LOGGER.debug(f"Interval Firing")
+        await hass_vehicle.update(interval=True)
+
+    data[DATA_VEHICLE_LISTENER] = async_track_time_interval(
+        hass, update, timedelta(minutes=1)
+    )
     data[DATA_CONFIG_UPDATE_LISTENER] = config_entry.add_update_listener(
         async_update_options
     )
@@ -165,7 +175,10 @@ async def async_unload_entry(hass: HomeAssistant, config_entry: ConfigEntry):
     if unload_ok:
         hass_vehicle = hass.data[DOMAIN][DATA_VEHICLE_INSTANCE]
         if hass_vehicle is not None:
-            await hass_vehicle.cleanup()
+            await hass_vehicle.api_cloud.cleanup()
+
+        vehicle_topic_listener = hass.data[DOMAIN][DATA_VEHICLE_LISTENER]
+        vehicle_topic_listener()
 
         config_update_listener = hass.data[DOMAIN][DATA_CONFIG_UPDATE_LISTENER]
         config_update_listener()

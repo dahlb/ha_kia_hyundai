@@ -8,15 +8,17 @@ from homeassistant.const import (
     LENGTH_MILES,
     TIME_MINUTES,
     TEMP_FAHRENHEIT,
+    DEVICE_CLASS_DATE,
 )
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.typing import ConfigType
 import homeassistant.util.dt as dt_util
+from datetime import datetime
+
 from .vehicle import Vehicle
 from .kia_uvo_entity import KiaUvoEntity
 from .const import (
     DOMAIN,
-    USA_TEMP_RANGE,
     DATA_VEHICLE_INSTANCE,
 )
 
@@ -87,11 +89,18 @@ async def async_setup_entry(
             DEVICE_CLASS_TEMPERATURE,
         ),
         (
-            "Last Update",
-            "last_updated",
+            "Last Synced To Cloud",
+            "last_synced_to_cloud",
             None,
             "mdi:update",
             DEVICE_CLASS_TIMESTAMP,
+        ),
+        (
+            "Sync Age",
+            "sync_age",
+            TIME_MINUTES,
+            "mdi:update",
+            DEVICE_CLASS_DATE,
         ),
     ]
 
@@ -133,19 +142,22 @@ class InstrumentSensor(KiaUvoEntity):
 
     @property
     def state(self):
-        if self._key == "last_updated":
-            return dt_util.as_local(self._vehicle.last_updated).isoformat()
+        if self._key == "last_synced_to_cloud":
+            return dt_util.as_local(self._vehicle.last_synced_to_cloud).isoformat()
+        if self._key == "sync_age":
+            local_timezone = dt_util.UTC
+            age_of_last_sync = (
+                datetime.now(local_timezone) - self._vehicle.last_synced_to_cloud
+            )
+            return int(age_of_last_sync.total_seconds() / 60)
 
         value = getattr(self._vehicle, self._key)
-
-        if self._attr_unit_of_measurement == TEMP_FAHRENHEIT:
-            if value == "0xLOW":
-                return USA_TEMP_RANGE[0]
-            if value == "0xHIGH":
-                return USA_TEMP_RANGE[-1]
         return value
 
     @property
     def available(self) -> bool:
         """Return if entity is available."""
-        return super() and getattr(self._vehicle, self._key) is not None
+        key_to_check = self._key
+        if self._key == "sync_age":
+            key_to_check = "last_synced_to_cloud"
+        return super() and getattr(self._vehicle, key_to_check) is not None

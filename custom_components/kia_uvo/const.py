@@ -1,9 +1,4 @@
-import logging
-
-from dateutil import tz
 from enum import Enum
-
-from homeassistant.const import LENGTH_KILOMETERS, LENGTH_MILES
 
 # Configuration Constants
 DOMAIN: str = "kia_uvo"
@@ -19,7 +14,6 @@ DEFAULT_SCAN_INTERVAL: int = 30
 DEFAULT_FORCE_SCAN_INTERVAL: int = 240
 DEFAULT_NO_FORCE_SCAN_HOUR_START: int = 18
 DEFAULT_NO_FORCE_SCAN_HOUR_FINISH: int = 6
-TIME_ZONE_EUROPE = tz.gettz("America/New_york")
 ACTION_LOCK_TIMEOUT_IN_SECONDS = 5 * 60
 
 # Integration Setting Constants
