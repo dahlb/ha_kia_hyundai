@@ -77,14 +77,21 @@ class Vehicle:
             _LOGGER.debug(f"last updated from cloud is None!")
             interval = False
         else:
-            age_of_last_update_from_cloud = datetime.now(api_timezone) - self.last_updated_from_cloud
+            age_of_last_update_from_cloud = (
+                datetime.now(api_timezone) - self.last_updated_from_cloud
+            )
             _LOGGER.debug(
                 f"age_of_last_update_from_cloud:{age_of_last_update_from_cloud}; last updated from cloud:{self.last_updated_from_cloud}; now:{event_time_api}"
             )
-        if not interval or age_of_last_update_from_cloud > self.api_cloud.update_interval:
+        if (
+            not interval
+            or age_of_last_update_from_cloud > self.api_cloud.update_interval
+        ):
             await self.coordinator.async_refresh()
         else:
-            _LOGGER.debug(f"update happened within update_interval, skipping interval update")
+            _LOGGER.debug(
+                f"update happened within update_interval, skipping interval update"
+            )
         age_of_last_sync = datetime.now(api_timezone) - self.last_synced_to_cloud
         _LOGGER.debug(
             f"age_of_last_sync:{age_of_last_sync}; last synced:{self.last_synced_to_cloud}; now:{event_time_api}"
@@ -126,9 +133,13 @@ class Vehicle:
                 _LOGGER.debug(f"data stale, requesting a sync based on scan interval")
                 call_force_update = True
             else:
-                _LOGGER.debug(f"last sync within force scan interval: age_of_last_sync:{age_of_last_sync}, force_scan_interval: {force_scan_interval}")
+                _LOGGER.debug(
+                    f"last sync within force scan interval: age_of_last_sync:{age_of_last_sync}, force_scan_interval: {force_scan_interval}"
+                )
         else:
-            _LOGGER.debug(f"skipping sync request because of no scan settings, setting start:{self.api_cloud.no_force_scan_hour_start}, finish:{self.api_cloud.no_force_scan_hour_finish}; now:{event_time_local.hour}")
+            _LOGGER.debug(
+                f"skipping sync request because of no scan settings, setting start:{self.api_cloud.no_force_scan_hour_start}, finish:{self.api_cloud.no_force_scan_hour_finish}; now:{event_time_local.hour}"
+            )
 
         if call_force_update:
             _LOGGER.debug(f"requesting data sync and update")
