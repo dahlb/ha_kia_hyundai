@@ -5,13 +5,15 @@ import asyncio
 from datetime import datetime, timedelta
 
 from homeassistant.core import HomeAssistant
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.helpers.event import async_track_time_interval
-from homeassistant.helpers.typing import ConfigType
 from homeassistant.const import (
+    ATTR_DEVICE_ID,
     CONF_PASSWORD,
     CONF_USERNAME,
 )
+from homeassistant.config_entries import ConfigEntry
+from homeassistant.helpers.event import async_track_time_interval
+from homeassistant.helpers.typing import ConfigType
+from homeassistant.helpers import device_registry as dr
 import homeassistant.helpers.config_validation as cv
 from .const import (
     DOMAIN,
@@ -24,7 +26,7 @@ from .const import (
     CONF_NO_FORCE_SCAN_HOUR_FINISH,
     CONF_NO_FORCE_SCAN_HOUR_START,
     CONF_SCAN_INTERVAL,
-    CONF_STORED_CREDENTIALS,
+    CONF_VEHICLE_IDENTIFIER,
     DEFAULT_NO_FORCE_SCAN_HOUR_FINISH,
     DEFAULT_NO_FORCE_SCAN_HOUR_START,
     DEFAULT_FORCE_SCAN_INTERVAL,
@@ -48,15 +50,30 @@ CONFIG_SCHEMA = vol.Schema(
 
 
 async def async_setup(hass: HomeAssistant, config_entry: ConfigType) -> bool:
-    if DOMAIN not in hass.data:
-        hass.data[DOMAIN] = {}
+    hass.data.setdefault(DOMAIN, {})
+
+    def convert_call_to_vehicle(call) -> Vehicle:
+        vehicle_identifiers = list(hass.data[DOMAIN].keys())
+        if len(vehicle_identifiers) == 1:
+            vehicle_identifier = vehicle_identifiers[0]
+        else:
+            vehicle_identifier = convert_device_id_to_vehicle_identifier(
+                call.data[ATTR_DEVICE_ID]
+            )
+
+        return hass.data[DOMAIN][vehicle_identifier][DATA_VEHICLE_INSTANCE]
+
+    def convert_device_id_to_vehicle_identifier(device_id: str) -> str:
+        device_registry = dr.async_get(hass)
+        device_entry: dr.DeviceEntry = device_registry.async_get(device_id)
+        return list(device_entry.identifiers.copy().pop())[1]
 
     async def async_handle_request_sync(call):
-        hass_vehicle: Vehicle = hass.data[DOMAIN][DATA_VEHICLE_INSTANCE]
+        hass_vehicle: Vehicle = convert_call_to_vehicle(call)
         await hass.async_create_task(hass_vehicle.request_sync())
 
     async def async_handle_update(call):
-        hass_vehicle: Vehicle = hass.data[DOMAIN][DATA_VEHICLE_INSTANCE]
+        hass_vehicle: Vehicle = convert_call_to_vehicle(call)
         await hass.async_create_task(hass_vehicle.update())
 
     async def async_handle_start_climate(call):
@@ -64,27 +81,27 @@ async def async_setup(hass: HomeAssistant, config_entry: ConfigType) -> bool:
         defrost = call.data.get("Defrost")
         climate = call.data.get("Climate")
         heating = call.data.get("Heating")
-        hass_vehicle: Vehicle = hass.data[DOMAIN][DATA_VEHICLE_INSTANCE]
+        hass_vehicle: Vehicle = convert_call_to_vehicle(call)
         await hass.async_create_task(
             hass_vehicle.start_climate(set_temp, defrost, climate, heating)
         )
 
     async def async_handle_stop_climate(call):
-        hass_vehicle: Vehicle = hass.data[DOMAIN][DATA_VEHICLE_INSTANCE]
+        hass_vehicle: Vehicle = convert_call_to_vehicle(call)
         await hass.async_create_task(hass_vehicle.stop_climate())
 
     async def async_handle_start_charge(call):
-        hass_vehicle: Vehicle = hass.data[DOMAIN][DATA_VEHICLE_INSTANCE]
+        hass_vehicle: Vehicle = convert_call_to_vehicle(call)
         await hass.async_create_task(hass_vehicle.start_charge())
 
     async def async_handle_stop_charge(call):
-        hass_vehicle: Vehicle = hass.data[DOMAIN][DATA_VEHICLE_INSTANCE]
+        hass_vehicle: Vehicle = convert_call_to_vehicle(call)
         await hass.async_create_task(hass_vehicle.stop_charge())
 
     async def async_handle_set_charge_limits(call):
         ac_limit = call.data.get("ac_limit")
         dc_limit = call.data.get("dc_limit")
-        hass_vehicle: Vehicle = hass.data[DOMAIN][DATA_VEHICLE_INSTANCE]
+        hass_vehicle: Vehicle = convert_call_to_vehicle(call)
         await hass.async_create_task(hass_vehicle.set_charge_limits(ac_limit, dc_limit))
 
     hass.services.async_register(DOMAIN, "request_sync", async_handle_request_sync)
@@ -101,8 +118,9 @@ async def async_setup(hass: HomeAssistant, config_entry: ConfigType) -> bool:
 
 
 async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry):
-    username = config_entry.data.get(CONF_USERNAME)
-    password = config_entry.data.get(CONF_PASSWORD)
+    vehicle_identifier = config_entry.data[CONF_VEHICLE_IDENTIFIER]
+    username = config_entry.data[CONF_USERNAME]
+    password = config_entry.data[CONF_PASSWORD]
 
     no_force_scan_hour_start = config_entry.options.get(
         CONF_NO_FORCE_SCAN_HOUR_START, DEFAULT_NO_FORCE_SCAN_HOUR_START
@@ -127,7 +145,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry):
         force_scan_interval=force_scan_interval,
         no_force_scan_hour_start=no_force_scan_hour_start,
         no_force_scan_hour_finish=no_force_scan_hour_finish,
-    ).get_vehicle()
+    ).get_vehicle(identifier=vehicle_identifier)
 
     data = {
         DATA_VEHICLE_INSTANCE: hass_vehicle,
@@ -154,7 +172,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry):
     data[DATA_CONFIG_UPDATE_LISTENER] = config_entry.add_update_listener(
         async_update_options
     )
-    hass.data[DOMAIN] = data
+    hass.data[DOMAIN][vehicle_identifier] = data
 
     return True
 
@@ -173,16 +191,19 @@ async def async_unload_entry(hass: HomeAssistant, config_entry: ConfigEntry):
         )
     )
     if unload_ok:
-        hass_vehicle = hass.data[DOMAIN][DATA_VEHICLE_INSTANCE]
+        vehicle_identifier = config_entry.data[CONF_VEHICLE_IDENTIFIER]
+        hass_vehicle = hass.data[DOMAIN][vehicle_identifier][DATA_VEHICLE_INSTANCE]
         if hass_vehicle is not None:
             await hass_vehicle.api_cloud.cleanup()
 
-        vehicle_topic_listener = hass.data[DOMAIN][DATA_VEHICLE_LISTENER]
-        vehicle_topic_listener()
+        vehicle_listener = hass.data[DOMAIN][vehicle_identifier][DATA_VEHICLE_LISTENER]
+        vehicle_listener()
 
-        config_update_listener = hass.data[DOMAIN][DATA_CONFIG_UPDATE_LISTENER]
+        config_update_listener = hass.data[DOMAIN][vehicle_identifier][
+            DATA_CONFIG_UPDATE_LISTENER
+        ]
         config_update_listener()
 
-        hass.data[DOMAIN] = None
+        hass.data[DOMAIN][vehicle_identifier] = None
 
     return unload_ok

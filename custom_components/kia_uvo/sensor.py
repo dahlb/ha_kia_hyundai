@@ -18,8 +18,9 @@ from datetime import datetime
 from .vehicle import Vehicle
 from .kia_uvo_entity import KiaUvoEntity
 from .const import (
-    DOMAIN,
+    CONF_VEHICLE_IDENTIFIER,
     DATA_VEHICLE_INSTANCE,
+    DOMAIN,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -27,9 +28,10 @@ PARALLEL_UPDATES: int = 1
 
 
 async def async_setup_entry(
-    hass: HomeAssistant, _config_entry: ConfigType, async_add_entities
+    hass: HomeAssistant, config_entry: ConfigType, async_add_entities
 ):
-    vehicle: Vehicle = hass.data[DOMAIN][DATA_VEHICLE_INSTANCE]
+    vehicle_identifier = config_entry.data[CONF_VEHICLE_IDENTIFIER]
+    vehicle: Vehicle = hass.data[DOMAIN][vehicle_identifier][DATA_VEHICLE_INSTANCE]
 
     instruments = [
         (

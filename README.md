@@ -8,7 +8,8 @@ You can install this either manually copying files or using HACS. Configuration 
 - It will only fetch values for the first car, I am sure there are people outside using Kia Uvo with multiple cars, please create an issue, so I can gauge interest.
 - refresh - It will fetch the cached information every 30 minutes from Kia Uvo Servers. **Now Configurable**
 - request sync - It will ask your car for the latest data every 4 hours. **Now Configurable**
-- It will not force update between 10PM to 6AM. I am trying to be cautious here. **Now Configurable**
+- It will not force update between 6PM to 6AM. I am trying to be cautious here. **Now Configurable**
+- To setup two vehicles add the integration through HA UI twice.
 
 ## Supported entities ##
 - Air Conditioner Status, Defroster Status, Set Temperature

@@ -15,7 +15,7 @@ from homeassistant.components.binary_sensor import (
 
 from .vehicle import Vehicle
 from .kia_uvo_entity import KiaUvoEntity, DeviceInfoMixin
-from .const import DOMAIN, DATA_VEHICLE_INSTANCE
+from .const import DOMAIN, DATA_VEHICLE_INSTANCE, CONF_VEHICLE_IDENTIFIER
 
 _LOGGER = logging.getLogger(__name__)
 PARALLEL_UPDATES: int = 1
@@ -24,7 +24,9 @@ PARALLEL_UPDATES: int = 1
 async def async_setup_entry(
     hass: HomeAssistant, config_entry: ConfigType, async_add_entities
 ):
-    vehicle: Vehicle = hass.data[DOMAIN][DATA_VEHICLE_INSTANCE]
+    vehicle: Vehicle = hass.data[DOMAIN][config_entry.data[CONF_VEHICLE_IDENTIFIER]][
+        DATA_VEHICLE_INSTANCE
+    ]
 
     binary_instruments = [
         (

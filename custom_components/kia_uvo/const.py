@@ -2,11 +2,12 @@ from enum import Enum
 
 # Configuration Constants
 DOMAIN: str = "kia_uvo"
-CONF_STORED_CREDENTIALS: str = "stored_credentials"
 CONF_SCAN_INTERVAL: str = "scan_interval"
 CONF_FORCE_SCAN_INTERVAL: str = "force_scan_interval"
 CONF_NO_FORCE_SCAN_HOUR_START: str = "no_force_scan_hour_start"
 CONF_NO_FORCE_SCAN_HOUR_FINISH: str = "no_force_scan_hour_finish"
+CONF_VEHICLES: str = "vehicles"
+CONF_VEHICLE_IDENTIFIER: str = "vehicle_identifier"
 
 # I have seen that many people can survive with receiving updates in every 30 minutes. Let's see how KIA will respond
 DEFAULT_SCAN_INTERVAL: int = 30
