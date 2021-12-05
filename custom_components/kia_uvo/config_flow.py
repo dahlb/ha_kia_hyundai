@@ -2,7 +2,7 @@ import logging
 from typing import Dict, Optional, Any
 
 import voluptuous as vol
-import traceback
+from homeassistant.exceptions import ConfigEntryAuthFailed
 
 from homeassistant import config_entries
 from homeassistant.const import (
@@ -10,7 +10,6 @@ from homeassistant.const import (
     CONF_USERNAME,
 )
 from homeassistant.core import callback
-import homeassistant.helpers.config_validation as cv
 from .const import (
     CONF_SCAN_INTERVAL,
     DEFAULT_SCAN_INTERVAL,
@@ -105,15 +104,11 @@ class KiaUvoConfigFlowHandler(config_entries.ConfigFlow):
                 await api_cloud.login()
                 self.data = user_input
                 self.data[CONF_VEHICLES] = await api_cloud.get_vehicles()
-                await api_cloud.cleanup()
                 return await self.async_step_pick_vehicle()
-            except Exception as ex:
-                _LOGGER.error(
-                    f"Exception in kia_uvo login : %s - traceback: %s",
-                    ex,
-                    traceback.format_exc(),
-                )
+            except ConfigEntryAuthFailed:
                 errors["base"] = "auth"
+            finally:
+                await api_cloud.cleanup()
 
         return self.async_show_form(
             step_id="user", data_schema=vol.Schema(data_schema), errors=errors

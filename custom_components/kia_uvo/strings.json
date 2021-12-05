@@ -16,10 +16,17 @@
         "data": {
           "vehicle_str": "Vehicle"
         }
+      },
+      "reauth_confirm": {
+        "title": "[%key:common::config_flow::title::reauth%]",
+        "description": "The Kia Uvo integration needs to re-authenticate your account."
       }
     },
     "error": {
       "auth": "Login failed into Kia Uvo. Please use official Kia Uvo app to logout and log back in and try again!"
+    },
+    "abort": {
+      "reauth_successful": "[%key:common::config_flow::abort::reauth_successful%]"
     }
   },
   "options": {

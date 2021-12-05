@@ -3,6 +3,7 @@ import logging
 from datetime import timedelta
 from homeassistant.util import dt as dt_util
 from homeassistant.core import HomeAssistant
+from homeassistant.exceptions import ConfigEntryAuthFailed
 import asyncio
 
 from .util import convert_last_updated_str_to_datetime
@@ -72,7 +73,10 @@ class ApiCloud(CallbacksMixin):
         return self._session_id
 
     async def login(self):
-        self._session_id: str = await self.api.login(self.username, self.password)
+        try:
+            self._session_id: str = await self.api.login(self.username, self.password)
+        except AuthError as err:
+            raise ConfigEntryAuthFailed(err) from err
 
     async def get_vehicle(self, identifier: str) -> Vehicle:
         vehicles = await self.get_vehicles()
