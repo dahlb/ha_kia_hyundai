@@ -10,6 +10,7 @@ from .const import (
     DOMAIN,
     DATA_VEHICLE_INSTANCE,
     VEHICLE_LOCK_ACTION,
+    CONF_VEHICLE_IDENTIFIER,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -17,9 +18,10 @@ PARALLEL_UPDATES: int = 1
 
 
 async def async_setup_entry(
-    hass: HomeAssistant, _config_entry: ConfigType, async_add_entities
+    hass: HomeAssistant, config_entry: ConfigType, async_add_entities
 ):
-    vehicle: Vehicle = hass.data[DOMAIN][DATA_VEHICLE_INSTANCE]
+    vehicle_identifier = config_entry.data[CONF_VEHICLE_IDENTIFIER]
+    vehicle: Vehicle = hass.data[DOMAIN][vehicle_identifier][DATA_VEHICLE_INSTANCE]
     async_add_entities([Lock(vehicle)], True)
 
 

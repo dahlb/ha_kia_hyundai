@@ -9,6 +9,13 @@
           "username": "Username",
           "password": "Password"
         }
+      },
+      "pick_vehicle": {
+        "title": "Kia Uvo",
+        "description": "Pick which vehicle to use.",
+        "data": {
+          "vehicle_str": "Vehicle"
+        }
       }
     },
     "error": {
