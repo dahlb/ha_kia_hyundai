@@ -89,9 +89,9 @@ class KiaUvoConfigFlowHandler(config_entries.ConfigFlow):
 
     async def async_step_user(self, user_input: Optional[Dict[str, Any]] = None):
         data_schema = {
-                vol.Required(CONF_USERNAME): str,
-                vol.Required(CONF_PASSWORD): str,
-            }
+            vol.Required(CONF_USERNAME): str,
+            vol.Required(CONF_PASSWORD): str,
+        }
         errors: Dict[str, str] = {}
 
         if user_input is not None:
@@ -119,7 +119,9 @@ class KiaUvoConfigFlowHandler(config_entries.ConfigFlow):
             step_id="user", data_schema=vol.Schema(data_schema), errors=errors
         )
 
-    async def async_step_pick_vehicle(self, user_input: Optional[Dict[str, Any]] = None):
+    async def async_step_pick_vehicle(
+        self, user_input: Optional[Dict[str, Any]] = None
+    ):
         vehicle_map = {}
         for vehicle in self.data[CONF_VEHICLES]:
             vehicle_map[vehicle.identifier] = f"{vehicle.name} ({vehicle.model})"
@@ -131,7 +133,9 @@ class KiaUvoConfigFlowHandler(config_entries.ConfigFlow):
             ): vol.In(vehicle_map),
         }
         if len(self.data[CONF_VEHICLES]) == 1:
-            user_input = {CONF_VEHICLE_IDENTIFIER: self.data[CONF_VEHICLES][0].identifier}
+            user_input = {
+                CONF_VEHICLE_IDENTIFIER: self.data[CONF_VEHICLES][0].identifier
+            }
         if user_input is not None:
             await self.async_set_unique_id(user_input[CONF_VEHICLE_IDENTIFIER])
             self._abort_if_unique_id_configured()
@@ -143,7 +147,7 @@ class KiaUvoConfigFlowHandler(config_entries.ConfigFlow):
             )
         else:
             return self.async_show_form(
-                step_id="pick_vehicle", data_schema=vol.Schema(data_schema), errors=errors
+                step_id="pick_vehicle",
+                data_schema=vol.Schema(data_schema),
+                errors=errors,
             )
-
-

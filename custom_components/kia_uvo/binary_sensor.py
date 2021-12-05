@@ -24,7 +24,9 @@ PARALLEL_UPDATES: int = 1
 async def async_setup_entry(
     hass: HomeAssistant, config_entry: ConfigType, async_add_entities
 ):
-    vehicle: Vehicle = hass.data[DOMAIN][config_entry.data[CONF_VEHICLE_IDENTIFIER]][DATA_VEHICLE_INSTANCE]
+    vehicle: Vehicle = hass.data[DOMAIN][config_entry.data[CONF_VEHICLE_IDENTIFIER]][
+        DATA_VEHICLE_INSTANCE
+    ]
 
     binary_instruments = [
         (

@@ -57,7 +57,9 @@ async def async_setup(hass: HomeAssistant, config_entry: ConfigType) -> bool:
         if len(vehicle_identifiers) == 1:
             vehicle_identifier = vehicle_identifiers[0]
         else:
-            vehicle_identifier = convert_device_id_to_vehicle_identifier(call.data[ATTR_DEVICE_ID])
+            vehicle_identifier = convert_device_id_to_vehicle_identifier(
+                call.data[ATTR_DEVICE_ID]
+            )
 
         return hass.data[DOMAIN][vehicle_identifier][DATA_VEHICLE_INSTANCE]
 
@@ -197,7 +199,9 @@ async def async_unload_entry(hass: HomeAssistant, config_entry: ConfigEntry):
         vehicle_listener = hass.data[DOMAIN][vehicle_identifier][DATA_VEHICLE_LISTENER]
         vehicle_listener()
 
-        config_update_listener = hass.data[DOMAIN][vehicle_identifier][DATA_CONFIG_UPDATE_LISTENER]
+        config_update_listener = hass.data[DOMAIN][vehicle_identifier][
+            DATA_CONFIG_UPDATE_LISTENER
+        ]
         config_update_listener()
 
         hass.data[DOMAIN][vehicle_identifier] = None
