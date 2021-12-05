@@ -143,7 +143,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry):
         force_scan_interval=force_scan_interval,
         no_force_scan_hour_start=no_force_scan_hour_start,
         no_force_scan_hour_finish=no_force_scan_hour_finish,
-    ).get_vehicle()
+    ).get_vehicle(identifier=vehicle_identifier)
 
     data = {
         DATA_VEHICLE_INSTANCE: hass_vehicle,

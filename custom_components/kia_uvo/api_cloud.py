@@ -29,13 +29,8 @@ def request_with_active_session(func):
             self = args[0]
             vehicle: Vehicle = kwargs["vehicle"]
             await self.login()
-            vehicles = await self.get_vehicles()
-            for updated_vehicle in vehicles:
-                if updated_vehicle.identifier == vehicle.identifier:
-                    _LOGGER.debug(
-                        f"updating vehicle old key:{vehicle.key}; new key:{updated_vehicle.key}"
-                    )
-                    vehicle.key = updated_vehicle.key
+            updated_vehicle = await self.get_vehicle(identifier=vehicle.identifier)
+            vehicle.key = updated_vehicle.key
             json_body = kwargs.get("json_body", None)
             if json_body is not None and json_body.get("vinKey", None):
                 json_body["vinKey"] = [vehicle.key]
@@ -79,9 +74,12 @@ class ApiCloud(CallbacksMixin):
     async def login(self):
         self._session_id: str = await self.api.login(self.username, self.password)
 
-    async def get_vehicle(self) -> Vehicle:
+    async def get_vehicle(self, identifier: str) -> Vehicle:
         vehicles = await self.get_vehicles()
-        return vehicles[0]
+        for vehicle in vehicles:
+            if vehicle.identifier == identifier:
+                return vehicle
+        raise RuntimeError(f"vehicle with identifier:{identifier} missing")
 
     @request_with_active_session
     async def get_vehicles(self):
