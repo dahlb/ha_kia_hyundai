@@ -26,7 +26,8 @@
       "auth": "Login failed into Kia Uvo. Please use official Kia Uvo app to logout and log back in and try again!"
     },
     "abort": {
-      "reauth_successful": "[%key:common::config_flow::abort::reauth_successful%]"
+      "reauth_successful": "[%key:common::config_flow::abort::reauth_successful%]",
+      "already_configured": "[%key:common::config_flow::abort::already_configured_device%]"
     }
   },
   "options": {
