@@ -11,12 +11,13 @@ from homeassistant.const import (
     DEVICE_CLASS_DATE,
 )
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers.entity import Entity
 from homeassistant.helpers.typing import ConfigType
 import homeassistant.util.dt as dt_util
 from datetime import datetime
 
 from .vehicle import Vehicle
-from .kia_uvo_entity import KiaUvoEntity
+from .kia_uvo_entity import KiaUvoEntity, DeviceInfoMixin
 from .const import (
     CONF_VEHICLE_IDENTIFIER,
     DATA_VEHICLE_INSTANCE,
@@ -122,6 +123,34 @@ async def async_setup_entry(
 
     async_add_entities(sensors, True)
 
+    usage_counters = [
+        (
+            "Action Calls Today",
+            "calls_today_for_actions",
+        ),
+        (
+            "Update Calls Today",
+            "calls_today_for_update",
+        ),
+        (
+            "Sync Requests Today",
+            "calls_today_for_request_sync",
+        ),
+    ]
+
+    usage_sensors = []
+
+    for description, key in usage_counters:
+        sensors.append(
+            ApiUsageSensor(
+                vehicle,
+                description,
+                key,
+            )
+        )
+
+    async_add_entities(usage_sensors, True)
+
 
 class InstrumentSensor(KiaUvoEntity):
     def __init__(
@@ -163,3 +192,29 @@ class InstrumentSensor(KiaUvoEntity):
         if self._key == "sync_age":
             key_to_check = "last_synced_to_cloud"
         return super() and getattr(self._vehicle, key_to_check) is not None
+
+
+class ApiUsageSensor(DeviceInfoMixin, Entity):
+    _attr_should_poll: bool = False
+    _attr_icon = "mdi:api"
+    _attr_state = 0
+
+    def __init__(
+        self,
+        vehicle: Vehicle,
+        description,
+        key,
+    ):
+        self._vehicle = vehicle
+        self._attr_unique_id = f"{DOMAIN}-{vehicle.identifier}-{key}"
+        self._attr_name = f"{vehicle.name} {description}"
+        self._counter_date = dt_util.as_local(dt_util.utcnow())
+        setattr(vehicle, key, self)
+
+    def mark_used(self):
+        event_time_local = dt_util.as_local(dt_util.utcnow())
+        if dt_util.start_of_local_day(self._counter_date) != dt_util.start_of_local_day(event_time_local):
+            self._counter_date = event_time_local
+            self._attr_state = 0
+        self._attr_state += 1
+        self.async_write_ha_state()

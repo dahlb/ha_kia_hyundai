@@ -50,12 +50,19 @@ class Vehicle:
     ev_max_ac_charge_level: int = None
     tire_all_on: bool = None
 
+    # usage counters
+    calls_today_for_actions = None
+    calls_today_for_update = None
+    calls_today_for_request_sync = None
+
     def __init__(self, api_cloud, identifier: str):
         self.api_cloud = api_cloud
         self.identifier = identifier
 
         async def async_update_data():
             await self.api_cloud.update(vehicle=self)
+            if self.calls_today_for_update is not None:
+                self.calls_today_for_update.mark_used()
             local_timezone = dt_util.UTC
             event_time_local = dt_util.utcnow().astimezone(local_timezone)
             self.last_updated_from_cloud = event_time_local
@@ -154,11 +161,15 @@ class Vehicle:
         self.last_sync_requested = event_time_api
         previous_last_synced_to_cloud = self.last_synced_to_cloud
         await self.api_cloud.request_sync(vehicle=self)
+        if self.calls_today_for_request_sync is not None:
+            self.calls_today_for_request_sync.mark_used()
         if previous_last_synced_to_cloud == self.last_synced_to_cloud:
             raise RuntimeError("sync requested but not completed!")
 
     async def lock_action(self, action: VEHICLE_LOCK_ACTION):
         await self.api_cloud.lock(vehicle=self, action=action)
+        if self.calls_today_for_actions is not None:
+            self.calls_today_for_actions.mark_used()
 
     async def start_climate(self, set_temp, defrost, climate, heating):
         if set_temp is None:
@@ -176,15 +187,23 @@ class Vehicle:
             climate=climate,
             heating=heating,
         )
+        if self.calls_today_for_actions is not None:
+            self.calls_today_for_actions.mark_used()
 
     async def stop_climate(self):
         await self.api_cloud.stop_climate(vehicle=self)
+        if self.calls_today_for_actions is not None:
+            self.calls_today_for_actions.mark_used()
 
     async def start_charge(self):
         await self.api_cloud.start_charge(vehicle=self)
+        if self.calls_today_for_actions is not None:
+            self.calls_today_for_actions.mark_used()
 
     async def stop_charge(self):
         await self.api_cloud.stop_charge(vehicle=self)
+        if self.calls_today_for_actions is not None:
+            self.calls_today_for_actions.mark_used()
 
     async def set_charge_limits(self, ac_limit: int, dc_limit: int):
         if ac_limit is None:
@@ -194,6 +213,8 @@ class Vehicle:
         await self.api_cloud.set_charge_limits(
             vehicle=self, ac_limit=ac_limit, dc_limit=dc_limit
         )
+        if self.calls_today_for_actions is not None:
+            self.calls_today_for_actions.mark_used()
 
     def __repr__(self):
         return {
