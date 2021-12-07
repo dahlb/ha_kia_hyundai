@@ -213,7 +213,9 @@ class ApiUsageSensor(DeviceInfoMixin, Entity):
 
     def mark_used(self):
         event_time_local = dt_util.as_local(dt_util.utcnow())
-        if dt_util.start_of_local_day(self._counter_date) != dt_util.start_of_local_day(event_time_local):
+        if dt_util.start_of_local_day(self._counter_date) != dt_util.start_of_local_day(
+            event_time_local
+        ):
             self._counter_date = event_time_local
             self._attr_state = 0
         self._attr_state += 1
