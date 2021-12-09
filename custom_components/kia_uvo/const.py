@@ -1,4 +1,5 @@
 from enum import Enum
+from datetime import timedelta
 
 # Configuration Constants
 DOMAIN: str = "kia_uvo"
@@ -15,7 +16,6 @@ DEFAULT_SCAN_INTERVAL: int = 30
 DEFAULT_FORCE_SCAN_INTERVAL: int = 240
 DEFAULT_NO_FORCE_SCAN_HOUR_START: int = 18
 DEFAULT_NO_FORCE_SCAN_HOUR_FINISH: int = 6
-ACTION_LOCK_TIMEOUT_IN_SECONDS = 5 * 60
 
 # Integration Setting Constants
 CONFIG_FLOW_VERSION: int = 1
@@ -33,7 +33,8 @@ DATA_CONFIG_UPDATE_LISTENER: str = (
 # action status delay constants
 INITIAL_STATUS_DELAY_AFTER_COMMAND: int = 15
 RECHECK_STATUS_DELAY_AFTER_COMMAND: int = 10
-ACTION_LOCK_TIMEOUT_IN_SECONDS: int = 5 * 60
+ACTION_LOCK_TIMEOUT_IN_SECONDS: int = 5 * 604
+REQUEST_TO_SYNC_COOLDOWN: timedelta = timedelta(minutes=5)
 
 # Sensor Specific Constants
 DATE_FORMAT: str = "%Y-%m-%d %H:%M:%S.%f"

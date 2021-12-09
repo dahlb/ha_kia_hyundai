@@ -186,9 +186,10 @@ class KiaUvoApiUSA:
         body = {
             "requestType": 0  # value of 1 would return cached results instead of forcing update
         }
-        await self._post_request_with_logging_and_active_session(
+        response = await self._post_request_with_logging_and_active_session(
             session_id=session_id, vehicle_key=vehicle_key, url=url, json_body=body
         )
+        return response.headers["Xid"]
 
     async def check_last_action_status(
         self, session_id: str, vehicle_key: str, xid: str
