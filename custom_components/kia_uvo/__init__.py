@@ -164,7 +164,10 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry):
 
     async def update(_event_time_utc: datetime):
         _LOGGER.debug(f"Interval Firing")
-        await hass_vehicle.update(interval=True)
+        try:
+            await hass_vehicle.update(interval=True)
+        except Exception as ex:
+            _LOGGER.error(f"Exception in interval update : %s", str(ex))
 
     data[DATA_VEHICLE_LISTENER] = async_track_time_interval(
         hass, update, timedelta(minutes=1)

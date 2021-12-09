@@ -1,3 +1,5 @@
+[![hacs_badge](https://img.shields.io/badge/HACS-Custom-41BDF5.svg?style=for-the-badge)](https://github.com/hacs/integration)
+
 A custom integration for Kia Uvo USA region. This project was mostly inspired by this [home assistant integration](https://github.com/fuatakgun/kia_uvo)
 
 Warning ahead; this is pre-alpha phase, please do not expect something fully functional, I will improve the integration by time.
