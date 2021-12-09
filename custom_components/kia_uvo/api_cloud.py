@@ -7,7 +7,7 @@ from homeassistant.exceptions import ConfigEntryAuthFailed
 import asyncio
 
 from .util import convert_last_updated_str_to_datetime
-from .api.KiaUvoApiUSA import KiaUvoApiUSA, AuthError
+from kia_uvo_api import KiaUvoApiUSA, AuthError
 from .vehicle import Vehicle
 from .api_action_status import ApiActionStatus
 from .callbacks import CallbacksMixin
