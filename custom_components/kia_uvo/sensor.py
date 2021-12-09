@@ -198,6 +198,8 @@ class ApiUsageSensor(DeviceInfoMixin, Entity):
     _attr_should_poll: bool = False
     _attr_icon = "mdi:api"
     _attr_state = 0
+    failed_today = False
+    failed_error = None
 
     def __init__(
         self,
@@ -213,8 +215,20 @@ class ApiUsageSensor(DeviceInfoMixin, Entity):
 
     def mark_used(self):
         event_time_local = dt_util.as_local(dt_util.utcnow())
-        if dt_util.start_of_local_day(self._counter_date) != dt_util.start_of_local_day(event_time_local):
+        if dt_util.start_of_local_day(self._counter_date) != dt_util.start_of_local_day(
+            event_time_local
+        ):
             self._counter_date = event_time_local
             self._attr_state = 0
+            self.failed_today = False
+            self.failed_error = None
         self._attr_state += 1
         self.async_write_ha_state()
+
+    def mark_failed(self, error):
+        self.failed_today = True
+        self.failed_error = error
+
+    @property
+    def state_attributes(self):
+        return {"failed_today": self.failed_today}

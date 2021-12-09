@@ -3,7 +3,7 @@ from datetime import datetime
 from homeassistant.util import dt as dt_util
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
-from .const import VEHICLE_LOCK_ACTION
+from .const import VEHICLE_LOCK_ACTION, REQUEST_TO_SYNC_COOLDOWN
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -149,9 +149,18 @@ class Vehicle:
             )
 
         if call_force_update:
-            _LOGGER.debug(f"requesting data sync and update")
-            await self.api_cloud.request_sync(vehicle=self)
-            await self.update()
+            if self.last_sync_requested is not None:
+                age_of_last_request_to_sync = (
+                    datetime.now(api_timezone) - self.last_sync_requested
+                )
+            if (
+                self.last_sync_requested is None
+                or age_of_last_request_to_sync < REQUEST_TO_SYNC_COOLDOWN
+            ):
+                _LOGGER.debug(f"requesting data sync and update: age of last scan")
+                await self.request_sync()
+            else:
+                raise RuntimeError("Request to Sync unfulfilled!!!")
         else:
             _LOGGER.debug(f"no request for data sync deemed needed")
 
@@ -160,10 +169,24 @@ class Vehicle:
         event_time_api = dt_util.utcnow().astimezone(api_timezone)
         self.last_sync_requested = event_time_api
         previous_last_synced_to_cloud = self.last_synced_to_cloud
-        await self.api_cloud.request_sync(vehicle=self)
+        if (
+            self.calls_today_for_request_sync is not None
+            and self.calls_today_for_request_sync.failed_today
+        ):
+            raise RuntimeError(
+                f"sync requested likely over quota skipping until tomorrow {self.calls_today_for_request_sync.failed_error}"
+            )
+        try:
+            await self.api_cloud.request_sync(vehicle=self)
+        except Exception as error:
+            if self.calls_today_for_request_sync is not None:
+                self.calls_today_for_request_sync.mark_failed(error)
+            raise
         if self.calls_today_for_request_sync is not None:
             self.calls_today_for_request_sync.mark_used()
         if previous_last_synced_to_cloud == self.last_synced_to_cloud:
+            if self.calls_today_for_request_sync is not None:
+                self.calls_today_for_request_sync.mark_failed()
             raise RuntimeError("sync requested but not completed!")
 
     async def lock_action(self, action: VEHICLE_LOCK_ACTION):

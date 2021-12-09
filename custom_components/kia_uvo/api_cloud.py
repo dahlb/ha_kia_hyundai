@@ -165,15 +165,20 @@ class ApiCloud(CallbacksMixin):
         vehicle.ev_remaining_range_unit = ev_status["drvDistance"][0]["rangeByFuel"][
             "totalAvailableRange"
         ]["unit"]
-        vehicle.ev_max_dc_charge_level = ev_status["targetSOC"][0]["targetSOClevel"]
-        vehicle.ev_max_ac_charge_level = ev_status["targetSOC"][1]["targetSOClevel"]
+        if ev_status["targetSOC"][0]["targetSOClevel"] <= 100:
+            vehicle.ev_max_dc_charge_level = ev_status["targetSOC"][0]["targetSOClevel"]
+        if ev_status["targetSOC"][1]["targetSOClevel"] <= 100:
+            vehicle.ev_max_ac_charge_level = ev_status["targetSOC"][1]["targetSOClevel"]
         vehicle.tire_all_on = bool(vehicle_status["tirePressure"]["all"])
         return vehicle
 
     @request_with_active_session
     async def request_sync(self, vehicle: Vehicle):
         session_id = await self.get_session_id()
-        await self.api.request_vehicle_data_sync(session_id, vehicle.key)
+        self._start_action(f"Request Sync")
+        xid = await self.api.request_vehicle_data_sync(session_id, vehicle.key)
+        self._current_action.set_xid(xid)
+        await self._check_action_completed(vehicle=vehicle)
         await vehicle.update()
 
     @request_with_active_session
