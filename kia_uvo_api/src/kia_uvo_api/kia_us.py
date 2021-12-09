@@ -10,11 +10,9 @@ import time
 
 from aiohttp import ClientSession, ClientResponse, ClientError
 
+from .auth_error import AuthError
+
 _LOGGER = logging.getLogger(__name__)
-
-
-class AuthError(ClientError):
-    pass
 
 
 def request_with_logging(func):
@@ -50,7 +48,7 @@ def request_with_logging(func):
     return request_with_logging_wrapper
 
 
-class KiaUvoApiUSA:
+class KiaUs:
     def __init__(self):
         # Randomly generate a plausible device id on startup
         self.device_id = (

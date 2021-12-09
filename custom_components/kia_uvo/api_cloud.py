@@ -7,7 +7,7 @@ from homeassistant.exceptions import ConfigEntryAuthFailed
 import asyncio
 
 from .util import convert_last_updated_str_to_datetime
-from kia_uvo_api import KiaUvoApiUSA, AuthError
+from kia_uvo_api import KiaUs, AuthError
 from .vehicle import Vehicle
 from .api_action_status import ApiActionStatus
 from .callbacks import CallbacksMixin
@@ -60,7 +60,7 @@ class ApiCloud(CallbacksMixin):
         self.username: str = username
         self.password: str = password
 
-        self.api = KiaUvoApiUSA()
+        self.api = KiaUs()
         self._session_id = None
         self._current_action: ApiActionStatus = None
 
@@ -246,7 +246,7 @@ class ApiCloud(CallbacksMixin):
     def _start_action(self, name: str):
         if self.action_in_progress():
             raise RuntimeError(
-                f"Existing Action in progress: {self._current_action.name}"
+                f"Existing Action in progress: {self._current_action.name}; started at {self._current_action.start_time}"
             )
         else:
             self._current_action = ApiActionStatus(name)

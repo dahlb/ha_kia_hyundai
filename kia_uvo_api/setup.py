@@ -6,19 +6,20 @@ here = pathlib.Path(__file__).parent.resolve()
 # Get the long description from the README file
 LONG_DESCRIPTION = (here / "README.md").read_text(encoding="utf-8")
 
-VERSION = "0.0.1"
+VERSION = "0.1.0"
 
 # Setting up
 setup(
     # the name must match the folder name "verysimplemodule"
-    name="kia-uvo-api",
+    name="kia_uvo_api",
     version=VERSION,
     author="Brendan Dahl",
     author_email="dahl.brendan@gmail.com",
     description="Kia Uvo Api Wrapper",
     long_description=LONG_DESCRIPTION,
     long_description_content_type="text/markdown",
-    packages=find_packages(),
+    package_dir={"": "src"},
+    packages=find_packages(where="src"),
     install_requires=["aiohttp>=3.8.1"],
     keywords=["Kia", "Uvo", "Api"],
     classifiers=[
