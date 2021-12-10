@@ -175,17 +175,28 @@ class ApiCloud(CallbacksMixin):
             vehicle.ev_max_ac_charge_level = ev_status["targetSOC"][1]["targetSOClevel"]
         vehicle.tire_all_on = bool(vehicle_status["tirePressure"]["all"])
 
-        coordinates = api_vehicle_status["vehicleInfoList"][0]["lastVehicleInfo"]["location"]["coord"]
+        coordinates = api_vehicle_status["vehicleInfoList"][0]["lastVehicleInfo"][
+            "location"
+        ]["coord"]
         previous_latitude = vehicle.latitude
         previous_longitude = vehicle.longitude
         vehicle.latitude = coordinates["lat"]
         vehicle.longitude = coordinates["lon"]
-        if (vehicle.latitude != previous_latitude or vehicle.longitude != previous_longitude) and vehicle.latitude is not None and vehicle.longitude is not None:
+        if (
+            (
+                vehicle.latitude != previous_latitude
+                or vehicle.longitude != previous_longitude
+            )
+            and vehicle.latitude is not None
+            and vehicle.longitude is not None
+        ):
             async with Nominatim(
-                    user_agent="kia_uvo_hass",
-                    adapter_factory=AioHTTPAdapter,
+                user_agent="kia_uvo_hass",
+                adapter_factory=AioHTTPAdapter,
             ) as geolocator:
-                location: Location = await geolocator.reverse(query=(vehicle.latitude, vehicle.longitude))
+                location: Location = await geolocator.reverse(
+                    query=(vehicle.latitude, vehicle.longitude)
+                )
                 vehicle.location_name = location.address
         return vehicle
 
