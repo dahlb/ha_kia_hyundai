@@ -19,7 +19,7 @@ DEFAULT_NO_FORCE_SCAN_HOUR_FINISH: int = 6
 
 # Integration Setting Constants
 CONFIG_FLOW_VERSION: int = 1
-PLATFORMS = ["binary_sensor", "sensor", "lock"]
+PLATFORMS = ["binary_sensor", "device_tracker", "sensor", "lock"]
 
 # Home Assistant Data Storage Constants
 DATA_VEHICLE_INSTANCE: str = "vehicle"  # Vehicle Instance

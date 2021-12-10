@@ -6,8 +6,12 @@ from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryAuthFailed
 import asyncio
 
-from .util import convert_last_updated_str_to_datetime
+from geopy.adapters import AioHTTPAdapter
+from geopy.geocoders import Nominatim
+from geopy.location import Location
 from kia_uvo_api import KiaUs, AuthError
+
+from .util import convert_last_updated_str_to_datetime
 from .vehicle import Vehicle
 from .api_action_status import ApiActionStatus
 from .callbacks import CallbacksMixin
@@ -170,6 +174,19 @@ class ApiCloud(CallbacksMixin):
         if ev_status["targetSOC"][1]["targetSOClevel"] <= 100:
             vehicle.ev_max_ac_charge_level = ev_status["targetSOC"][1]["targetSOClevel"]
         vehicle.tire_all_on = bool(vehicle_status["tirePressure"]["all"])
+
+        coordinates = api_vehicle_status["vehicleInfoList"][0]["lastVehicleInfo"]["location"]["coord"]
+        previous_latitude = vehicle.latitude
+        previous_longitude = vehicle.longitude
+        vehicle.latitude = coordinates["lat"]
+        vehicle.longitude = coordinates["lon"]
+        if (vehicle.latitude != previous_latitude or vehicle.longitude != previous_longitude) and vehicle.latitude is not None and vehicle.longitude is not None:
+            async with Nominatim(
+                    user_agent="kia_uvo_hass",
+                    adapter_factory=AioHTTPAdapter,
+            ) as geolocator:
+                location: Location = await geolocator.reverse(query=(vehicle.latitude, vehicle.longitude))
+                vehicle.location_name = location.address
         return vehicle
 
     @request_with_active_session

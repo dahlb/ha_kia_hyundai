@@ -50,6 +50,10 @@ class Vehicle:
     ev_max_ac_charge_level: int = None
     tire_all_on: bool = None
 
+    latitude: float = None
+    longitude: float = None
+    location_name: str = None
+
     # usage counters
     calls_today_for_actions = None
     calls_today_for_update = None
