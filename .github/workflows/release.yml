@@ -19,6 +19,7 @@ jobs:
         run: |
           echo "Version: ${{steps.semantic_release_info.outputs.version}}"
           sed -i "s/\"version\": \".*\",/\"version\": \"${{steps.semantic_release_info.outputs.version}}\",/g" custom_components/kia_uvo/manifest.json 
+          sed -i "s/VERSION = \".*\"/VERSION = \"${{steps.semantic_release_info.outputs.version}}\"/g" kia_uvo_api/setup.py
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add -A
