@@ -60,9 +60,9 @@ class Vehicle:
         self.identifier = identifier
 
         async def async_update_data():
-            await self.api_cloud.update(vehicle=self)
             if self.calls_today_for_update is not None:
                 self.calls_today_for_update.mark_used()
+            await self.api_cloud.update(vehicle=self)
             local_timezone = dt_util.UTC
             event_time_local = dt_util.utcnow().astimezone(local_timezone)
             self.last_updated_from_cloud = event_time_local
@@ -177,17 +177,18 @@ class Vehicle:
                 f"sync requested likely over quota skipping until tomorrow {self.calls_today_for_request_sync.failed_error}"
             )
         try:
+            if self.calls_today_for_request_sync is not None:
+                self.calls_today_for_request_sync.mark_used()
             await self.api_cloud.request_sync(vehicle=self)
         except Exception as error:
             if self.calls_today_for_request_sync is not None:
                 self.calls_today_for_request_sync.mark_failed(error)
             raise
-        if self.calls_today_for_request_sync is not None:
-            self.calls_today_for_request_sync.mark_used()
         if previous_last_synced_to_cloud == self.last_synced_to_cloud:
+            error = RuntimeError("sync requested but not completed!")
             if self.calls_today_for_request_sync is not None:
-                self.calls_today_for_request_sync.mark_failed()
-            raise RuntimeError("sync requested but not completed!")
+                self.calls_today_for_request_sync.mark_failed(error=error)
+            raise error
 
     async def lock_action(self, action: VEHICLE_LOCK_ACTION):
         await self.api_cloud.lock(vehicle=self, action=action)

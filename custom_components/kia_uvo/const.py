@@ -34,7 +34,7 @@ DATA_CONFIG_UPDATE_LISTENER: str = (
 INITIAL_STATUS_DELAY_AFTER_COMMAND: int = 15
 RECHECK_STATUS_DELAY_AFTER_COMMAND: int = 10
 ACTION_LOCK_TIMEOUT_IN_SECONDS: int = 5 * 604
-REQUEST_TO_SYNC_COOLDOWN: timedelta = timedelta(minutes=5)
+REQUEST_TO_SYNC_COOLDOWN: timedelta = timedelta(minutes=15)
 
 # Sensor Specific Constants
 DATE_FORMAT: str = "%Y-%m-%d %H:%M:%S.%f"
