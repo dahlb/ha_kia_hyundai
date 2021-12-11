@@ -158,7 +158,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry):
     _LOGGER.debug("first update finished")
 
     for platform in PLATFORMS:
-        await hass.async_create_task(
+        hass.async_create_task(
             hass.config_entries.async_forward_entry_setup(config_entry, platform)
         )
 

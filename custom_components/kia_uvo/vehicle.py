@@ -84,7 +84,6 @@ class Vehicle:
         )
 
     async def update(self, interval: bool = False):
-        _LOGGER.debug(f"update starting interval?:{interval}")
         api_timezone = dt_util.UTC
         event_time_api = dt_util.utcnow().astimezone(api_timezone)
         event_time_local = dt_util.as_local(dt_util.utcnow())
@@ -148,14 +147,9 @@ class Vehicle:
             raise RuntimeError(
                 f"sync requested likely over quota skipping until tomorrow {self.calls_today_for_request_sync.failed_error}"
             )
-        try:
-            if self.calls_today_for_request_sync is not None:
-                self.calls_today_for_request_sync.mark_used()
-            await self.api_cloud.request_sync(vehicle=self)
-        except Exception as error:
-            if self.calls_today_for_request_sync is not None:
-                self.calls_today_for_request_sync.mark_failed(error)
-            raise
+        if self.calls_today_for_request_sync is not None:
+            self.calls_today_for_request_sync.mark_used()
+        await self.api_cloud.request_sync(vehicle=self)
         if previous_last_synced_to_cloud == self.last_synced_to_cloud:
             self.api_cloud._session_id = None
             error = RuntimeError("sync requested but not completed!")
