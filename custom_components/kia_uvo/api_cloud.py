@@ -4,6 +4,7 @@ from datetime import timedelta
 from homeassistant.util import dt as dt_util
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryAuthFailed
+from homeassistant.helpers.aiohttp_client import async_get_clientsession
 import asyncio
 
 from geopy.adapters import AioHTTPAdapter
@@ -64,12 +65,13 @@ class ApiCloud(CallbacksMixin):
         self.username: str = username
         self.password: str = password
 
-        self.api = KiaUs()
+        client_session = async_get_clientsession(hass)
+        self.api = KiaUs(client_session=client_session)
         self._session_id = None
         self._current_action: ApiActionStatus = None
 
     async def cleanup(self):
-        await self.api.close()
+        pass
 
     async def get_session_id(self):
         if self._session_id is None:
@@ -159,7 +161,8 @@ class ApiCloud(CallbacksMixin):
         )
         vehicle.ev_plugged_in = bool(ev_status["batteryPlugin"])
         vehicle.ev_battery_charging = bool(ev_status["batteryCharge"])
-        vehicle.ev_battery_level = ev_status["batteryStatus"]
+        if ev_status["batteryStatus"] != 0:
+            vehicle.ev_battery_level = ev_status["batteryStatus"]
         vehicle.ev_charge_remaining_time = ev_status["remainChargeTime"][0][
             "timeInterval"
         ]["value"]

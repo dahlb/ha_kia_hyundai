@@ -158,14 +158,13 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry):
     _LOGGER.debug("first update finished")
 
     for platform in PLATFORMS:
-        hass.async_create_task(
+        await hass.async_create_task(
             hass.config_entries.async_forward_entry_setup(config_entry, platform)
         )
 
     async def update(_event_time_utc: datetime):
-        _LOGGER.debug(f"Interval Firing")
         try:
-            await hass_vehicle.update(interval=True)
+            await hass.async_create_task(hass_vehicle.update(interval=True))
         except Exception as ex:
             _LOGGER.error(f"Exception in interval update : %s", str(ex))
 

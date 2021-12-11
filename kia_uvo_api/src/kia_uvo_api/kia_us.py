@@ -49,7 +49,7 @@ def request_with_logging(func):
 
 
 class KiaUs:
-    def __init__(self):
+    def __init__(self, client_session: ClientSession = None):
         # Randomly generate a plausible device id on startup
         self.device_id = (
             "".join(
@@ -62,9 +62,12 @@ class KiaUs:
         self.BASE_URL: str = "api.owners.kia.com"
         self.API_URL: str = "https://" + self.BASE_URL + "/apigw/v1/"
 
-        self.api_session = ClientSession(raise_for_status=True)
+        if client_session is None:
+            self.api_session = ClientSession(raise_for_status=True)
+        else:
+            self.api_session = client_session
 
-    async def close(self):
+    async def cleanup_client_session(self):
         await self.api_session.close()
 
     def _api_headers(self, session_id: str = None, vehicle_key: str = None) -> dict:
