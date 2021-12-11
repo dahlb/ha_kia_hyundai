@@ -99,9 +99,7 @@ class Vehicle:
         ):
             await self.coordinator.async_refresh()
         else:
-            _LOGGER.debug(
-                f"interval update skipping"
-            )
+            _LOGGER.debug(f"interval update skipping")
 
         force_scan_interval = self.api_cloud.force_scan_interval
         if self.climate_hvac_on is not None and self.climate_hvac_on:
@@ -116,11 +114,12 @@ class Vehicle:
             if age_of_last_sync > force_scan_interval:
                 if self.last_sync_requested is not None and interval:
                     age_of_last_request_to_sync = (
-                            datetime.now(api_timezone) - self.last_sync_requested
+                        datetime.now(api_timezone) - self.last_sync_requested
                     )
                     if age_of_last_request_to_sync < REQUEST_TO_SYNC_COOLDOWN:
                         raise RuntimeError(
-                            f"interval sync request failed, waiting for REQUEST_TO_SYNC_COOLDOWN:{REQUEST_TO_SYNC_COOLDOWN}; age_of_last_request_to_sync:{age_of_last_request_to_sync}")
+                            f"interval sync request failed, waiting for REQUEST_TO_SYNC_COOLDOWN:{REQUEST_TO_SYNC_COOLDOWN}; age_of_last_request_to_sync:{age_of_last_request_to_sync}"
+                        )
                 _LOGGER.debug(
                     f"requesting a sync based on scan interval; age_of_last_sync:{age_of_last_sync}; last synced:{self.last_synced_to_cloud}; now:{event_time_api}"
                 )
@@ -152,7 +151,7 @@ class Vehicle:
         await self.api_cloud.request_sync(vehicle=self)
         if previous_last_synced_to_cloud == self.last_synced_to_cloud:
             self.api_cloud._session_id = None
-            error = RuntimeError("sync requested but not completed!")
+            error = RuntimeError(f"sync requested but not completed! {event_time_api}")
             if self.calls_today_for_request_sync is not None:
                 self.calls_today_for_request_sync.mark_failed(error=error)
             raise error
