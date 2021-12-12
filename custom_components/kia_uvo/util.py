@@ -18,3 +18,18 @@ def convert_last_updated_str_to_datetime(
         second=int(m.group(6)),
         tzinfo=timezone_of_str,
     )
+
+
+def safely_get_json_value(json, key, callable_to_cast=None):
+    value = json
+    for x in key.split("."):
+        try:
+            value = value[x]
+        except (TypeError, KeyError):
+            try:
+                value = value[int(x)]
+            except (KeyError, ValueError):
+                value = None
+    if callable_to_cast is not None  and value is not None:
+        value = callable_to_cast(value)
+    return value

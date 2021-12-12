@@ -25,6 +25,10 @@ class Vehicle:
     last_updated_from_cloud: datetime = None
     last_sync_requested: datetime = None
 
+    fuel_range_value: float = None
+    fuel_range_unit: int = None
+    total_range_value: float = None
+    total_range_unit: int = None
     odometer_value: float = None
     odometer_unit: int = None
     battery_level: int = None
@@ -45,15 +49,34 @@ class Vehicle:
     climate_heated_steering_wheel_on: bool = None
     climate_heated_side_mirror_on: bool = None
     climate_heated_rear_window_on: bool = None
+    climate_heated_seat_front_right_on: bool = None
+    climate_heated_seat_front_left_on: bool = None
+    climate_heated_seat_rear_right_on: bool = None
+    climate_heated_seat_rear_left_on: bool = None
     ev_plugged_in: bool = None
     ev_battery_charging: bool = None
     ev_battery_level: int = None
-    ev_charge_remaining_time: int = None
+    ev_charge_current_remaining_duration: int = None
+    ev_charge_fast_duration: int = None
+    ev_charge_portable_duration: int = None
+    ev_charge_station_duration: int = None
     ev_remaining_range_value: int = None
     ev_remaining_range_unit: int = None
     ev_max_dc_charge_level: int = None
     ev_max_ac_charge_level: int = None
+    ev_max_range_ac_charge_value: float = None
+    ev_max_range_ac_charge_unit: int = None
+    ev_max_range_dc_charge_value: float = None
+    ev_max_range_dc_charge_unit: int = None
     tire_all_on: bool = None
+    tire_front_left_on: bool = None
+    tire_front_right_on: bool = None
+    tire_rear_left_on: bool = None
+    tire_rear_right_on: bool = None
+    last_service_value: float = None
+    last_service_unit: int = None
+    next_service_value: float = None
+    next_service_unit: int = None
 
     latitude: float = None
     longitude: float = None
@@ -213,7 +236,13 @@ class Vehicle:
             "key": self.key,
             "model": self.model,
             "name": self.name,
-            "last_updated": self.last_synced_to_cloud,
+            "last_synced_to_cloud": self.last_synced_to_cloud,
+            "last_updated_from_cloud": self.last_updated_from_cloud,
+            "last_sync_requested": self.last_sync_requested,
+            "fuel_range_value": self.fuel_range_value,
+            "fuel_range_unit": self.fuel_range_unit,
+            "total_range_value": self.total_range_value,
+            "total_range_unit": self.total_range_unit,
             "odometer_value": self.odometer_value,
             "odometer_unit": self.odometer_unit,
             "battery_level": self.battery_level,
@@ -234,15 +263,37 @@ class Vehicle:
             "climate_heated_steering_wheel_on": self.climate_heated_steering_wheel_on,
             "climate_heated_side_mirror_on": self.climate_heated_side_mirror_on,
             "climate_heated_rear_window_on": self.climate_heated_rear_window_on,
+            "climate_heated_seat_front_right_on": self.climate_heated_seat_front_right_on,
+            "climate_heated_seat_front_left_on": self.climate_heated_seat_front_left_on,
+            "climate_heated_seat_rear_right_on": self.climate_heated_seat_rear_right_on,
+            "climate_heated_seat_rear_left_on": self.climate_heated_seat_rear_left_on,
             "ev_plugged_in": self.ev_plugged_in,
             "ev_battery_charging": self.ev_battery_charging,
             "ev_battery_level": self.ev_battery_level,
-            "ev_charge_remaining_time": self.ev_charge_remaining_time,
+            "ev_charge_current_remaining_duration": self.ev_charge_current_remaining_duration,
+            "ev_charge_fast_duration": self.ev_charge_fast_duration,
+            "ev_charge_portable_duration": self.ev_charge_portable_duration,
+            "ev_charge_station_duration": self.ev_charge_station_duration,
             "ev_remaining_range_value": self.ev_remaining_range_value,
             "ev_remaining_range_unit": self.ev_remaining_range_unit,
             "ev_max_dc_charge_level": self.ev_max_dc_charge_level,
             "ev_max_ac_charge_level": self.ev_max_ac_charge_level,
+            "ev_max_range_ac_charge_value": self.ev_max_range_ac_charge_value,
+            "ev_max_range_ac_charge_unit": self.ev_max_range_ac_charge_unit,
+            "ev_max_range_dc_charge_value": self.ev_max_range_dc_charge_value,
+            "ev_max_range_dc_charge_unit": self.ev_max_range_dc_charge_unit,
             "tire_all_on": self.tire_all_on,
+            "tire_front_left_on": self.tire_front_left_on,
+            "tire_front_right_on": self.tire_front_right_on,
+            "tire_rear_left_on": self.tire_rear_left_on,
+            "tire_rear_right_on": self.tire_rear_right_on,
+            "last_service_value": self.last_service_value,
+            "last_service_unit": self.last_service_unit,
+            "next_service_value": self.next_service_value,
+            "next_service_unit": self.next_service_unit,
+            "latitude": self.latitude,
+            "longitude": self.longitude,
+            "location_name": self.location_name,
         }
 
     def __str__(self):

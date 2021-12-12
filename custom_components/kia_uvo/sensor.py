@@ -1,15 +1,5 @@
 import logging
 
-from homeassistant.const import (
-    PERCENTAGE,
-    DEVICE_CLASS_BATTERY,
-    DEVICE_CLASS_TIMESTAMP,
-    DEVICE_CLASS_TEMPERATURE,
-    LENGTH_MILES,
-    TIME_MINUTES,
-    TEMP_FAHRENHEIT,
-    DEVICE_CLASS_DATE,
-)
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity import Entity
 from homeassistant.helpers.typing import ConfigType
@@ -22,6 +12,7 @@ from .const import (
     CONF_VEHICLE_IDENTIFIER,
     DATA_VEHICLE_INSTANCE,
     DOMAIN,
+    INSTRUMENTS,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -34,82 +25,9 @@ async def async_setup_entry(
     vehicle_identifier = config_entry.data[CONF_VEHICLE_IDENTIFIER]
     vehicle: Vehicle = hass.data[DOMAIN][vehicle_identifier][DATA_VEHICLE_INSTANCE]
 
-    instruments = [
-        (
-            "EV Battery",
-            "ev_battery_level",
-            PERCENTAGE,
-            "mdi:car-electric",
-            DEVICE_CLASS_BATTERY,
-        ),
-        (
-            "Range by EV",
-            "ev_remaining_range_value",
-            LENGTH_MILES,
-            "mdi:road-variant",
-            None,
-        ),
-        (
-            "Estimated Current Charge Duration",
-            "ev_charge_remaining_time",
-            TIME_MINUTES,
-            "mdi:ev-station",
-            None,
-        ),
-        (
-            "Target Capacity of Charge AC",
-            "ev_max_ac_charge_level",
-            PERCENTAGE,
-            "mdi:car-electric",
-            None,
-        ),
-        (
-            "Target Capacity of Charge DC",
-            "ev_max_dc_charge_level",
-            PERCENTAGE,
-            "mdi:car-electric",
-            None,
-        ),
-        (
-            "Odometer",
-            "odometer_value",
-            LENGTH_MILES,
-            "mdi:speedometer",
-            None,
-        ),
-        (
-            "Car Battery",
-            "battery_level",
-            PERCENTAGE,
-            "mdi:car-battery",
-            DEVICE_CLASS_BATTERY,
-        ),
-        (
-            "Set Temperature",
-            "climate_temperature_value",
-            TEMP_FAHRENHEIT,
-            None,
-            DEVICE_CLASS_TEMPERATURE,
-        ),
-        (
-            "Last Synced To Cloud",
-            "last_synced_to_cloud",
-            None,
-            "mdi:update",
-            DEVICE_CLASS_TIMESTAMP,
-        ),
-        (
-            "Sync Age",
-            "sync_age",
-            TIME_MINUTES,
-            "mdi:update",
-            DEVICE_CLASS_DATE,
-        ),
-    ]
-
     sensors = []
 
-    for description, key, unit, icon, device_class in instruments:
+    for description, key, unit, icon, device_class in INSTRUMENTS:
         sensors.append(
             InstrumentSensor(
                 vehicle,

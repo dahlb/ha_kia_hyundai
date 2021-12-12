@@ -12,7 +12,7 @@ from geopy.geocoders import Nominatim
 from geopy.location import Location
 from kia_uvo_api import KiaUs, AuthError
 
-from .util import convert_last_updated_str_to_datetime
+from .util import convert_last_updated_str_to_datetime, safely_get_json_value
 from .vehicle import Vehicle
 from .api_action_status import ApiActionStatus
 from .callbacks import CallbacksMixin
@@ -114,77 +114,169 @@ class ApiCloud(CallbacksMixin):
         api_vehicle_status = await self.api.get_cached_vehicle_status(
             session_id, vehicle.key
         )
-        vehicle_status = api_vehicle_status["vehicleInfoList"][0]["lastVehicleInfo"][
-            "vehicleStatusRpt"
-        ]["vehicleStatus"]
-        climate_data = vehicle_status["climate"]
-        ev_status = vehicle_status["evStatus"]
-        ev_status["targetSOC"].sort(key=lambda x: x["plugType"])
+        vehicle_status = safely_get_json_value(
+            api_vehicle_status,
+            "vehicleInfoList.0.lastVehicleInfo.vehicleStatusRpt.vehicleStatus",
+        )
+        target_soc = safely_get_json_value(vehicle_status, "evStatus.targetSOC")
+        if target_soc is not None:
+            target_soc.sort(key=lambda x: x["plugType"])
         vehicle.last_synced_to_cloud = convert_last_updated_str_to_datetime(
             last_updated_str=vehicle_status["syncDate"]["utc"],
             timezone_of_str=dt_util.UTC,
         )
-        vehicle.odometer_value = float(
-            api_vehicle_status["vehicleInfoList"][0]["vehicleConfig"]["vehicleDetail"][
-                "vehicle"
-            ]["mileage"]
+        vehicle.odometer_value = safely_get_json_value(
+            api_vehicle_status,
+            "vehicleInfoList.0.vehicleConfig.vehicleDetail.vehicle.mileage",
+            float,
         )
         vehicle.odometer_unit = 3
-        vehicle.battery_level = vehicle_status["batteryStatus"]["stateOfCharge"]
-        vehicle.engine_on = bool(vehicle_status["engine"])
-        vehicle.low_fuel_light_on = bool(vehicle_status["lowFuelLight"])
-        vehicle.doors_locked = bool(vehicle_status["doorLock"])
-        vehicle.door_front_left_open = bool(vehicle_status["doorStatus"]["frontLeft"])
-        vehicle.door_front_right_open = bool(vehicle_status["doorStatus"]["frontRight"])
-        vehicle.door_back_left_open = bool(vehicle_status["doorStatus"]["backLeft"])
-        vehicle.door_back_right_open = bool(vehicle_status["doorStatus"]["backRight"])
-        vehicle.door_trunk_open = bool(vehicle_status["doorStatus"]["trunk"])
-        vehicle.door_hood_open = bool(vehicle_status["doorStatus"]["hood"])
-        vehicle.sleep_mode_on = bool(vehicle_status["sleepMode"])
-        vehicle.climate_hvac_on = bool(climate_data["airCtrl"])
-        vehicle.climate_defrost_on = bool(climate_data["defrost"])
-        vehicle.climate_temperature_value = int(climate_data["airTemp"]["value"])
+
+        maintenance_array = safely_get_json_value(
+            api_vehicle_status,
+            "vehicleInfoList.0.vehicleConfig.maintenance.maintenanceSchedule",
+        )
+        if maintenance_array is not None:
+            maintenance_array.append(vehicle.odometer_value)
+            maintenance_array.sort()
+            current_mileage_index = maintenance_array.index(vehicle.odometer_value)
+            vehicle.last_service_value = maintenance_array[current_mileage_index - 1]
+            vehicle.last_service_unit = 3
+            vehicle.next_service_value = maintenance_array[current_mileage_index + 1]
+            vehicle.next_service_unit = 3
+
+        vehicle.battery_level = safely_get_json_value(
+            vehicle_status, "batteryStatus.stateOfCharge", int
+        )
+        vehicle.engine_on = safely_get_json_value(vehicle_status, "engine", bool)
+        vehicle.low_fuel_light_on = safely_get_json_value(
+            vehicle_status, "lowFuelLight", bool
+        )
+        vehicle.doors_locked = safely_get_json_value(vehicle_status, "doorLock", bool)
+        vehicle.door_front_left_open = safely_get_json_value(
+            vehicle_status, "doorStatus.frontLeft", bool
+        )
+        vehicle.door_front_right_open = safely_get_json_value(
+            vehicle_status, "doorStatus.frontRight", bool
+        )
+        vehicle.door_back_left_open = safely_get_json_value(
+            vehicle_status, "doorStatus.backLeft", bool
+        )
+        vehicle.door_back_right_open = safely_get_json_value(
+            vehicle_status, "doorStatus.backRight", bool
+        )
+        vehicle.door_trunk_open = safely_get_json_value(
+            vehicle_status, "doorStatus.trunk", bool
+        )
+        vehicle.door_hood_open = safely_get_json_value(
+            vehicle_status, "doorStatus.hood", bool
+        )
+        vehicle.sleep_mode_on = safely_get_json_value(vehicle_status, "sleepMode", bool)
+        vehicle.climate_hvac_on = safely_get_json_value(
+            vehicle_status, "climate.airCtrl", bool
+        )
+        vehicle.climate_defrost_on = safely_get_json_value(
+            vehicle_status, "climate.defrost", bool
+        )
+
+        vehicle.climate_temperature_value = safely_get_json_value(
+            vehicle_status, "climate.airTemp.value"
+        )
         if vehicle.climate_temperature_value == "0xLOW":
             vehicle.climate_temperature_value = USA_TEMP_RANGE[0]
         elif vehicle.climate_temperature_value == "0xHIGH":
             vehicle.climate_temperature_value = USA_TEMP_RANGE[-1]
+        vehicle.climate_temperature_unit = safely_get_json_value(
+            vehicle_status, "climate.airTemp.unit", int
+        )
 
-        vehicle.climate_temperature_unit = climate_data["airTemp"]["unit"]
-        vehicle.climate_heated_steering_wheel_on = bool(
-            climate_data["heatingAccessory"]["steeringWheel"]
+        vehicle.climate_heated_steering_wheel_on = safely_get_json_value(
+            vehicle_status, "climate.heatingAccessory.steeringWheel", bool
         )
-        vehicle.climate_heated_side_mirror_on = bool(
-            climate_data["heatingAccessory"]["sideMirror"]
+        vehicle.climate_heated_side_mirror_on = safely_get_json_value(
+            vehicle_status, "climate.heatingAccessory.sideMirror", bool
         )
-        vehicle.climate_heated_rear_window_on = bool(
-            climate_data["heatingAccessory"]["rearWindow"]
+        vehicle.climate_heated_rear_window_on = safely_get_json_value(
+            vehicle_status, "climate.heatingAccessory.rearWindow", bool
         )
-        vehicle.ev_plugged_in = bool(ev_status["batteryPlugin"])
-        vehicle.ev_battery_charging = bool(ev_status["batteryCharge"])
-        if ev_status["batteryStatus"] != 0:
-            vehicle.ev_battery_level = ev_status["batteryStatus"]
-        vehicle.ev_charge_remaining_time = ev_status["remainChargeTime"][0][
-            "timeInterval"
-        ]["value"]
-        vehicle.ev_remaining_range_value = ev_status["drvDistance"][0]["rangeByFuel"][
-            "totalAvailableRange"
-        ]["value"]
-        vehicle.ev_remaining_range_unit = ev_status["drvDistance"][0]["rangeByFuel"][
-            "totalAvailableRange"
-        ]["unit"]
-        if ev_status["targetSOC"][0]["targetSOClevel"] <= 100:
-            vehicle.ev_max_dc_charge_level = ev_status["targetSOC"][0]["targetSOClevel"]
-        if ev_status["targetSOC"][1]["targetSOClevel"] <= 100:
-            vehicle.ev_max_ac_charge_level = ev_status["targetSOC"][1]["targetSOClevel"]
-        vehicle.tire_all_on = bool(vehicle_status["tirePressure"]["all"])
+        vehicle.ev_plugged_in = safely_get_json_value(
+            vehicle_status, "evStatus.batteryPlugin", bool
+        )
+        vehicle.ev_battery_charging = safely_get_json_value(
+            vehicle_status, "evStatus.batteryCharge", bool
+        )
+        ev_battery_level = safely_get_json_value(
+            vehicle_status, "evStatus.batteryStatus", int
+        )
+        if ev_battery_level != 0:
+            vehicle.ev_battery_level = ev_battery_level
+        vehicle.ev_charge_current_remaining_duration = safely_get_json_value(
+            vehicle_status, "evStatus.remainChargeTime.0.timeInterval.value", int
+        )
+        vehicle.ev_remaining_range_value = safely_get_json_value(
+            vehicle_status,
+            "evStatus.drvDistance.0.rangeByFuel.evModeRange.value",
+            float,
+        )
+        vehicle.ev_remaining_range_unit = safely_get_json_value(
+            vehicle_status, "evStatus.drvDistance.0.rangeByFuel.evModeRange.unit", int
+        )
+        vehicle.total_range_value = safely_get_json_value(
+            vehicle_status,
+            "evStatus.drvDistance.0.rangeByFuel.totalAvailableRange.value",
+            float,
+        )
+        vehicle.total_range_unit = safely_get_json_value(
+            vehicle_status,
+            "evStatus.drvDistance.0.rangeByFuel.totalAvailableRange.unit",
+            int,
+        )
+        hybrid_fuel_range_value = safely_get_json_value(
+            vehicle_status,
+            "evStatus.drvDistance.0.rangeByFuel.gasModeRange.value",
+            float,
+        )
+        hybrid_fuel_range_unit = safely_get_json_value(
+            vehicle_status, "evStatus.drvDistance.0.rangeByFuel.gasModeRange.unit", int
+        )
+        no_ev_fuel_range_value = safely_get_json_value(vehicle_status, "dte.value")
+        no_ev_fuel_range_unit = safely_get_json_value(vehicle_status, "dte.unit")
+        if hybrid_fuel_range_value is not None:
+            vehicle.fuel_range_value = hybrid_fuel_range_value
+        else:
+            vehicle.fuel_range_value = no_ev_fuel_range_value
+        if hybrid_fuel_range_unit is not None:
+            vehicle.fuel_range_unit = hybrid_fuel_range_unit
+        else:
+            vehicle.fuel_range_unit = no_ev_fuel_range_unit
 
-        coordinates = api_vehicle_status["vehicleInfoList"][0]["lastVehicleInfo"][
-            "location"
-        ]["coord"]
+        ev_max_dc_charge_level = safely_get_json_value(
+            vehicle_status, "evStatus.targetSOC.0.targetSOClevel", int
+        )
+        if ev_max_dc_charge_level <= 100:
+            vehicle.ev_max_dc_charge_level = ev_max_dc_charge_level
+        ev_max_ac_charge_level = safely_get_json_value(
+            vehicle_status, "evStatus.targetSOC.1.targetSOClevel", int
+        )
+        if ev_max_ac_charge_level <= 100:
+            vehicle.ev_max_ac_charge_level = ev_max_ac_charge_level
+
+        vehicle.tire_all_on = safely_get_json_value(
+            vehicle_status, "tirePressure.all", bool
+        )
+
         previous_latitude = vehicle.latitude
         previous_longitude = vehicle.longitude
-        vehicle.latitude = coordinates["lat"]
-        vehicle.longitude = coordinates["lon"]
+        vehicle.latitude = safely_get_json_value(
+            api_vehicle_status,
+            "vehicleInfoList.0.lastVehicleInfo.location.coord.lat",
+            float,
+        )
+        vehicle.longitude = safely_get_json_value(
+            api_vehicle_status,
+            "vehicleInfoList.0.lastVehicleInfo.location.coord.lon",
+            float,
+        )
         if (
             (
                 vehicle.latitude != previous_latitude
