@@ -250,7 +250,15 @@ class Vehicle:
             if instrument_key not in self.api_unsupported_keys:
                 if instrument_key not in empty_keys:
                     supported_instruments.append(instrument)
-                elif instrument_key in ["ev_battery_level","ev_max_dc_charge_level","ev_max_ac_charge_level"] and self.ev_plugged_in is not None:
+                elif (
+                    instrument_key
+                    in [
+                        "ev_battery_level",
+                        "ev_max_dc_charge_level",
+                        "ev_max_ac_charge_level",
+                    ]
+                    and self.ev_plugged_in is not None
+                ):
                     supported_instruments.append(instrument)
         return supported_instruments
 

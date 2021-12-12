@@ -29,7 +29,13 @@ async def async_setup_entry(
 
     binary_sensors = []
 
-    for description, key, on_icon, off_icon, device_class in vehicle.supported_binary_instruments():
+    for (
+        description,
+        key,
+        on_icon,
+        off_icon,
+        device_class,
+    ) in vehicle.supported_binary_instruments():
         binary_sensors.append(
             InstrumentSensor(
                 vehicle,

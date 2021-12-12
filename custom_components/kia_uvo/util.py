@@ -30,6 +30,6 @@ def safely_get_json_value(json, key, callable_to_cast=None):
                 value = value[int(x)]
             except (KeyError, ValueError):
                 value = None
-    if callable_to_cast is not None  and value is not None:
+    if callable_to_cast is not None and value is not None:
         value = callable_to_cast(value)
     return value
