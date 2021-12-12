@@ -370,3 +370,19 @@ INSTRUMENTS = [
         None,
     ),
 ]
+
+KIA_US_UNSUPPORTED_INSTRUMENT_KEYS = [
+    "ev_max_range_ac_charge_value",
+    "ev_max_range_dc_charge_value",
+    "ev_charge_fast_duration",
+    "ev_charge_portable_duration",
+    "ev_charge_station_duration",
+    "climate_heated_seat_front_right_on",
+    "climate_heated_seat_front_left_on",
+    "climate_heated_seat_rear_right_on",
+    "climate_heated_seat_rear_left_on",
+    "tire_front_right_on",
+    "tire_front_left_on",
+    "tire_rear_right_on",
+    "tire_rear_left_on",
+]

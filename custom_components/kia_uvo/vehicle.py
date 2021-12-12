@@ -8,6 +8,8 @@ from .const import (
     VEHICLE_LOCK_ACTION,
     REQUEST_TO_SYNC_COOLDOWN,
     INITIAL_STATUS_DELAY_AFTER_COMMAND,
+    INSTRUMENTS,
+    BINARY_INSTRUMENTS,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -87,9 +89,10 @@ class Vehicle:
     calls_today_for_update = None
     calls_today_for_request_sync = None
 
-    def __init__(self, api_cloud, identifier: str):
+    def __init__(self, api_cloud, identifier: str, api_unsupported_keys):
         self.api_cloud = api_cloud
         self.identifier = identifier
+        self.api_unsupported_keys = api_unsupported_keys
 
         async def async_update_data():
             if self.calls_today_for_update is not None:
@@ -228,6 +231,31 @@ class Vehicle:
         )
         if self.calls_today_for_actions is not None:
             self.calls_today_for_actions.mark_used()
+
+    def supported_binary_instruments(self):
+        supported_binary_instruments = []
+        empty_keys = self.empty_keys()
+        for binary_instrument in BINARY_INSTRUMENTS:
+            binary_instrument_key = binary_instrument[1]
+            if binary_instrument_key not in self.api_unsupported_keys:
+                if binary_instrument_key not in empty_keys:
+                    supported_binary_instruments.append(binary_instrument)
+        return supported_binary_instruments
+
+    def supported_instruments(self):
+        supported_instruments = []
+        empty_keys = self.empty_keys()
+        for instrument in INSTRUMENTS:
+            instrument_key = instrument[1]
+            if instrument_key not in self.api_unsupported_keys:
+                if instrument_key not in empty_keys:
+                    supported_instruments.append(instrument)
+                elif instrument_key in ["ev_battery_level","ev_max_dc_charge_level","ev_max_ac_charge_level"] and self.ev_plugged_in is not None:
+                    supported_instruments.append(instrument)
+        return supported_instruments
+
+    def empty_keys(self):
+        return [key for key, value in self.__repr__().items() if value is None]
 
     def __repr__(self):
         return {

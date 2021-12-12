@@ -12,7 +12,6 @@ from .const import (
     CONF_VEHICLE_IDENTIFIER,
     DATA_VEHICLE_INSTANCE,
     DOMAIN,
-    INSTRUMENTS,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -27,7 +26,7 @@ async def async_setup_entry(
 
     sensors = []
 
-    for description, key, unit, icon, device_class in INSTRUMENTS:
+    for description, key, unit, icon, device_class in vehicle.supported_instruments():
         sensors.append(
             InstrumentSensor(
                 vehicle,

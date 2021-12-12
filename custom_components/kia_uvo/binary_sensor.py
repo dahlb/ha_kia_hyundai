@@ -11,7 +11,6 @@ from homeassistant.components.binary_sensor import (
 from .vehicle import Vehicle
 from .kia_uvo_entity import KiaUvoEntity, DeviceInfoMixin
 from .const import (
-    BINARY_INSTRUMENTS,
     CONF_VEHICLE_IDENTIFIER,
     DATA_VEHICLE_INSTANCE,
     DOMAIN,
@@ -30,7 +29,7 @@ async def async_setup_entry(
 
     binary_sensors = []
 
-    for description, key, on_icon, off_icon, device_class in BINARY_INSTRUMENTS:
+    for description, key, on_icon, off_icon, device_class in vehicle.supported_binary_instruments():
         binary_sensors.append(
             InstrumentSensor(
                 vehicle,

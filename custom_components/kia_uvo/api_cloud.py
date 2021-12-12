@@ -21,6 +21,7 @@ from .const import (
     RECHECK_STATUS_DELAY_AFTER_COMMAND,
     VEHICLE_LOCK_ACTION,
     USA_TEMP_RANGE,
+    KIA_US_UNSUPPORTED_INSTRUMENT_KEYS,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -98,7 +99,9 @@ class ApiCloud(CallbacksMixin):
         vehicles = []
         for response_vehicle in api_vehicles["vehicleSummary"]:
             vehicle = Vehicle(
-                api_cloud=self, identifier=response_vehicle["vehicleIdentifier"]
+                api_cloud=self,
+                identifier=response_vehicle["vehicleIdentifier"],
+                api_unsupported_keys=KIA_US_UNSUPPORTED_INSTRUMENT_KEYS,
             )
             vehicle.vin = response_vehicle["vin"]
             vehicle.key = response_vehicle["vehicleKey"]
