@@ -3,7 +3,6 @@ from typing import Dict, Optional, Any
 
 import voluptuous as vol
 from homeassistant.exceptions import ConfigEntryAuthFailed
-
 from homeassistant import config_entries
 from homeassistant.const import (
     CONF_PASSWORD,
@@ -11,6 +10,7 @@ from homeassistant.const import (
     CONF_REGION,
 )
 from homeassistant.core import callback
+
 from .const import (
     CONF_SCAN_INTERVAL,
     DEFAULT_SCAN_INTERVAL,
@@ -33,7 +33,7 @@ from .const import (
     BRANDS,
     CONF_PIN,
 )
-from .api_cloud import ApiCloud
+from .api_cloud_util import api_cloud_for_region_and_brand
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -102,10 +102,13 @@ class KiaUvoConfigFlowHandler(config_entries.ConfigFlow):
         }
         if user_input is not None:
             self.data.update(user_input)
+            region = self.data[CONF_REGION]
+            brand = self.data[CONF_BRAND]
+            api_cloud_class = api_cloud_for_region_and_brand(region=region, brand=brand)
+            if api_cloud_class is None:
+                return self.async_abort(reason="unsupported_brand_region")
             return await self.async_step_auth()
-        return self.async_show_form(
-            step_id="user", data_schema=vol.Schema(data_schema)
-        )
+        return self.async_show_form(step_id="user", data_schema=vol.Schema(data_schema))
 
     async def async_step_auth(self, user_input: Optional[Dict[str, Any]] = None):
         data_schema = {
@@ -119,9 +122,12 @@ class KiaUvoConfigFlowHandler(config_entries.ConfigFlow):
         if user_input is not None:
             username = user_input[CONF_USERNAME]
             password = user_input[CONF_PASSWORD]
+            region = self.data[CONF_REGION]
+            brand = self.data[CONF_BRAND]
 
             try:
-                api_cloud = ApiCloud(
+                api_cloud_class = api_cloud_for_region_and_brand(region=region, brand=brand)
+                api_cloud = api_cloud_class(
                     username=username, password=password, hass=self.hass
                 )
                 await api_cloud.login()

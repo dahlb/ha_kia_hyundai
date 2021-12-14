@@ -68,6 +68,7 @@ BRAND_KIA = "Kia"
 BRAND_HYUNDAI = "Hyundai"
 BRANDS = [BRAND_KIA, BRAND_HYUNDAI]
 
+
 class VEHICLE_LOCK_ACTION(Enum):
     LOCK = "close"
     UNLOCK = "open"

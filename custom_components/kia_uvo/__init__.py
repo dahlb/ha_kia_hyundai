@@ -9,12 +9,14 @@ from homeassistant.const import (
     ATTR_DEVICE_ID,
     CONF_PASSWORD,
     CONF_USERNAME,
+    CONF_REGION
 )
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.helpers.event import async_track_time_interval
 from homeassistant.helpers.typing import ConfigType
 from homeassistant.helpers import device_registry as dr
 import homeassistant.helpers.config_validation as cv
+
 from .const import (
     DOMAIN,
     PLATFORMS,
@@ -30,7 +32,9 @@ from .const import (
     DEFAULT_NO_FORCE_SCAN_HOUR_FINISH,
     DEFAULT_NO_FORCE_SCAN_HOUR_START,
     DEFAULT_FORCE_SCAN_INTERVAL,
+    CONF_BRAND,
 )
+from .api_cloud_util import api_cloud_for_region_and_brand
 from .api_cloud import ApiCloud
 from .vehicle import Vehicle
 
@@ -121,6 +125,8 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry):
     vehicle_identifier = config_entry.data[CONF_VEHICLE_IDENTIFIER]
     username = config_entry.data[CONF_USERNAME]
     password = config_entry.data[CONF_PASSWORD]
+    region = config_entry.data[CONF_REGION]
+    brand = config_entry.data[CONF_BRAND]
 
     no_force_scan_hour_start = config_entry.options.get(
         CONF_NO_FORCE_SCAN_HOUR_START, DEFAULT_NO_FORCE_SCAN_HOUR_START
@@ -137,7 +143,8 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry):
         )
     )
 
-    hass_vehicle: Vehicle = await ApiCloud(
+    api_cloud_class = api_cloud_for_region_and_brand(region=region, brand=brand)
+    hass_vehicle: Vehicle = await api_cloud_class(
         username=username,
         password=password,
         hass=hass,

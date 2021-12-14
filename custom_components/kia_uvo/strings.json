@@ -33,6 +33,9 @@
     },
     "error": {
       "auth": "Login failed into Kia Uvo. Please use official Kia Uvo app to logout and log back in and try again!"
+    },
+    "abort": {
+      "unsupported_brand_region": "Your Region/Brand combination is not yet supported, please check open tickets."
     }
   },
   "options": {
