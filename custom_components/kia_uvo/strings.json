@@ -3,15 +3,24 @@
   "config": {
     "step": {
       "user": {
-        "title": "Kia Uvo",
+        "title": "Kia Uvo Locale",
         "description": "Set up your Kia Uvo to integrate with Home Assistant.",
         "data": {
+          "region": "Region",
+          "brand": "Brand"
+        }
+      },
+      "auth": {
+        "title": "Kia Uvo Auth",
+        "description": "Configure your Credentials.",
+        "data": {
           "username": "Username",
-          "password": "Password"
+          "password": "Password",
+          "pin": "PIN"
         }
       },
       "pick_vehicle": {
-        "title": "Kia Uvo",
+        "title": "Kia Uvo Vehicle",
         "description": "Pick which vehicle to use.",
         "data": {
           "vehicle_str": "Vehicle"
@@ -24,10 +33,6 @@
     },
     "error": {
       "auth": "Login failed into Kia Uvo. Please use official Kia Uvo app to logout and log back in and try again!"
-    },
-    "abort": {
-      "reauth_successful": "[%key:common::config_flow::abort::reauth_successful%]",
-      "already_configured": "[%key:common::config_flow::abort::already_configured_device%]"
     }
   },
   "options": {

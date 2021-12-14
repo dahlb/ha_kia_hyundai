@@ -26,6 +26,8 @@ CONF_NO_FORCE_SCAN_HOUR_START: str = "no_force_scan_hour_start"
 CONF_NO_FORCE_SCAN_HOUR_FINISH: str = "no_force_scan_hour_finish"
 CONF_VEHICLES: str = "vehicles"
 CONF_VEHICLE_IDENTIFIER: str = "vehicle_identifier"
+CONF_BRAND: str = "brand"
+CONF_PIN: str = "pin"
 
 # I have seen that many people can survive with receiving updates in every 30 minutes. Let's see how KIA will respond
 DEFAULT_SCAN_INTERVAL: int = 30
@@ -35,7 +37,7 @@ DEFAULT_NO_FORCE_SCAN_HOUR_START: int = 18
 DEFAULT_NO_FORCE_SCAN_HOUR_FINISH: int = 6
 
 # Integration Setting Constants
-CONFIG_FLOW_VERSION: int = 1
+CONFIG_FLOW_VERSION: int = 2
 PLATFORMS = ["binary_sensor", "device_tracker", "sensor", "lock"]
 
 # Home Assistant Data Storage Constants
@@ -58,6 +60,13 @@ DATE_FORMAT: str = "%Y-%m-%d %H:%M:%S.%f"
 
 USA_TEMP_RANGE = range(62, 82)
 
+REGION_CANADA = "Canada"
+REGION_USA = "USA"
+REGIONS = [REGION_USA, REGION_CANADA]
+
+BRAND_KIA = "Kia"
+BRAND_HYUNDAI = "Hyundai"
+BRANDS = [BRAND_KIA, BRAND_HYUNDAI]
 
 class VEHICLE_LOCK_ACTION(Enum):
     LOCK = "close"

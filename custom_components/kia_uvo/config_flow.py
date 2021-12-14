@@ -8,6 +8,7 @@ from homeassistant import config_entries
 from homeassistant.const import (
     CONF_PASSWORD,
     CONF_USERNAME,
+    CONF_REGION,
 )
 from homeassistant.core import callback
 from .const import (
@@ -23,6 +24,14 @@ from .const import (
     CONFIG_FLOW_VERSION,
     CONF_VEHICLES,
     CONF_VEHICLE_IDENTIFIER,
+    CONF_BRAND,
+    REGION_USA,
+    REGION_CANADA,
+    REGIONS,
+    BRAND_KIA,
+    BRAND_HYUNDAI,
+    BRANDS,
+    CONF_PIN,
 )
 from .api_cloud import ApiCloud
 
@@ -76,7 +85,7 @@ class KiaUvoConfigFlowHandler(config_entries.ConfigFlow):
     VERSION = CONFIG_FLOW_VERSION
     CONNECTION_CLASS = config_entries.CONN_CLASS_CLOUD_POLL
 
-    data: Optional[Dict[str, Any]]
+    data: Optional[Dict[str, Any]] = {}
 
     @staticmethod
     @callback
@@ -88,9 +97,23 @@ class KiaUvoConfigFlowHandler(config_entries.ConfigFlow):
 
     async def async_step_user(self, user_input: Optional[Dict[str, Any]] = None):
         data_schema = {
+            vol.Required(CONF_REGION): vol.In(REGIONS),
+            vol.Required(CONF_BRAND): vol.In(BRANDS),
+        }
+        if user_input is not None:
+            self.data.update(user_input)
+            return await self.async_step_auth()
+        return self.async_show_form(
+            step_id="user", data_schema=vol.Schema(data_schema)
+        )
+
+    async def async_step_auth(self, user_input: Optional[Dict[str, Any]] = None):
+        data_schema = {
             vol.Required(CONF_USERNAME): str,
             vol.Required(CONF_PASSWORD): str,
         }
+        if self.data[CONF_REGION] == REGION_CANADA:
+            data_schema[vol.Required(CONF_PIN)] = str
         errors: Dict[str, str] = {}
 
         if user_input is not None:
@@ -102,7 +125,7 @@ class KiaUvoConfigFlowHandler(config_entries.ConfigFlow):
                     username=username, password=password, hass=self.hass
                 )
                 await api_cloud.login()
-                self.data = user_input
+                self.data.update(user_input)
                 self.data[CONF_VEHICLES] = await api_cloud.get_vehicles()
                 return await self.async_step_pick_vehicle()
             except ConfigEntryAuthFailed:
@@ -111,7 +134,7 @@ class KiaUvoConfigFlowHandler(config_entries.ConfigFlow):
                 await api_cloud.cleanup()
 
         return self.async_show_form(
-            step_id="user", data_schema=vol.Schema(data_schema), errors=errors
+            step_id="auth", data_schema=vol.Schema(data_schema), errors=errors
         )
 
     async def async_step_pick_vehicle(
