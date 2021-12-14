@@ -10,7 +10,7 @@ import asyncio
 from geopy.adapters import AioHTTPAdapter
 from geopy.geocoders import Nominatim
 from geopy.location import Location
-from kia_uvo_api import KiaUs, AuthError
+from kia_uvo_api import UsKia, AuthError
 
 from .util import convert_last_updated_str_to_datetime, safely_get_json_value
 from .vehicle import Vehicle
@@ -67,7 +67,7 @@ class ApiCloud(CallbacksMixin):
         self.password: str = password
 
         client_session = async_get_clientsession(hass)
-        self.api = KiaUs(client_session=client_session)
+        self.api = UsKia(client_session=client_session)
         self._session_id = None
         self._current_action: ApiActionStatus = None
 

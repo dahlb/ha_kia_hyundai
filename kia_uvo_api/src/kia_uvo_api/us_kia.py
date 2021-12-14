@@ -48,7 +48,7 @@ def request_with_logging(func):
     return request_with_logging_wrapper
 
 
-class KiaUs:
+class UsKia:
     def __init__(self, client_session: ClientSession = None):
         # Randomly generate a plausible device id on startup
         self.device_id = (
@@ -99,14 +99,14 @@ class KiaUs:
         return headers
 
     @request_with_logging
-    async def _post_request_with_logging_and_active_session(
+    async def _post_request_with_logging_and_errors_raised(
         self, session_id: str, vehicle_key: str, url: str, json_body: dict
     ) -> ClientResponse:
         headers = self._api_headers(session_id, vehicle_key)
         return await self.api_session.post(url=url, json=json_body, headers=headers)
 
     @request_with_logging
-    async def _get_request_with_logging_and_active_session(
+    async def _get_request_with_logging_and_errors_raised(
         self, session_id: str, vehicle_key: str, url: str
     ) -> ClientResponse:
         headers = self._api_headers(session_id, vehicle_key)
@@ -121,7 +121,7 @@ class KiaUs:
             "userCredential": {"userId": username, "password": password},
         }
         response: ClientResponse = (
-            await self._post_request_with_logging_and_active_session(
+            await self._post_request_with_logging_and_errors_raised(
                 session_id=None, vehicle_key=None, url=url, json_body=data
             )
         )
@@ -140,7 +140,7 @@ class KiaUs:
         """
         url = self.API_URL + "ownr/gvl"
         response: ClientResponse = (
-            await self._get_request_with_logging_and_active_session(
+            await self._get_request_with_logging_and_errors_raised(
                 session_id=session_id, vehicle_key=None, url=url
             )
         )
@@ -172,7 +172,7 @@ class KiaUs:
             },
             "vinKey": [vehicle_key],
         }
-        response = await self._post_request_with_logging_and_active_session(
+        response = await self._post_request_with_logging_and_errors_raised(
             session_id=session_id, vehicle_key=vehicle_key, url=url, json_body=body
         )
 
@@ -187,7 +187,7 @@ class KiaUs:
         body = {
             "requestType": 0  # value of 1 would return cached results instead of forcing update
         }
-        await self._post_request_with_logging_and_active_session(
+        await self._post_request_with_logging_and_errors_raised(
             session_id=session_id, vehicle_key=vehicle_key, url=url, json_body=body
         )
 
@@ -196,7 +196,7 @@ class KiaUs:
     ):
         url = self.API_URL + "cmm/gts"
         body = {"xid": xid}
-        response = await self._post_request_with_logging_and_active_session(
+        response = await self._post_request_with_logging_and_errors_raised(
             session_id=session_id, vehicle_key=vehicle_key, url=url, json_body=body
         )
         response_json = await response.json()
@@ -204,14 +204,14 @@ class KiaUs:
 
     async def lock(self, session_id: str, vehicle_key: str):
         url = self.API_URL + "rems/door/lock"
-        response = await self._get_request_with_logging_and_active_session(
+        response = await self._get_request_with_logging_and_errors_raised(
             session_id=session_id, vehicle_key=vehicle_key, url=url
         )
         return response.headers["Xid"]
 
     async def unlock(self, session_id: str, vehicle_key: str):
         url = self.API_URL + "rems/door/unlock"
-        response = await self._get_request_with_logging_and_active_session(
+        response = await self._get_request_with_logging_and_errors_raised(
             session_id=session_id, vehicle_key=vehicle_key, url=url
         )
         return response.headers["Xid"]
@@ -239,14 +239,14 @@ class KiaUs:
                 },
             }
         }
-        response = await self._post_request_with_logging_and_active_session(
+        response = await self._post_request_with_logging_and_errors_raised(
             session_id=session_id, vehicle_key=vehicle_key, url=url, json_body=body
         )
         return response.headers["Xid"]
 
     async def stop_climate(self, session_id: str, vehicle_key: str):
         url = self.API_URL + "rems/stop"
-        response = await self._get_request_with_logging_and_active_session(
+        response = await self._get_request_with_logging_and_errors_raised(
             session_id=session_id, vehicle_key=vehicle_key, url=url
         )
         return response.headers["Xid"]
@@ -254,14 +254,14 @@ class KiaUs:
     async def start_charge(self, session_id: str, vehicle_key: str):
         url = self.API_URL + "evc/charge"
         body = {"chargeRatio": 100}
-        response = await self._post_request_with_logging_and_active_session(
+        response = await self._post_request_with_logging_and_errors_raised(
             session_id=session_id, vehicle_key=vehicle_key, url=url, json_body=body
         )
         return response.headers["Xid"]
 
     async def stop_charge(self, session_id: str, vehicle_key: str):
         url = self.API_URL + "evc/cancel"
-        response = await self._get_request_with_logging_and_active_session(
+        response = await self._get_request_with_logging_and_errors_raised(
             session_id=session_id, vehicle_key=vehicle_key, url=url
         )
         return response.headers["Xid"]
@@ -282,7 +282,7 @@ class KiaUs:
                 },
             ]
         }
-        response = await self._post_request_with_logging_and_active_session(
+        response = await self._post_request_with_logging_and_errors_raised(
             session_id=session_id, vehicle_key=vehicle_key, url=url, json_body=body
         )
         return response.headers["Xid"]
