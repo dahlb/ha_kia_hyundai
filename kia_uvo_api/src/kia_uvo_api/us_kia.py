@@ -34,9 +34,10 @@ def request_with_logging(func):
             response_json["status"]["statusCode"] == 1
             and response_json["status"]["errorType"] == 1
             and (
-                response_json["status"]["errorCode"] == 1003
+                response_json["status"]["errorCode"] == 1001
+                or response_json["status"]["errorCode"] == 1003
+                or response_json["status"]["errorCode"] == 1005
                 or response_json["status"]["errorCode"] == 1037
-                or response_json["status"]["errorCode"] == 1001
             )
         ):
             _LOGGER.debug(f"error: session invalid")
