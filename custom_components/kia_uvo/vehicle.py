@@ -143,9 +143,10 @@ class Vehicle:
                         datetime.now(api_timezone) - self.last_sync_requested
                     )
                     if age_of_last_request_to_sync < REQUEST_TO_SYNC_COOLDOWN:
-                        raise RuntimeError(
-                            f"interval sync request failed, waiting for REQUEST_TO_SYNC_COOLDOWN:{REQUEST_TO_SYNC_COOLDOWN}; age_of_last_request_to_sync:{age_of_last_request_to_sync}"
+                        _LOGGER.debug(
+                            f"sync request skipping, interval sync request failed to be fulfilled by Vehicle, REQUEST_TO_SYNC_COOLDOWN:{REQUEST_TO_SYNC_COOLDOWN}; age_of_last_request_to_sync:{age_of_last_request_to_sync}"
                         )
+                        return
                 _LOGGER.debug(
                     f"requesting a sync based on scan interval; age_of_last_sync:{age_of_last_sync}; last synced:{self.last_synced_to_cloud}; now:{event_time_api}"
                 )
