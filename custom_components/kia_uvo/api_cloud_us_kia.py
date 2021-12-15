@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import logging
 
 from asyncio import sleep
@@ -8,6 +6,7 @@ from homeassistant.util import dt as dt_util
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryAuthFailed
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
+from homeassistant.const import LENGTH_MILES, TEMP_FAHRENHEIT
 
 from geopy.adapters import AioHTTPAdapter
 from geopy.geocoders import Nominatim
@@ -16,7 +15,6 @@ from kia_uvo_api import UsKia, AuthError
 
 from .util import convert_last_updated_str_to_datetime, safely_get_json_value
 from .vehicle import Vehicle
-from .api_action_status import ApiActionStatus
 from .api_cloud import ApiCloud
 from .const import (
     INITIAL_STATUS_DELAY_AFTER_COMMAND,
@@ -72,10 +70,6 @@ class ApiCloudUsKia(ApiCloud):
         client_session = async_get_clientsession(hass)
         self.api = UsKia(client_session=client_session)
         self._session_id = None
-        self._current_action: ApiActionStatus | None = None
-
-    async def cleanup(self):
-        pass
 
     async def _get_session_id(self):
         if self._session_id is None:
@@ -129,7 +123,7 @@ class ApiCloudUsKia(ApiCloud):
             "vehicleInfoList.0.vehicleConfig.vehicleDetail.vehicle.mileage",
             float,
         )
-        vehicle.odometer_unit = 3
+        vehicle.odometer_unit = LENGTH_MILES
 
         maintenance_array = safely_get_json_value(
             api_vehicle_status,
@@ -140,9 +134,9 @@ class ApiCloudUsKia(ApiCloud):
             maintenance_array.sort()
             current_mileage_index = maintenance_array.index(vehicle.odometer_value)
             vehicle.last_service_value = maintenance_array[current_mileage_index - 1]
-            vehicle.last_service_unit = 3
+            vehicle.last_service_unit = LENGTH_MILES
             vehicle.next_service_value = maintenance_array[current_mileage_index + 1]
-            vehicle.next_service_unit = 3
+            vehicle.next_service_unit = LENGTH_MILES
 
         vehicle.battery_level = safely_get_json_value(
             vehicle_status, "batteryStatus.stateOfCharge", int
@@ -185,9 +179,7 @@ class ApiCloudUsKia(ApiCloud):
             vehicle.climate_temperature_value = USA_TEMP_RANGE[0]
         elif vehicle.climate_temperature_value == "0xHIGH":
             vehicle.climate_temperature_value = USA_TEMP_RANGE[-1]
-        vehicle.climate_temperature_unit = safely_get_json_value(
-            vehicle_status, "climate.airTemp.unit", int
-        )
+        vehicle.climate_temperature_unit = TEMP_FAHRENHEIT
 
         vehicle.climate_heated_steering_wheel_on = safely_get_json_value(
             vehicle_status, "climate.heatingAccessory.steeringWheel", bool
@@ -215,39 +207,26 @@ class ApiCloudUsKia(ApiCloud):
         vehicle.ev_remaining_range_value = safely_get_json_value(
             vehicle_status,
             "evStatus.drvDistance.0.rangeByFuel.evModeRange.value",
-            float,
+            int,
         )
-        vehicle.ev_remaining_range_unit = safely_get_json_value(
-            vehicle_status, "evStatus.drvDistance.0.rangeByFuel.evModeRange.unit", int
-        )
+        vehicle.ev_remaining_range_unit = LENGTH_MILES
         vehicle.total_range_value = safely_get_json_value(
             vehicle_status,
             "evStatus.drvDistance.0.rangeByFuel.totalAvailableRange.value",
-            float,
-        )
-        vehicle.total_range_unit = safely_get_json_value(
-            vehicle_status,
-            "evStatus.drvDistance.0.rangeByFuel.totalAvailableRange.unit",
             int,
         )
+        vehicle.total_range_unit = LENGTH_MILES
         hybrid_fuel_range_value = safely_get_json_value(
             vehicle_status,
             "evStatus.drvDistance.0.rangeByFuel.gasModeRange.value",
             float,
         )
-        hybrid_fuel_range_unit = safely_get_json_value(
-            vehicle_status, "evStatus.drvDistance.0.rangeByFuel.gasModeRange.unit", int
-        )
         no_ev_fuel_range_value = safely_get_json_value(vehicle_status, "dte.value")
-        no_ev_fuel_range_unit = safely_get_json_value(vehicle_status, "dte.unit")
         if hybrid_fuel_range_value is not None:
             vehicle.fuel_range_value = hybrid_fuel_range_value
         else:
             vehicle.fuel_range_value = no_ev_fuel_range_value
-        if hybrid_fuel_range_unit is not None:
-            vehicle.fuel_range_unit = hybrid_fuel_range_unit
-        else:
-            vehicle.fuel_range_unit = no_ev_fuel_range_unit
+        vehicle.fuel_range_unit = LENGTH_MILES
 
         ev_max_dc_charge_level = safely_get_json_value(
             vehicle_status, "evStatus.targetSOC.0.targetSOClevel", int
@@ -285,7 +264,7 @@ class ApiCloudUsKia(ApiCloud):
             and vehicle.longitude is not None
         ):
             async with Nominatim(
-                user_agent="kia_uvo_hass",
+                user_agent="ha_kia_hyundai",
                 adapter_factory=AioHTTPAdapter,
             ) as geolocator:
                 location: Location = await geolocator.reverse(
@@ -318,6 +297,7 @@ class ApiCloudUsKia(ApiCloud):
         defrost: bool,
         climate: bool,
         heating: bool,
+        duration: int = None,
     ) -> None:
         session_id = await self._get_session_id()
         self._start_action(f"Start Climate")
@@ -352,7 +332,9 @@ class ApiCloudUsKia(ApiCloud):
         await self._check_action_completed(vehicle=vehicle)
 
     @request_with_active_session
-    async def set_charge_limits(self, vehicle: Vehicle, ac_limit: int, dc_limit: int) -> None:
+    async def set_charge_limits(
+        self, vehicle: Vehicle, ac_limit: int, dc_limit: int
+    ) -> None:
         session_id = await self._get_session_id()
         self._start_action(f"Set Charge Limits")
         xid = await self.api.set_charge_limits(

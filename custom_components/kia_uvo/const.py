@@ -58,6 +58,43 @@ REQUEST_TO_SYNC_COOLDOWN: timedelta = timedelta(minutes=15)
 # Sensor Specific Constants
 DATE_FORMAT: str = "%Y-%m-%d %H:%M:%S.%f"
 
+DYNAMIC_UNIT: str = "dynamic_unit"
+
+CA_TEMP_RANGE = [
+    16,
+    16.5,
+    17,
+    17.5,
+    18,
+    18.5,
+    19,
+    19.5,
+    20,
+    20.5,
+    21,
+    21.5,
+    22,
+    22.5,
+    23,
+    23.5,
+    24,
+    24.5,
+    25,
+    25.5,
+    26,
+    26.5,
+    27,
+    27.5,
+    28,
+    28.5,
+    29,
+    29.5,
+    30,
+    30.5,
+    31,
+    31.5,
+    32,
+]
 USA_TEMP_RANGE = range(62, 82)
 
 REGION_CANADA = "Canada"
@@ -256,21 +293,21 @@ INSTRUMENTS = [
     (
         "Range by EV",
         "ev_remaining_range_value",
-        LENGTH_MILES,
+        DYNAMIC_UNIT,
         "mdi:road-variant",
         None,
     ),
     (
         "Range by Fuel",
         "fuel_range_value",
-        LENGTH_MILES,
+        DYNAMIC_UNIT,
         "mdi:road-variant",
         None,
     ),
     (
         "Range Total",
         "total_range_value",
-        LENGTH_MILES,
+        DYNAMIC_UNIT,
         "mdi:road-variant",
         None,
     ),
@@ -319,21 +356,21 @@ INSTRUMENTS = [
     (
         "Target Range of Charge AC",
         "ev_max_range_ac_charge_value",
-        LENGTH_MILES,
+        DYNAMIC_UNIT,
         "mdi:car-electric",
         None,
     ),
     (
         "Target Range of Charge DC",
         "ev_max_range_dc_charge_value",
-        LENGTH_MILES,
+        DYNAMIC_UNIT,
         "mdi:car-electric",
         None,
     ),
     (
         "Odometer",
         "odometer_value",
-        LENGTH_MILES,
+        DYNAMIC_UNIT,
         "mdi:speedometer",
         None,
     ),
@@ -347,7 +384,7 @@ INSTRUMENTS = [
     (
         "Set Temperature",
         "climate_temperature_value",
-        TEMP_FAHRENHEIT,
+        DYNAMIC_UNIT,
         None,
         DEVICE_CLASS_TEMPERATURE,
     ),
@@ -368,14 +405,14 @@ INSTRUMENTS = [
     (
         "Last Service",
         "last_service_value",
-        LENGTH_MILES,
+        DYNAMIC_UNIT,
         "mdi:car-wrench",
         None,
     ),
     (
         "Next Service",
         "next_service_value",
-        LENGTH_MILES,
+        DYNAMIC_UNIT,
         "mdi:car-wrench",
         None,
     ),

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import logging
 
 from homeassistant.core import HomeAssistant
@@ -12,6 +14,7 @@ from .const import (
     CONF_VEHICLE_IDENTIFIER,
     DATA_VEHICLE_INSTANCE,
     DOMAIN,
+    DYNAMIC_UNIT,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -109,6 +112,13 @@ class InstrumentSensor(KiaUvoEntity):
         if self._key == "sync_age":
             key_to_check = "last_synced_to_cloud"
         return super() and getattr(self._vehicle, key_to_check) is not None
+
+    @property
+    def unit_of_measurement(self) -> str | None:
+        if self._attr_unit_of_measurement != DYNAMIC_UNIT:
+            return self._attr_unit_of_measurement
+        key_unit = self._key.replace("_value", "_unit")
+        return getattr(self._vehicle, key_unit)
 
 
 class ApiUsageSensor(DeviceInfoMixin, Entity):

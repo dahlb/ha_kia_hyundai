@@ -126,10 +126,18 @@ class KiaUvoConfigFlowHandler(config_entries.ConfigFlow):
             brand = self.data[CONF_BRAND]
 
             try:
-                api_cloud_class = api_cloud_for_region_and_brand(region=region, brand=brand)
-                api_cloud = api_cloud_class(
-                    username=username, password=password, hass=self.hass
+                api_cloud_class = api_cloud_for_region_and_brand(
+                    region=region, brand=brand
                 )
+                if region == REGION_CANADA:
+                    pin = user_input[CONF_PIN]
+                    api_cloud = api_cloud_class(
+                        username=username, password=password, hass=self.hass, pin=pin
+                    )
+                else:
+                    api_cloud = api_cloud_class(
+                        username=username, password=password, hass=self.hass
+                    )
                 await api_cloud.login()
                 self.data.update(user_input)
                 self.data[CONF_VEHICLES] = await api_cloud.get_vehicles()

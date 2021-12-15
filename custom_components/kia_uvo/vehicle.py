@@ -1,7 +1,15 @@
+from __future__ import annotations
+
 import logging
 from datetime import datetime
 from homeassistant.util import dt as dt_util
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
+from homeassistant.const import (
+    LENGTH_MILES,
+    LENGTH_KILOMETERS,
+    TEMP_CELSIUS,
+    TEMP_FAHRENHEIT,
+)
 import asyncio
 
 from .const import (
@@ -28,11 +36,11 @@ class Vehicle:
     last_sync_requested: datetime = None
 
     fuel_range_value: float = None
-    fuel_range_unit: int = None
+    fuel_range_unit: LENGTH_KILOMETERS | LENGTH_MILES = None
     total_range_value: float = None
-    total_range_unit: int = None
+    total_range_unit: LENGTH_KILOMETERS | LENGTH_MILES = None
     odometer_value: float = None
-    odometer_unit: int = None
+    odometer_unit: LENGTH_KILOMETERS | LENGTH_MILES = None
     battery_level: int = None
     engine_on: bool = None
     low_fuel_light_on: bool = None
@@ -46,8 +54,8 @@ class Vehicle:
     sleep_mode_on: bool = None
     climate_hvac_on: bool = None
     climate_defrost_on: bool = None
-    climate_temperature_value: int = None
-    climate_temperature_unit: int = None
+    climate_temperature_value: float = None
+    climate_temperature_unit: TEMP_CELSIUS | TEMP_FAHRENHEIT = None
     climate_heated_steering_wheel_on: bool = None
     climate_heated_side_mirror_on: bool = None
     climate_heated_rear_window_on: bool = None
@@ -63,22 +71,22 @@ class Vehicle:
     ev_charge_portable_duration: int = None
     ev_charge_station_duration: int = None
     ev_remaining_range_value: int = None
-    ev_remaining_range_unit: int = None
+    ev_remaining_range_unit: LENGTH_KILOMETERS | LENGTH_MILES = None
     ev_max_dc_charge_level: int = None
     ev_max_ac_charge_level: int = None
     ev_max_range_ac_charge_value: float = None
-    ev_max_range_ac_charge_unit: int = None
+    ev_max_range_ac_charge_unit: LENGTH_KILOMETERS | LENGTH_MILES = None
     ev_max_range_dc_charge_value: float = None
-    ev_max_range_dc_charge_unit: int = None
+    ev_max_range_dc_charge_unit: LENGTH_KILOMETERS | LENGTH_MILES = None
     tire_all_on: bool = None
     tire_front_left_on: bool = None
     tire_front_right_on: bool = None
     tire_rear_left_on: bool = None
     tire_rear_right_on: bool = None
     last_service_value: float = None
-    last_service_unit: int = None
+    last_service_unit: LENGTH_KILOMETERS | LENGTH_MILES = None
     next_service_value: float = None
-    next_service_unit: int = None
+    next_service_unit: LENGTH_KILOMETERS | LENGTH_MILES = None
 
     latitude: float = None
     longitude: float = None

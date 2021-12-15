@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import logging
 
 from abc import ABC, abstractmethod
@@ -15,6 +17,8 @@ _LOGGER = logging.getLogger(__name__)
 
 
 class ApiCloud(CallbacksMixin, ABC):
+    _current_action: ApiActionStatus | None = None
+
     def __init__(
         self,
         username: str,
@@ -71,6 +75,7 @@ class ApiCloud(CallbacksMixin, ABC):
         defrost: bool,
         climate: bool,
         heating: bool,
+        duration: int = None,
     ) -> None:
         pass
 

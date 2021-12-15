@@ -9,7 +9,7 @@ from homeassistant.const import (
     ATTR_DEVICE_ID,
     CONF_PASSWORD,
     CONF_USERNAME,
-    CONF_REGION
+    CONF_REGION,
 )
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.helpers.event import async_track_time_interval
@@ -33,9 +33,10 @@ from .const import (
     DEFAULT_NO_FORCE_SCAN_HOUR_START,
     DEFAULT_FORCE_SCAN_INTERVAL,
     CONF_BRAND,
+    REGION_CANADA,
+    CONF_PIN,
 )
 from .api_cloud_util import api_cloud_for_region_and_brand
-from .api_cloud import ApiCloud
 from .vehicle import Vehicle
 
 _LOGGER = logging.getLogger(__name__)
@@ -144,15 +145,31 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry):
     )
 
     api_cloud_class = api_cloud_for_region_and_brand(region=region, brand=brand)
-    hass_vehicle: Vehicle = await api_cloud_class(
-        username=username,
-        password=password,
-        hass=hass,
-        update_interval=scan_interval,
-        force_scan_interval=force_scan_interval,
-        no_force_scan_hour_start=no_force_scan_hour_start,
-        no_force_scan_hour_finish=no_force_scan_hour_finish,
-    ).get_vehicle(identifier=vehicle_identifier)
+    if region == REGION_CANADA:
+        pin = config_entry.data[CONF_PIN]
+        api_cloud_instance = api_cloud_class(
+            username=username,
+            password=password,
+            pin=pin,
+            hass=hass,
+            update_interval=scan_interval,
+            force_scan_interval=force_scan_interval,
+            no_force_scan_hour_start=no_force_scan_hour_start,
+            no_force_scan_hour_finish=no_force_scan_hour_finish,
+        )
+    else:
+        api_cloud_instance = api_cloud_class(
+            username=username,
+            password=password,
+            hass=hass,
+            update_interval=scan_interval,
+            force_scan_interval=force_scan_interval,
+            no_force_scan_hour_start=no_force_scan_hour_start,
+            no_force_scan_hour_finish=no_force_scan_hour_finish,
+        )
+    hass_vehicle: Vehicle = await api_cloud_instance.get_vehicle(
+        identifier=vehicle_identifier
+    )
 
     data = {
         DATA_VEHICLE_INSTANCE: hass_vehicle,
