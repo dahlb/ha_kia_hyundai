@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 
 from asyncio import sleep
-from kia_uvo_api import CaKia, CaHyundai, AuthError
+from kia_hyundai_api import CaKia, CaHyundai, AuthError
 from homeassistant.const import TEMP_CELSIUS
 from homeassistant.util import dt as dt_util
 from geopy.adapters import AioHTTPAdapter

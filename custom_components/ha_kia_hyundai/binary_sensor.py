@@ -9,7 +9,7 @@ from homeassistant.components.binary_sensor import (
 )
 
 from .vehicle import Vehicle
-from .kia_uvo_entity import KiaUvoEntity, DeviceInfoMixin
+from .base_entity import BaseEntity, DeviceInfoMixin
 from .const import (
     CONF_VEHICLE_IDENTIFIER,
     DATA_VEHICLE_INSTANCE,
@@ -52,7 +52,7 @@ async def async_setup_entry(
     async_add_entities([APIActionInProgress(vehicle)], True)
 
 
-class InstrumentSensor(KiaUvoEntity):
+class InstrumentSensor(BaseEntity):
     def __init__(
         self,
         vehicle: Vehicle,
@@ -90,7 +90,7 @@ class InstrumentSensor(KiaUvoEntity):
         return super() and getattr(self._vehicle, self._key) is not None
 
 
-class VehicleEntity(KiaUvoEntity):
+class VehicleEntity(BaseEntity):
     def __init__(self, vehicle: Vehicle):
         super().__init__(vehicle)
         self._attr_unique_id = f"{DOMAIN}-{vehicle.identifier}-all-data"

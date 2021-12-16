@@ -1,12 +1,12 @@
 from datetime import timedelta
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
-from kia_uvo_api import CaHyundai
+from kia_hyundai_api import CaKia
 
 from .api_cloud_ca import ApiCloudCa
 
 
-class ApiCloudCaHyundai(ApiCloudCa):
+class ApiCloudCaKia(ApiCloudCa):
     def __init__(
         self,
         username: str,
@@ -30,4 +30,4 @@ class ApiCloudCaHyundai(ApiCloudCa):
         self.pin = pin
 
         client_session = async_get_clientsession(hass)
-        self.api = CaHyundai(client_session=client_session)
+        self.api = CaKia(client_session=client_session)

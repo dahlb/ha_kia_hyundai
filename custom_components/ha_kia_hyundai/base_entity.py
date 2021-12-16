@@ -22,7 +22,7 @@ class DeviceInfoMixin:
         }
 
 
-class KiaUvoEntity(CoordinatorEntity[Vehicle], DeviceInfoMixin, Entity):
+class BaseEntity(CoordinatorEntity[Vehicle], DeviceInfoMixin, Entity):
     def __init__(self, vehicle: Vehicle):
         super().__init__(vehicle.coordinator)
         self._vehicle = vehicle

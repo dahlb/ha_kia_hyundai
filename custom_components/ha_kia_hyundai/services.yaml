@@ -7,7 +7,7 @@ request_sync:
       required: false
       selector:
         device:
-          integration: kia_uvo
+          integration: ha_kia_hyundai
 update:
   description: Update vehicle data from cloud cache
   fields:
@@ -17,7 +17,7 @@ update:
       required: false
       selector:
         device:
-          integration: kia_uvo
+          integration: ha_kia_hyundai
 start_climate:
   description: Start car climate. Not all items available for all cars.  Refer to Kia app for which are supported for your car.
   fields:
@@ -27,7 +27,7 @@ start_climate:
       required: false
       selector:
         device:
-          integration: kia_uvo
+          integration: ha_kia_hyundai
     Climate:
       name: Climate
       description: Enable the HVAC System
@@ -74,7 +74,7 @@ stop_climate:
       required: false
       selector:
         device:
-          integration: kia_uvo
+          integration: ha_kia_hyundai
 start_charge:
   description: Start charging
   fields:
@@ -84,7 +84,7 @@ start_charge:
       required: false
       selector:
         device:
-          integration: kia_uvo
+          integration: ha_kia_hyundai
 stop_charge:
   description: Stop charging
   fields:
@@ -94,7 +94,7 @@ stop_charge:
       required: false
       selector:
         device:
-          integration: kia_uvo
+          integration: ha_kia_hyundai
 lock:
   description: Lock the vehicle
   fields:
@@ -104,7 +104,7 @@ lock:
       required: false
       selector:
         device:
-          integration: kia_uvo
+          integration: ha_kia_hyundai
 unlock:
   description: Unlock the vehicle
   fields:
@@ -114,7 +114,7 @@ unlock:
       required: false
       selector:
         device:
-          integration: kia_uvo
+          integration: ha_kia_hyundai
 set_charge_limits:
   description: sets ac and dc charge capacity limits
   fields:
@@ -124,7 +124,7 @@ set_charge_limits:
       required: false
       selector:
         device:
-          integration: kia_uvo
+          integration: ha_kia_hyundai
     dc_limit:
       name: DC Charge limit
       description: max charge capacity using DC charger

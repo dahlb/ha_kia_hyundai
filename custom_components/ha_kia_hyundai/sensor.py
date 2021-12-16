@@ -9,7 +9,7 @@ import homeassistant.util.dt as dt_util
 from datetime import datetime
 
 from .vehicle import Vehicle
-from .kia_uvo_entity import KiaUvoEntity, DeviceInfoMixin
+from .base_entity import BaseEntity, DeviceInfoMixin
 from .const import (
     CONF_VEHICLE_IDENTIFIER,
     DATA_VEHICLE_INSTANCE,
@@ -72,7 +72,7 @@ async def async_setup_entry(
     async_add_entities(usage_sensors, True)
 
 
-class InstrumentSensor(KiaUvoEntity):
+class InstrumentSensor(BaseEntity):
     def __init__(
         self,
         vehicle: Vehicle,

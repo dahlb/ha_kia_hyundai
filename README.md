@@ -2,16 +2,16 @@
 
 A custom integration for Kia Uvo/Hyundai Bluelink in the USA/Canada regions. This project was mostly inspired by this [home assistant integration](https://github.com/fuatakgun/kia_uvo)
 
-Warning ahead; this is pre-alpha phase, please do not expect something fully functional, I will improve the integration by time.
+Warning ahead; this is beta phase, this is mostly functional, if you notice something missing please open an issue.
 
 ## Installation ##
 You can install this either manually copying files or using HACS. Configuration can be done on UI, you need to enter your username and password, (I know, translations are missing!). 
 
-- It will only fetch values for the first car, I am sure there are people outside using Kia Uvo with multiple cars, please create an issue, so I can gauge interest.
-- refresh - It will fetch the cached information every 30 minutes from Kia Uvo Servers. **Now Configurable**
+- It will allow selection during setup of which vehicle to fetch values for.
+- To setup two vehicles add the integration through HA UI twice.
+- refresh - It will fetch the cached information every 30 minutes from Kia/Hyundai Servers. **Now Configurable**
 - request sync - It will ask your car for the latest data every 4 hours. **Now Configurable**
 - It will not force update between 6PM to 6AM. **Now Configurable**
-- To setup two vehicles add the integration through HA UI twice.
 
 ## Supported entities ##
 - Air Conditioner Status, Defroster Status, Set Temperature
@@ -42,6 +42,6 @@ If you receive an error while trying to login, please go through these steps;
 logger:
   default: warning
   logs:
-    custom_components.kia_uvo: debug
+    custom_components.ha_kia_hyundai: debug
 ```
 

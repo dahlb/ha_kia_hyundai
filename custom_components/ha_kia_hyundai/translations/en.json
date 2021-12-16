@@ -1,17 +1,17 @@
 {
-  "title": "Kia Uvo",
+  "title": "Kia/Hyundai",
   "config": {
     "step": {
       "user": {
-        "title": "Kia Uvo Locale",
-        "description": "Set up your Kia Uvo to integrate with Home Assistant.",
+        "title": "Kia/Hyundai Locale",
+        "description": "Set up your Kia/Hyundai to integrate with Home Assistant.",
         "data": {
           "region": "Region",
           "brand": "Brand"
         }
       },
       "auth": {
-        "title": "Kia Uvo Auth",
+        "title": "Kia/Hyundai Auth",
         "description": "Configure your Credentials.",
         "data": {
           "username": "Username",
@@ -20,7 +20,7 @@
         }
       },
       "pick_vehicle": {
-        "title": "Kia Uvo Vehicle",
+        "title": "Kia/Hyundai Vehicle",
         "description": "Pick which vehicle to use.",
         "data": {
           "vehicle_str": "Vehicle"
@@ -28,11 +28,11 @@
       },
       "reauth_confirm": {
         "title": "[%key:common::config_flow::title::reauth%]",
-        "description": "The Kia Uvo integration needs to re-authenticate your account."
+        "description": "The Kia/Hyundai integration needs to re-authenticate your account."
       }
     },
     "error": {
-      "auth": "Login failed into Kia Uvo. Please use official Kia Uvo app to logout and log back in and try again!"
+      "auth": "Login failed into Kia/Hyundai. Please use official Kia/Hyundai app to logout and log back in and try again."
     },
     "abort": {
       "unsupported_brand_region": "Your Region/Brand combination is not yet supported, please check open tickets."
@@ -41,7 +41,7 @@
   "options": {
     "step": {
       "init": {
-        "title": "Kia Uvo: Configuration",
+        "title": "Kia/Hyundai: Configuration",
         "data": {
           "scan_interval": "Scan Interval in Minutes",
           "force_scan_interval": "Max Sync Age (Force Scan Interval) in Minutes",

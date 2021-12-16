@@ -19,7 +19,7 @@ from homeassistant.const import (
 )
 
 # Configuration Constants
-DOMAIN: str = "kia_uvo"
+DOMAIN: str = "ha_kia_hyundai"
 CONF_SCAN_INTERVAL: str = "scan_interval"
 CONF_FORCE_SCAN_INTERVAL: str = "force_scan_interval"
 CONF_NO_FORCE_SCAN_HOUR_START: str = "no_force_scan_hour_start"

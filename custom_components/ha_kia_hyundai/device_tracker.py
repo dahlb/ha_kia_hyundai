@@ -8,7 +8,7 @@ from homeassistant.helpers.entity import Entity
 
 from .const import DOMAIN, DATA_VEHICLE_INSTANCE, CONF_VEHICLE_IDENTIFIER
 from .vehicle import Vehicle
-from .kia_uvo_entity import KiaUvoEntity
+from .base_entity import BaseEntity
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -24,7 +24,7 @@ async def async_setup_entry(
     async_add_entities([LocationTracker(vehicle)], True)
 
 
-class LocationTracker(KiaUvoEntity, TrackerEntity):
+class LocationTracker(BaseEntity, TrackerEntity):
     def __init__(self, vehicle: Vehicle):
         super().__init__(vehicle)
         self._attr_unique_id = f"{DOMAIN}-{vehicle.identifier}-location"

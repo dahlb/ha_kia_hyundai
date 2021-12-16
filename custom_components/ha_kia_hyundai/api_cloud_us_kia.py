@@ -11,7 +11,7 @@ from homeassistant.const import LENGTH_MILES, TEMP_FAHRENHEIT
 from geopy.adapters import AioHTTPAdapter
 from geopy.geocoders import Nominatim
 from geopy.location import Location
-from kia_uvo_api import UsKia, AuthError
+from kia_hyundai_api import UsKia, AuthError
 
 from .util import convert_last_updated_str_to_datetime, safely_get_json_value
 from .vehicle import Vehicle

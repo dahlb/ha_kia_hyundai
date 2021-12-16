@@ -5,7 +5,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.typing import ConfigType
 
 from .vehicle import Vehicle
-from .kia_uvo_entity import KiaUvoEntity
+from .base_entity import BaseEntity
 from .const import (
     DOMAIN,
     DATA_VEHICLE_INSTANCE,
@@ -25,7 +25,7 @@ async def async_setup_entry(
     async_add_entities([Lock(vehicle)], True)
 
 
-class Lock(KiaUvoEntity, LockEntity):
+class Lock(BaseEntity, LockEntity):
     def __init__(
         self,
         vehicle: Vehicle,
