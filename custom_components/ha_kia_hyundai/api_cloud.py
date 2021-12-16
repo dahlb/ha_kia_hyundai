@@ -76,7 +76,7 @@ class ApiCloud(CallbacksMixin, ABC):
         defrost: bool,
         climate: bool,
         heating: bool,
-        duration: int = None,
+        duration: int,
     ) -> None:
         pass
 

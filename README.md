@@ -7,6 +7,7 @@ Warning ahead; this is beta phase, this is mostly functional, if you notice some
 ## Installation ##
 You can install this either manually copying files or using HACS. Configuration can be done on UI, you need to enter your username and password, (I know, translations are missing!). 
 
+- Expects your HA metric setting to match region defaults. AKA in the USA not metric, in Canada is metric
 - It will allow selection during setup of which vehicle to fetch values for.
 - To setup two vehicles add the integration through HA UI twice.
 - refresh - It will fetch the cached information every 30 minutes from Kia/Hyundai Servers. **Now Configurable**

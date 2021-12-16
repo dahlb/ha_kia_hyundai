@@ -137,7 +137,9 @@ class Vehicle:
 
         force_scan_interval: timedelta = self.api_cloud.force_scan_interval
         if self.climate_hvac_on:
-            _LOGGER.debug(f"HVAC on, changing force_scan_interval to api_cloud duration of minutes")
+            _LOGGER.debug(
+                f"HVAC on, changing force_scan_interval to api_cloud duration of minutes"
+            )
             force_scan_interval = self.api_cloud.hvac_on_force_scan_interval
         if (
             self.api_cloud.no_force_scan_hour_start
@@ -196,7 +198,7 @@ class Vehicle:
         if self.calls_today_for_actions is not None:
             self.calls_today_for_actions.mark_used()
 
-    async def start_climate(self, set_temp, defrost, climate, heating):
+    async def start_climate(self, set_temp, defrost, climate, heating, duration):
         if set_temp is None:
             set_temp = 76
         if defrost is None:
@@ -205,12 +207,15 @@ class Vehicle:
             climate = True
         if heating is None:
             heating = False
+        if duration is None:
+            duration = 5
         await self.api_cloud.start_climate(
             vehicle=self,
             set_temp=set_temp,
             defrost=defrost,
             climate=climate,
             heating=heating,
+            duration=duration,
         )
         if self.calls_today_for_actions is not None:
             self.calls_today_for_actions.mark_used()

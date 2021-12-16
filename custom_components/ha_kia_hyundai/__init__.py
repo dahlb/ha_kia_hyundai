@@ -35,6 +35,22 @@ from .const import (
     CONF_BRAND,
     REGION_CANADA,
     CONF_PIN,
+    CA_TEMP_RANGE,
+    USA_TEMP_RANGE,
+    SERVICE_NAME_REQUEST_SYNC,
+    SERVICE_NAME_UPDATE,
+    SERVICE_NAME_START_CLIMATE,
+    SERVICE_NAME_STOP_CLIMATE,
+    SERVICE_NAME_START_CHARGE,
+    SERVICE_NAME_STOP_CHARGE,
+    SERVICE_NAME_SET_CHARGE_LIMITS,
+    SERVICE_ATTRIBUTE_TEMPERATURE,
+    SERVICE_ATTRIBUTE_DEFROST,
+    SERVICE_ATTRIBUTE_CLIMATE,
+    SERVICE_ATTRIBUTE_HEATING,
+    SERVICE_ATTRIBUTE_DURATION,
+    SERVICE_ATTRIBUTE_AC_LIMIT,
+    SERVICE_ATTRIBUTE_DC_LIMIT,
 )
 from .api_cloud_util import api_cloud_for_region_and_brand
 from .vehicle import Vehicle
@@ -82,13 +98,20 @@ async def async_setup(hass: HomeAssistant, config_entry: ConfigType) -> bool:
         await hass.async_create_task(hass_vehicle.update())
 
     async def async_handle_start_climate(call):
-        set_temp = call.data.get("Temperature")
-        defrost = call.data.get("Defrost")
-        climate = call.data.get("Climate")
-        heating = call.data.get("Heating")
+        set_temp = call.data.get(SERVICE_ATTRIBUTE_TEMPERATURE)
+        defrost = call.data.get(SERVICE_ATTRIBUTE_DEFROST)
+        climate = call.data.get(SERVICE_ATTRIBUTE_CLIMATE)
+        heating = call.data.get(SERVICE_ATTRIBUTE_HEATING)
+        duration = call.data.get(SERVICE_ATTRIBUTE_DURATION)
         hass_vehicle: Vehicle = convert_call_to_vehicle(call)
         await hass.async_create_task(
-            hass_vehicle.start_climate(set_temp, defrost, climate, heating)
+            hass_vehicle.start_climate(
+                set_temp=set_temp,
+                defrost=defrost,
+                climate=climate,
+                heating=heating,
+                duration=duration,
+            )
         )
 
     async def async_handle_stop_climate(call):
@@ -104,19 +127,69 @@ async def async_setup(hass: HomeAssistant, config_entry: ConfigType) -> bool:
         await hass.async_create_task(hass_vehicle.stop_charge())
 
     async def async_handle_set_charge_limits(call):
-        ac_limit = call.data.get("ac_limit")
-        dc_limit = call.data.get("dc_limit")
+        ac_limit = call.data.get(SERVICE_ATTRIBUTE_AC_LIMIT)
+        dc_limit = call.data.get(SERVICE_ATTRIBUTE_DC_LIMIT)
         hass_vehicle: Vehicle = convert_call_to_vehicle(call)
         await hass.async_create_task(hass_vehicle.set_charge_limits(ac_limit, dc_limit))
 
-    hass.services.async_register(DOMAIN, "request_sync", async_handle_request_sync)
-    hass.services.async_register(DOMAIN, "update", async_handle_update)
-    hass.services.async_register(DOMAIN, "start_climate", async_handle_start_climate)
-    hass.services.async_register(DOMAIN, "stop_climate", async_handle_stop_climate)
-    hass.services.async_register(DOMAIN, "start_charge", async_handle_start_charge)
-    hass.services.async_register(DOMAIN, "stop_charge", async_handle_stop_charge)
     hass.services.async_register(
-        DOMAIN, "set_charge_limits", async_handle_set_charge_limits
+        DOMAIN, SERVICE_NAME_REQUEST_SYNC, async_handle_request_sync
+    )
+    hass.services.async_register(DOMAIN, SERVICE_NAME_UPDATE, async_handle_update)
+    climate_schema = {
+        vol.Optional(
+            SERVICE_ATTRIBUTE_CLIMATE,
+        ): cv.boolean,
+        vol.Optional(
+            SERVICE_ATTRIBUTE_DEFROST,
+        ): cv.boolean,
+        vol.Optional(
+            SERVICE_ATTRIBUTE_HEATING,
+        ): cv.boolean,
+        vol.Optional(
+            SERVICE_ATTRIBUTE_CLIMATE,
+        ): vol.Range(1, 10),
+    }
+    if hass.config.units.is_metric:
+        climate_schema[
+            vol.Optional(
+                SERVICE_ATTRIBUTE_TEMPERATURE,
+            )
+        ] = vol.All(vol.Coerce(float), vol.In(CA_TEMP_RANGE))
+    else:
+        climate_schema[
+            vol.Optional(
+                SERVICE_ATTRIBUTE_TEMPERATURE,
+            )
+        ] = vol.All(vol.Coerce(int), vol.In(USA_TEMP_RANGE))
+    hass.services.async_register(
+        DOMAIN,
+        SERVICE_NAME_START_CLIMATE,
+        async_handle_start_climate,
+        vol.Schema(climate_schema),
+    )
+    hass.services.async_register(
+        DOMAIN, SERVICE_NAME_STOP_CLIMATE, async_handle_stop_climate
+    )
+    hass.services.async_register(
+        DOMAIN, SERVICE_NAME_START_CHARGE, async_handle_start_charge
+    )
+    hass.services.async_register(
+        DOMAIN, SERVICE_NAME_STOP_CHARGE, async_handle_stop_charge
+    )
+    charge_limit_schema = {
+        vol.Optional(
+            SERVICE_ATTRIBUTE_AC_LIMIT,
+        ): vol.All(vol.Coerce(int), vol.In(range(50, 101, 10))),
+        vol.Optional(
+            SERVICE_ATTRIBUTE_DC_LIMIT,
+        ): vol.All(vol.Coerce(int), vol.In(range(50, 101, 10))),
+    }
+    hass.services.async_register(
+        DOMAIN,
+        SERVICE_NAME_SET_CHARGE_LIMITS,
+        async_handle_set_charge_limits,
+        vol.Schema(charge_limit_schema),
     )
 
     return True

@@ -28,28 +28,22 @@ start_climate:
       selector:
         device:
           integration: ha_kia_hyundai
-    Climate:
+    climate:
       name: Climate
       description: Enable the HVAC System
       required: false
       example: true
-      default: true  
+      default: true
       selector:
-        boolean: 
-    Temperature:
+        boolean:
+    temperature:
       name: Temperature
       description: Set temperature of climate control.
       required: false
-      example: 72
-      default: 76
+      example: 76 for Fahrenheit or 21 for Celsius
       selector:
-        number:
-            min: 62
-            max: 82
-            step: 1
-            mode: box
-            unit_of_measurement: Degrees
-    Defrost:
+        text:
+    defrost:
       name: Defrost
       description: Front Windshield Defrost
       required: false
@@ -57,14 +51,26 @@ start_climate:
       default: false
       selector:
         boolean:
-    Heating:
+    heating:
       name: Heating
       description: Heated features like the steering wheel and rear window
       required: false
       example: false
-      default: false  
+      default: false
       selector:
         boolean:
+    duration:
+      name: Duration
+      description: On Duration, Ignored by USA Kia API
+      required: false
+      example: 5
+      default: 5
+      selector:
+        number:
+            min: 1
+            max: 10
+            step: 1
+            unit_of_measurement: minutes
 stop_climate:
   description: Stop car climate
   fields:
@@ -133,10 +139,10 @@ set_charge_limits:
       default: 90
       selector:
         number:
-            min: 50
-            max: 100
-            step: 10
-            unit_of_measurement: '%'
+          min: 50
+          max: 100
+          step: 10
+          unit_of_measurement: '%'
     ac_limit:
       name: AC Charge limit
       description: max charge capacity using AC charger
@@ -145,7 +151,7 @@ set_charge_limits:
       default: 90
       selector:
         number:
-            min: 50
-            max: 100
-            step: 10
-            unit_of_measurement: '%'
+          min: 50
+          max: 100
+          step: 10
+          unit_of_measurement: '%'

@@ -299,7 +299,7 @@ class ApiCloudUsKia(ApiCloud):
         defrost: bool,
         climate: bool,
         heating: bool,
-        duration: int = None,
+        duration: int,
     ) -> None:
         session_id = await self._get_session_id()
         self._start_action(f"Start Climate")
