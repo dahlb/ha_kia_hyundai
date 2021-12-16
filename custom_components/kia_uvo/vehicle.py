@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import logging
-from datetime import datetime
+from datetime import datetime, timedelta
 from homeassistant.util import dt as dt_util
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 from homeassistant.const import (
@@ -135,10 +135,10 @@ class Vehicle:
         else:
             _LOGGER.debug(f"interval update skipping")
 
-        force_scan_interval = self.api_cloud.force_scan_interval
-        if self.climate_hvac_on is not None and self.climate_hvac_on:
-            _LOGGER.debug(f"HVAC on, changing force_scan_interval to 5 minutes")
-            force_scan_interval = 5
+        force_scan_interval: timedelta = self.api_cloud.force_scan_interval
+        if self.climate_hvac_on:
+            _LOGGER.debug(f"HVAC on, changing force_scan_interval to api_cloud duration of minutes")
+            force_scan_interval = self.api_cloud.hvac_on_force_scan_interval
         if (
             self.api_cloud.no_force_scan_hour_start
             > event_time_local.hour

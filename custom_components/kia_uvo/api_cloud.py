@@ -18,6 +18,7 @@ _LOGGER = logging.getLogger(__name__)
 
 class ApiCloud(CallbacksMixin, ABC):
     _current_action: ApiActionStatus | None = None
+    hvac_on_force_scan_interval: timedelta = timedelta(minutes=10)
 
     def __init__(
         self,
@@ -29,11 +30,11 @@ class ApiCloud(CallbacksMixin, ABC):
         no_force_scan_hour_start: int = None,
         no_force_scan_hour_finish: int = None,
     ):
-        self.hass = hass
+        self.hass: HomeAssistant = hass
         self.update_interval: timedelta = update_interval
-        self.force_scan_interval = force_scan_interval
-        self.no_force_scan_hour_start = no_force_scan_hour_start
-        self.no_force_scan_hour_finish = no_force_scan_hour_finish
+        self.force_scan_interval: timedelta = force_scan_interval
+        self.no_force_scan_hour_start: int = no_force_scan_hour_start
+        self.no_force_scan_hour_finish: int = no_force_scan_hour_finish
         self.username: str = username
         self.password: str = password
 

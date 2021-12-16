@@ -48,6 +48,8 @@ def request_with_active_session(func):
 
 
 class ApiCloudUsKia(ApiCloud):
+    hvac_on_force_scan_interval: timedelta = timedelta(minutes=5)
+
     def __init__(
         self,
         username: str,

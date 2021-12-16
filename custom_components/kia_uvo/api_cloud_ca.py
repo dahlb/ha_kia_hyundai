@@ -9,6 +9,7 @@ from homeassistant.util import dt as dt_util
 from geopy.adapters import AioHTTPAdapter
 from geopy.geocoders import Nominatim
 from geopy.location import Location
+from datetime import timedelta
 
 from .api_cloud import ApiCloud
 from .vehicle import Vehicle
@@ -411,6 +412,7 @@ class ApiCloudCa(ApiCloud):
             )
         self._current_action.set_xid(xid)
         await self._check_action_completed(vehicle=vehicle, pin_token=pin_token)
+        self.hvac_on_force_scan_interval = timedelta(minutes=int(duration)+1)
 
     @request_with_active_session
     async def stop_climate(self, vehicle: Vehicle) -> None:
