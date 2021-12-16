@@ -170,9 +170,11 @@ class ApiCloudCa(ApiCloud):
             api_vehicle_status, "status.evStatus.batteryPlugin", bool
         )
 
-        vehicle.ev_battery_level = safely_get_json_value(
+        ev_battery_level = safely_get_json_value(
             api_vehicle_status, "status.evStatus.batteryStatus", int
         )
+        if ev_battery_level != 0:
+            vehicle.ev_battery_level = ev_battery_level
         vehicle.ev_remaining_range_value = safely_get_json_value(
             api_vehicle_status,
             "status.evStatus.drvDistance.0.rangeByFuel.evModeRange.value",
