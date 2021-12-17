@@ -97,6 +97,9 @@ class ApiCloudCa(ApiCloud):
         if target_soc is not None:
             target_soc.sort(key=lambda x: x["plugType"])
 
+        vehicle.doors_locked = safely_get_json_value(
+            api_vehicle_status, "status.doorLock", bool
+        )
         vehicle.door_hood_open = safely_get_json_value(
             api_vehicle_status, "status.hoodOpen", bool
         )
@@ -476,7 +479,7 @@ class ApiCloudCa(ApiCloud):
     async def set_charge_limits(
         self, vehicle: Vehicle, ac_limit: int, dc_limit: int
     ) -> None:
-        raise Exception("Not yet implemented")
+        raise NotImplemented("Not yet implemented")
 
     async def _check_action_completed(self, vehicle: Vehicle, pin_token: str) -> None:
         access_token = await self._get_access_token()

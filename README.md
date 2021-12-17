@@ -2,7 +2,14 @@
 
 A custom integration for Kia Uvo/Hyundai Bluelink in the USA/Canada regions. This project was mostly inspired by this [home assistant integration](https://github.com/fuatakgun/kia_uvo)
 
-Warning ahead; this is beta phase, this is mostly functional, if you notice something missing please open an issue.
+Warning ahead; this is beta phase, this is mostly functional for USA Kia, if you notice something missing please open an issue.
+Warning ahead; this is alpha phase for CA and US Hyundai, if you notice something missing please open an issue.
+
+## Feature Highlights ##
+- Minimizing UI thread workload to allow things like Google Home to function correctly
+- Clean easy to maintain MVC design
+- Isolation of Region/Brand idiosyncrasy.
+- Published PyPi for all API interactions to help full python community
 
 ## Installation ##
 You can install this either manually copying files or using HACS. Configuration can be done on UI, you need to enter your username and password, (I know, translations are missing!). 
@@ -31,10 +38,10 @@ You can install this either manually copying files or using HACS. Configuration 
 
 ## Supported services ##
 - update: get latest **cached** vehicle data
-- request_sync: this will make a call to your vehicle to get its latest data, do not overuse this!
+- request_sync: this will make a call to your vehicle to get its latest data, do not overuse this! (unavailable in US Hyundai)
 - start_climate / stop_climate: Control the HVAC car services
-- start_charge / stop_charge: You can control your charging using these services
-- set_charge_limits: You can control your charging capacity limits using this services
+- start_charge / stop_charge: You can control your charging using these services (unavailable in US Hyundai)
+- set_charge_limits: You can control your charging capacity limits using this services  (unavailable in US Hyundai and CA)
 
 ## Troubleshooting ##
 If you receive an error while trying to login, please go through these steps;
@@ -44,5 +51,6 @@ logger:
   default: warning
   logs:
     custom_components.ha_kia_hyundai: debug
+    kia_hyundai_api: debug
 ```
 
