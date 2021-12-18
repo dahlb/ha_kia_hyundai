@@ -7,8 +7,9 @@ Warning ahead; this is alpha phase for CA and US Hyundai, if you notice somethin
 
 ## Feature Highlights ##
 - Minimizing UI thread workload to allow things like Google Home to function correctly
+- Multiple vehicle support, both within same login and across brands
 - Clean easy to maintain MVC design
-- Isolation of Region/Brand idiosyncrasy.
+- Isolation of Region/Brand idiosyncrasy
 - Published PyPi for all API interactions to help full python community
 
 ## Installation ##

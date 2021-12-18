@@ -218,28 +218,18 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry):
     )
 
     api_cloud_class = api_cloud_for_region_and_brand(region=region, brand=brand)
-    if region == REGION_CANADA:
+    api_cloud_instance = api_cloud_class(
+        username=username,
+        password=password,
+        hass=hass,
+        update_interval=scan_interval,
+        force_scan_interval=force_scan_interval,
+        no_force_scan_hour_start=no_force_scan_hour_start,
+        no_force_scan_hour_finish=no_force_scan_hour_finish,
+    )
+    if config_entry.data[CONF_PIN] is not None:
         pin = config_entry.data[CONF_PIN]
-        api_cloud_instance = api_cloud_class(
-            username=username,
-            password=password,
-            pin=pin,
-            hass=hass,
-            update_interval=scan_interval,
-            force_scan_interval=force_scan_interval,
-            no_force_scan_hour_start=no_force_scan_hour_start,
-            no_force_scan_hour_finish=no_force_scan_hour_finish,
-        )
-    else:
-        api_cloud_instance = api_cloud_class(
-            username=username,
-            password=password,
-            hass=hass,
-            update_interval=scan_interval,
-            force_scan_interval=force_scan_interval,
-            no_force_scan_hour_start=no_force_scan_hour_start,
-            no_force_scan_hour_finish=no_force_scan_hour_finish,
-        )
+        api_cloud_instance.pin = pin
     hass_vehicle: Vehicle = await api_cloud_instance.get_vehicle(
         identifier=vehicle_identifier
     )
