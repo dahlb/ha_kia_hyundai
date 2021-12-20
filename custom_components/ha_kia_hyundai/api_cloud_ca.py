@@ -9,6 +9,7 @@ from homeassistant.util import dt as dt_util
 from geopy.adapters import AioHTTPAdapter
 from geopy.geocoders import Nominatim
 from geopy.location import Location
+from geopy.exc import GeocoderServiceError
 from datetime import timedelta
 
 from .api_cloud import ApiCloud
@@ -339,10 +340,13 @@ class ApiCloudCa(ApiCloud):
                     user_agent="ha_kia_hyundai",
                     adapter_factory=AioHTTPAdapter,
                 ) as geolocator:
-                    location: Location = await geolocator.reverse(
-                        query=(vehicle.latitude, vehicle.longitude)
-                    )
-                    vehicle.location_name = location.address
+                    try:
+                        location: Location = await geolocator.reverse(
+                            query=(vehicle.latitude, vehicle.longitude)
+                        )
+                        vehicle.location_name = location.address
+                    except GeocoderServiceError as error:
+                        _LOGGER.warning(f"Location name lookup failed:{error}")
 
     @request_with_active_session
     async def request_sync(self, vehicle: Vehicle) -> None:

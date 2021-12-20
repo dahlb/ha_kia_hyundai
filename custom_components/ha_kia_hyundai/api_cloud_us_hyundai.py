@@ -12,6 +12,7 @@ from datetime import timedelta, datetime
 from geopy.adapters import AioHTTPAdapter
 from geopy.geocoders import Nominatim
 from geopy.location import Location
+from geopy.exc import GeocoderServiceError
 
 from .api_cloud import ApiCloud
 from .vehicle import Vehicle
@@ -361,10 +362,13 @@ class ApiCloudUsHyundai(ApiCloud):
                             user_agent="ha_kia_hyundai",
                             adapter_factory=AioHTTPAdapter,
                     ) as geolocator:
-                        location: Location = await geolocator.reverse(
-                            query=(vehicle.latitude, vehicle.longitude)
-                        )
-                        vehicle.location_name = location.address
+                        try:
+                            location: Location = await geolocator.reverse(
+                                query=(vehicle.latitude, vehicle.longitude)
+                            )
+                            vehicle.location_name = location.address
+                        except GeocoderServiceError as error:
+                            _LOGGER.warning(f"Location name lookup failed:{error}")
             except RateError:
                 self.last_loc_timestamp = datetime.now() + timedelta(hours=11)
                 _LOGGER.warning(
