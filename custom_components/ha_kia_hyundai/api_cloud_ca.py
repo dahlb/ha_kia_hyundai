@@ -54,8 +54,7 @@ class ApiCloudCa(ApiCloud):
         return self._access_token
 
     async def login(self):
-        tokens = self.api.login(self.username, self.password)
-        self._access_token = tokens["access_token"]
+        self._access_token, _ = self.api.login(self.username, self.password)
 
     @request_with_active_session
     async def get_vehicles(self) -> list[Vehicle]:
