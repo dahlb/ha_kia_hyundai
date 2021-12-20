@@ -11,6 +11,10 @@ from homeassistant.const import (
     TEMP_FAHRENHEIT,
 )
 import asyncio
+from geopy.adapters import AioHTTPAdapter
+from geopy.geocoders import Nominatim
+from geopy.location import Location
+from geopy.exc import GeocoderServiceError
 
 from .const import (
     VEHICLE_LOCK_ACTION,
@@ -278,6 +282,19 @@ class Vehicle:
 
     def empty_keys(self):
         return [key for key, value in self.__repr__().items() if value is None]
+
+    def update_location_name(self):
+        async with Nominatim(
+                user_agent="ha_kia_hyundai",
+                adapter_factory=AioHTTPAdapter,
+        ) as geolocator:
+            try:
+                location: Location = await geolocator.reverse(
+                    query=(self.latitude, self.longitude)
+                )
+                self.location_name = location.address
+            except GeocoderServiceError as error:
+                _LOGGER.warning(f"Location name lookup failed:{error}")
 
     def __repr__(self):
         return {

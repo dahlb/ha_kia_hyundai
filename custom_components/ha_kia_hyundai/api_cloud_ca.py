@@ -6,10 +6,6 @@ from asyncio import sleep
 from kia_hyundai_api import CaKia, CaHyundai, AuthError
 from homeassistant.const import TEMP_CELSIUS
 from homeassistant.util import dt as dt_util
-from geopy.adapters import AioHTTPAdapter
-from geopy.geocoders import Nominatim
-from geopy.location import Location
-from geopy.exc import GeocoderServiceError
 from datetime import timedelta
 
 from .api_cloud import ApiCloud
@@ -335,17 +331,7 @@ class ApiCloudCa(ApiCloud):
                 and vehicle.latitude is not None
                 and vehicle.longitude is not None
             ):
-                async with Nominatim(
-                    user_agent="ha_kia_hyundai",
-                    adapter_factory=AioHTTPAdapter,
-                ) as geolocator:
-                    try:
-                        location: Location = await geolocator.reverse(
-                            query=(vehicle.latitude, vehicle.longitude)
-                        )
-                        vehicle.location_name = location.address
-                    except GeocoderServiceError as error:
-                        _LOGGER.warning(f"Location name lookup failed:{error}")
+                vehicle.update_location_name()
 
     @request_with_active_session
     async def request_sync(self, vehicle: Vehicle) -> None:
