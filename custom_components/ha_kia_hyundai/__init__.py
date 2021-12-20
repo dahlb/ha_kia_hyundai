@@ -78,9 +78,13 @@ async def async_setup(hass: HomeAssistant, config_entry: ConfigType) -> bool:
         if len(vehicle_identifiers) == 1:
             vehicle_identifier = vehicle_identifiers[0]
         else:
-            vehicle_identifier = convert_device_id_to_vehicle_identifier(
-                call.data[ATTR_DEVICE_ID]
-            )
+            _LOGGER.debug(f"multiple vehicles in domain:{vehicle_identifiers}; call.data:{call.data}")
+            if ATTR_DEVICE_ID in call.data:
+                vehicle_identifier = convert_device_id_to_vehicle_identifier(
+                    call.data[ATTR_DEVICE_ID]
+                )
+            else:
+                raise Exception("multiple devices detected, device_id is required.")
 
         return hass.data[DOMAIN][vehicle_identifier][DATA_VEHICLE_INSTANCE]
 
@@ -227,7 +231,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry):
         no_force_scan_hour_start=no_force_scan_hour_start,
         no_force_scan_hour_finish=no_force_scan_hour_finish,
     )
-    if config_entry.data[CONF_PIN] is not None:
+    if CONF_PIN in config_entry.data and config_entry.data[CONF_PIN] is not None:
         pin = config_entry.data[CONF_PIN]
         api_cloud_instance.pin = pin
     hass_vehicle: Vehicle = await api_cloud_instance.get_vehicle(
