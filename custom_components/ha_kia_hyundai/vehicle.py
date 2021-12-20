@@ -283,7 +283,7 @@ class Vehicle:
     def empty_keys(self):
         return [key for key, value in self.__repr__().items() if value is None]
 
-    def update_location_name(self):
+    async def update_location_name(self):
         async with Nominatim(
                 user_agent="ha_kia_hyundai",
                 adapter_factory=AioHTTPAdapter,

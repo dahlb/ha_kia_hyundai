@@ -354,7 +354,7 @@ class ApiCloudUsHyundai(ApiCloud):
                         and vehicle.latitude is not None
                         and vehicle.longitude is not None
                 ):
-                    vehicle.update_location_name()
+                    await vehicle.update_location_name()
             except RateError:
                 self.last_loc_timestamp = datetime.now() + timedelta(hours=11)
                 _LOGGER.warning(

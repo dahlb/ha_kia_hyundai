@@ -331,7 +331,7 @@ class ApiCloudCa(ApiCloud):
                 and vehicle.latitude is not None
                 and vehicle.longitude is not None
             ):
-                vehicle.update_location_name()
+                await vehicle.update_location_name()
 
     @request_with_active_session
     async def request_sync(self, vehicle: Vehicle) -> None:
