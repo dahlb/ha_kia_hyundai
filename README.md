@@ -11,6 +11,7 @@ Warning ahead; this is alpha phase for CA and US Hyundai, if you notice somethin
 - Clean easy to maintain MVC design
 - Isolation of Region/Brand idiosyncrasy
 - Published PyPi for all API interactions to help full python community
+- Action locks to prevent attempts to call two actions at the same time, the api doesn't support parallel actions. (feature not available for US Hyundai)
 
 ## Installation ##
 You can install this either manually copying files or using HACS. Configuration can be done on UI, you need to enter your username and password, (I know, translations are missing!). 
