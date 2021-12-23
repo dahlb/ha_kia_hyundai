@@ -12,6 +12,7 @@ Warning ahead; this is alpha phase for CA and US Hyundai, if you notice somethin
 - Isolation of Region/Brand idiosyncrasy
 - Published PyPi for all API interactions to help full python community
 - Action locks to prevent attempts to call two actions at the same time, the api doesn't support parallel actions. (feature not available for US Hyundai)
+- Tracking results of asynchronous vehicle APIs through to conclusion. (feature not available for US Hyundai)
 
 ## Installation ##
 You can install this either manually copying files or using HACS. Configuration can be done on UI, you need to enter your username and password, (I know, translations are missing!). 
@@ -35,7 +36,7 @@ You can install this either manually copying files or using HACS. Configuration 
 - Engine Status
 - Odometer, EV Range
 - Last Updated from Cloud: Timestamp this integration last attempted to retrieve data from the cloud
-- Sync Age: Minutes since car synced to cloud during last update
+- *Sync Age*: Minutes since car synced to cloud during last update
 - Api Call Counts: Updates, Sync Requests, and Action calls counted daily
 
 ## Supported services ##
