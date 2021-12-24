@@ -5,6 +5,7 @@ import logging
 from asyncio import sleep
 from kia_hyundai_api import CaKia, CaHyundai, AuthError
 from homeassistant.const import TEMP_CELSIUS
+from homeassistant.exceptions import ConfigEntryAuthFailed
 from homeassistant.util import dt as dt_util
 from datetime import timedelta
 
@@ -50,7 +51,10 @@ class ApiCloudCa(ApiCloud):
         return self._access_token
 
     async def login(self):
-        self._access_token, _ = await self.api.login(self.username, self.password)
+        try:
+            self._access_token, _ = await self.api.login(self.username, self.password)
+        except AuthError as err:
+            raise ConfigEntryAuthFailed(err) from err
 
     @request_with_active_session
     async def get_vehicles(self) -> list[Vehicle]:

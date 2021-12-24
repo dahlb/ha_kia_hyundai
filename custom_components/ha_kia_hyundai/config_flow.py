@@ -139,7 +139,7 @@ class KiaUvoConfigFlowHandler(config_entries.ConfigFlow):
                 self.data.update(user_input)
                 self.data[CONF_VEHICLES] = await api_cloud.get_vehicles()
                 return await self.async_step_pick_vehicle()
-            except (ConfigEntryAuthFailed, AuthError):
+            except ConfigEntryAuthFailed:
                 errors["base"] = "auth"
             finally:
                 await api_cloud.cleanup()
