@@ -10,6 +10,7 @@ from homeassistant.const import (
     CONF_REGION,
 )
 from homeassistant.core import callback
+from kia_hyundai_api import AuthError
 
 from .const import (
     CONF_SCAN_INTERVAL,
@@ -138,7 +139,7 @@ class KiaUvoConfigFlowHandler(config_entries.ConfigFlow):
                 self.data.update(user_input)
                 self.data[CONF_VEHICLES] = await api_cloud.get_vehicles()
                 return await self.async_step_pick_vehicle()
-            except ConfigEntryAuthFailed:
+            except (ConfigEntryAuthFailed, AuthError):
                 errors["base"] = "auth"
             finally:
                 await api_cloud.cleanup()

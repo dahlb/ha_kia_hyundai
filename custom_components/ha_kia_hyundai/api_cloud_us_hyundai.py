@@ -33,7 +33,6 @@ class ApiCloudUsHyundai(ApiCloud):
         self,
         username: str,
         password: str,
-        pin: str,
         hass: HomeAssistant,
         update_interval: timedelta = None,
         force_scan_interval: timedelta = None,
@@ -49,8 +48,6 @@ class ApiCloudUsHyundai(ApiCloud):
             no_force_scan_hour_start=no_force_scan_hour_start,
             no_force_scan_hour_finish=no_force_scan_hour_finish,
         )
-        self.pin = pin
-
         client_session = async_get_clientsession(hass)
         self.api: UsHyundai = UsHyundai(client_session=client_session)
         self.hvac_on_force_scan_interval: timedelta = force_scan_interval
