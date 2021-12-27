@@ -49,13 +49,14 @@ def convert_api_unit_to_ha_unit_of_temperature(
 def safely_get_json_value(json, key, callable_to_cast=None):
     value = json
     for x in key.split("."):
-        try:
-            value = value[x]
-        except (TypeError, KeyError):
+        if value is not None:
             try:
-                value = value[int(x)]
-            except (KeyError, ValueError):
-                value = None
+                value = value[x]
+            except (TypeError, KeyError):
+                try:
+                    value = value[int(x)]
+                except (TypeError, KeyError, ValueError):
+                    value = None
     if callable_to_cast is not None and value is not None:
         value = callable_to_cast(value)
     return value
