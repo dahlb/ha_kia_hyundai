@@ -67,12 +67,11 @@ class ApiCloudCa(ApiCloud):
                 identifier=response_vehicle["vehicleId"],
                 api_unsupported_keys=[],  # KIA_US_UNSUPPORTED_INSTRUMENT_KEYS, TODO
             )
-            # vehicle.vin = response_vehicle["vin"]
-            # vehicle.key = response_vehicle["vehicleKey"]
-            # vehicle.model = response_vehicle["modelName"]
+            vehicle.vin = response_vehicle["vin"]
+            vehicle.model = response_vehicle["modelName"]
             vehicle.name = response_vehicle["nickName"]
-            # if bool(response_vehicle["enrollmentStatus"]):
-            #     vehicles.append(vehicle)
+            if response_vehicle["subscriptionStatus"] == "A":
+                vehicles.append(vehicle)
         return vehicles
 
     @request_with_active_session
