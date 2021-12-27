@@ -96,8 +96,7 @@ class ApiCloudUsKia(ApiCloud):
             vehicle.key = response_vehicle["vehicleKey"]
             vehicle.model = response_vehicle["modelName"]
             vehicle.name = response_vehicle["nickName"]
-            if bool(response_vehicle["enrollmentStatus"]):
-                vehicles.append(vehicle)
+            vehicles.append(vehicle)
         return vehicles
 
     @request_with_active_session

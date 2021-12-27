@@ -70,8 +70,7 @@ class ApiCloudCa(ApiCloud):
             vehicle.vin = response_vehicle["vin"]
             vehicle.model = response_vehicle["modelName"]
             vehicle.name = response_vehicle["nickName"]
-            if response_vehicle["subscriptionStatus"] == "A":
-                vehicles.append(vehicle)
+            vehicles.append(vehicle)
         return vehicles
 
     @request_with_active_session
