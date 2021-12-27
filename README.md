@@ -19,7 +19,7 @@ You can install this either manually copying files or using HACS. Configuration 
 
 - Expects your HA metric setting to match region defaults. AKA in the USA not metric, in Canada is metric
 - It will allow selection during setup of which vehicle to fetch values for.
-- To setup two vehicles add the integration through HA UI twice.
+- To set up two vehicles add the integration through HA UI twice.
 - refresh - It will fetch the cached information every 30 minutes from Kia/Hyundai Servers. **Now Configurable**
 - request sync - It will ask your car for the latest data every 4 hours. **Now Configurable**
 - It will not force update between 6PM to 6AM. **Now Configurable**
@@ -40,8 +40,10 @@ You can install this either manually copying files or using HACS. Configuration 
 - Api Call Counts: Updates, Sync Requests, and Action calls counted daily
 
 ## Supported services ##
+### this integration aims to automate what you can do in the official app, if you can't do it in the app because your subscription is expired then this integration won't be able to do it either.
+### device id is optional unless you have two vehicles setup then it becomes required, this is for common convenience but if you plan to add a second vehicle use the device_id parameter always.
 - update: get latest **cached** vehicle data
-- request_sync: this will make a call to your vehicle to get its latest data, do not overuse this! (unavailable in US Hyundai)
+- request_sync: this will make a call to your vehicle to get its latest data, watch sync age to tell if you are over using this! (unavailable in US Hyundai)
 - start_climate / stop_climate: Control the HVAC car services
 - start_charge / stop_charge: You can control your charging using these services (unavailable in US Hyundai)
 - set_charge_limits: You can control your charging capacity limits using this services  (unavailable in US Hyundai and CA)
