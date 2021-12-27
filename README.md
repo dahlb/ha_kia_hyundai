@@ -41,6 +41,7 @@ You can install this either manually copying files or using HACS. Configuration 
 
 ## Supported services ##
 this integration aims to automate what you can do in the official app, if you can't do it in the app because your subscription is expired then this integration won't be able to do it either.
+
 device id is optional unless you have two vehicles setup then it becomes required, this is for common convenience but if you plan to add a second vehicle use the device_id parameter always.
 - update: get latest **cached** vehicle data
 - request_sync: this will make a call to your vehicle to get its latest data, watch sync age to tell if you are over using this! (unavailable in US Hyundai)
