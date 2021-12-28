@@ -115,7 +115,7 @@ class KiaUvoConfigFlowHandler(config_entries.ConfigFlow):
             vol.Required(CONF_USERNAME): str,
             vol.Required(CONF_PASSWORD): str,
         }
-        if self.data[CONF_REGION] == REGION_CANADA:
+        if self.data[CONF_REGION] == REGION_CANADA or (self.data[CONF_REGION] == REGION_USA and self.data[CONF_BRAND] == BRAND_HYUNDAI):
             data_schema[vol.Required(CONF_PIN)] = str
         errors: Dict[str, str] = {}
 
@@ -133,7 +133,7 @@ class KiaUvoConfigFlowHandler(config_entries.ConfigFlow):
                 api_cloud = api_cloud_class(
                     username=username, password=password, hass=self.hass
                 )
-                if user_input[CONF_PIN] is not None:
+                if user_input.get(CONF_PIN) is not None:
                     api_cloud.pin = user_input[CONF_PIN]
                 await api_cloud.login()
                 self.data.update(user_input)
