@@ -250,11 +250,10 @@ class ApiCloudCa(ApiCloud):
             api_vehicle_status, "status.battery.batSoc", int
         )
 
-        temp_value = (
-            safely_get_json_value(api_vehicle_status, "status.airTemp.value")
-            .replace("H", "")
-        )
-        vehicle.climate_temperature_value = CA_TEMP_RANGE[int(temp_value, 16)]
+        temp_value = safely_get_json_value(api_vehicle_status, "status.airTemp.value")
+        if temp_value is not None:
+            temp_value = temp_value.replace("H", "")
+            vehicle.climate_temperature_value = CA_TEMP_RANGE[int(temp_value, 16)]
         vehicle.climate_temperature_unit = TEMP_CELSIUS
 
         non_ev_fuel_distance = safely_get_json_value(
