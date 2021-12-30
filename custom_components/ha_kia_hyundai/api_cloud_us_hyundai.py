@@ -365,7 +365,7 @@ class ApiCloudUsHyundai(ApiCloud):
                 )
 
     async def request_sync(self, vehicle: Vehicle) -> None:
-        _LOGGER.debug(f"request_sync no implemented")
+        raise NotImplemented(f"request_sync not implemented, api sniffing needed for this feature")
 
     async def lock(self, vehicle: Vehicle, action: VEHICLE_LOCK_ACTION) -> None:
         access_token = await self._get_access_token()
