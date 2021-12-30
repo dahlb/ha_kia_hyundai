@@ -229,12 +229,12 @@ class ApiCloudUsKia(ApiCloud):
         ev_max_dc_charge_level = safely_get_json_value(
             vehicle_status, "evStatus.targetSOC.0.targetSOClevel", int
         )
-        if ev_max_dc_charge_level <= 100:
+        if ev_max_dc_charge_level is not None and ev_max_dc_charge_level <= 100:
             vehicle.ev_max_dc_charge_level = ev_max_dc_charge_level
         ev_max_ac_charge_level = safely_get_json_value(
             vehicle_status, "evStatus.targetSOC.1.targetSOClevel", int
         )
-        if ev_max_ac_charge_level <= 100:
+        if ev_max_ac_charge_level is not None and ev_max_ac_charge_level <= 100:
             vehicle.ev_max_ac_charge_level = ev_max_ac_charge_level
 
         vehicle.tire_all_on = safely_get_json_value(

@@ -212,12 +212,16 @@ class ApiCloudCa(ApiCloud):
         vehicle.ev_charge_station_duration = safely_get_json_value(
             api_vehicle_status, "status.evStatus.remainTime2.etc3.value", int
         )
-        vehicle.ev_max_dc_charge_level = safely_get_json_value(
+        ev_max_dc_charge_level = safely_get_json_value(
             api_vehicle_status, "status.evStatus.targetSOC.0.targetSOClevel", int
         )
-        vehicle.ev_max_ac_charge_level = safely_get_json_value(
+        if ev_max_dc_charge_level is not None and ev_max_dc_charge_level <= 100:
+            vehicle.ev_max_dc_charge_level = ev_max_dc_charge_level
+        ev_max_ac_charge_level = safely_get_json_value(
             api_vehicle_status, "status.evStatus.targetSOC.1.targetSOClevel", int
         )
+        if ev_max_ac_charge_level is not None and ev_max_ac_charge_level <= 100:
+            vehicle.ev_max_ac_charge_level = ev_max_ac_charge_level
         vehicle.ev_max_range_dc_charge_value = safely_get_json_value(
             api_vehicle_status,
             "status.evStatus.targetSOC.0.dte.rangeByFuel.totalAvailableRange.value",
