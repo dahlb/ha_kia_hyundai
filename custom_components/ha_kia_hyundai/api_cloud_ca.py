@@ -251,11 +251,9 @@ class ApiCloudCa(ApiCloud):
         )
 
         temp_value = (
-            safely_get_json_value(api_vehicle_status, "status.airTemp.value", float)
+            safely_get_json_value(api_vehicle_status, "status.airTemp.value")
             .replace("H", "")
-            .replace("C", "")
         )
-        temp_value = "0x" + temp_value
         vehicle.climate_temperature_value = CA_TEMP_RANGE[int(temp_value, 16)]
         vehicle.climate_temperature_unit = TEMP_CELSIUS
 

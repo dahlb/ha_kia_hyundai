@@ -14,6 +14,7 @@ from .api_cloud import ApiCloud
 from .vehicle import Vehicle
 from .const import (
     VEHICLE_LOCK_ACTION,
+    USA_TEMP_RANGE,
 )
 from .util import (
     convert_last_updated_str_to_datetime,
@@ -298,9 +299,11 @@ class ApiCloudUsHyundai(ApiCloud):
             api_vehicle_status, "vehicleStatus.battery.batSoc", int
         )
 
-        vehicle.climate_temperature_value = safely_get_json_value(
-            api_vehicle_status, "vehicleStatus.airTemp.value", float
+        temp_value = (
+            safely_get_json_value(api_vehicle_status, "status.airTemp.value")
+            .replace("H", "")
         )
+        vehicle.climate_temperature_value = USA_TEMP_RANGE[int(temp_value, 16)]
         vehicle.climate_temperature_unit = TEMP_FAHRENHEIT
 
         non_ev_fuel_distance = safely_get_json_value(

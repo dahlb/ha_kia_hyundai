@@ -60,41 +60,7 @@ DATE_FORMAT: str = "%Y-%m-%d %H:%M:%S.%f"
 
 DYNAMIC_UNIT: str = "dynamic_unit"
 
-CA_TEMP_RANGE = [
-    16,
-    16.5,
-    17,
-    17.5,
-    18,
-    18.5,
-    19,
-    19.5,
-    20,
-    20.5,
-    21,
-    21.5,
-    22,
-    22.5,
-    23,
-    23.5,
-    24,
-    24.5,
-    25,
-    25.5,
-    26,
-    26.5,
-    27,
-    27.5,
-    28,
-    28.5,
-    29,
-    29.5,
-    30,
-    30.5,
-    31,
-    31.5,
-    32,
-]
+CA_TEMP_RANGE = [x * 0.5 for x in range(32, 64)]
 USA_TEMP_RANGE = range(62, 82)
 
 REGION_CANADA = "Canada"
