@@ -101,6 +101,9 @@ class Vehicle:
     calls_today_for_update = None
     calls_today_for_request_sync = None
 
+    # debug
+    raw_responses = None
+
     def __init__(self, api_cloud, identifier: str, api_unsupported_keys):
         self.api_cloud = api_cloud
         self.identifier = identifier

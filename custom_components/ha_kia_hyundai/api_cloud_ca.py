@@ -84,6 +84,10 @@ class ApiCloudCa(ApiCloud):
         api_vehicle_next_service = await self.api.get_next_service_status(
             access_token=access_token, vehicle_id=vehicle.identifier
         )
+        vehicle.raw_responses = {
+            "status": api_vehicle_status,
+            "next_service": api_vehicle_next_service,
+        }
 
         vehicle.last_synced_to_cloud = convert_last_updated_str_to_datetime(
             last_updated_str=api_vehicle_status["status"]["lastStatusDate"],
@@ -319,6 +323,7 @@ class ApiCloudCa(ApiCloud):
                 pin=self.pin,
                 pin_token=pin_token,
             )
+            vehicle.raw_responses["location"] = api_vehicle_location
             previous_latitude = vehicle.latitude
             previous_longitude = vehicle.longitude
             vehicle.latitude = safely_get_json_value(

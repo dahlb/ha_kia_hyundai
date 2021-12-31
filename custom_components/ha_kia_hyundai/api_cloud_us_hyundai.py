@@ -107,6 +107,10 @@ class ApiCloudUsHyundai(ApiCloud):
             access_token=access_token,
             vehicle_vin=vehicle.vin,
         )
+        vehicle.raw_responses = {
+            "status": api_vehicle_status
+        }
+
         updated_vehicle = await self.get_vehicle(identifier=vehicle.identifier)
 
         vehicle.last_synced_to_cloud = convert_last_updated_str_to_datetime(
@@ -350,6 +354,8 @@ class ApiCloudUsHyundai(ApiCloud):
                     access_token=access_token,
                     vehicle_vin=vehicle.vin,
                 )
+                vehicle.raw_responses["location"] = api_vehicle_location
+
                 vehicle.latitude = safely_get_json_value(
                     api_vehicle_location, "coord.lat", float
                 )

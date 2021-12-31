@@ -107,6 +107,7 @@ class ApiCloudUsKia(ApiCloud):
         api_vehicle_status = await self.api.get_cached_vehicle_status(
             session_id, vehicle.key
         )
+        vehicle.raw_responses = api_vehicle_status
         vehicle_status = safely_get_json_value(
             api_vehicle_status,
             "vehicleInfoList.0.lastVehicleInfo.vehicleStatusRpt.vehicleStatus",
