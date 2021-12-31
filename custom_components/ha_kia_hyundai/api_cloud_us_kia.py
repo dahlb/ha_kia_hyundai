@@ -19,6 +19,8 @@ from .const import (
     VEHICLE_LOCK_ACTION,
     USA_TEMP_RANGE,
     KIA_US_UNSUPPORTED_INSTRUMENT_KEYS,
+    BRAND_KIA,
+    REGION_USA,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -350,3 +352,11 @@ class ApiCloudUsKia(ApiCloud):
             self._current_action.complete()
             self.publish_updates()
         await vehicle.update()
+
+    @property
+    def brand(self) -> str:
+        return BRAND_KIA
+
+    @property
+    def region(self) -> str:
+        return REGION_USA

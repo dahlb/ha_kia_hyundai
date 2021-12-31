@@ -16,6 +16,7 @@ from .const import (
     INITIAL_STATUS_DELAY_AFTER_COMMAND,
     RECHECK_STATUS_DELAY_AFTER_COMMAND,
     CA_TEMP_RANGE,
+    REGION_CANADA,
 )
 from .util import (
     convert_last_updated_str_to_datetime,
@@ -497,3 +498,7 @@ class ApiCloudCa(ApiCloud):
             self._current_action.complete()
             self.publish_updates()
         await vehicle.update()
+
+    @property
+    def region(self) -> str:
+        return REGION_CANADA

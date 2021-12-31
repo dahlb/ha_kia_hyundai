@@ -4,6 +4,7 @@ from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from kia_hyundai_api import CaKia
 
 from .api_cloud_ca import ApiCloudCa
+from .const import BRAND_KIA
 
 
 class ApiCloudCaKia(ApiCloudCa):
@@ -28,3 +29,7 @@ class ApiCloudCaKia(ApiCloudCa):
         )
         client_session = async_get_clientsession(hass)
         self.api = CaKia(client_session=client_session)
+
+    @property
+    def brand(self) -> str:
+        return BRAND_KIA

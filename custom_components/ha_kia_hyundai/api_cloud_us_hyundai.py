@@ -15,6 +15,8 @@ from .vehicle import Vehicle
 from .const import (
     VEHICLE_LOCK_ACTION,
     USA_TEMP_RANGE,
+    BRAND_HYUNDAI,
+    REGION_USA,
 )
 from .util import (
     convert_last_updated_str_to_datetime,
@@ -434,3 +436,11 @@ class ApiCloudUsHyundai(ApiCloud):
         self, vehicle: Vehicle, ac_limit: int, dc_limit: int
     ) -> None:
         raise NotImplemented("Not yet implemented")
+
+    @property
+    def region(self) -> str:
+        return REGION_USA
+
+    @property
+    def brand(self) -> str:
+        return BRAND_HYUNDAI

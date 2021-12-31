@@ -16,7 +16,7 @@ class DeviceInfoMixin:
         return {
             "identifiers": {(DOMAIN, self._vehicle.identifier)},
             "name": self._vehicle.name,
-            "manufacturer": "Kia",
+            "manufacturer": f"{self._vehicle.api_cloud.region} {self._vehicle.api_cloud.brand}",
             "model": self._vehicle.model,
             "via_device": (DOMAIN, self._vehicle.identifier),
         }
@@ -25,7 +25,7 @@ class DeviceInfoMixin:
 class BaseEntity(CoordinatorEntity[Vehicle], DeviceInfoMixin, Entity):
     def __init__(self, vehicle: Vehicle):
         super().__init__(vehicle.coordinator)
-        self._vehicle = vehicle
+        self._vehicle: Vehicle = vehicle
 
     async def async_update(self) -> None:
         """

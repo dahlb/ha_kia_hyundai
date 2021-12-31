@@ -119,3 +119,13 @@ class ApiCloud(CallbacksMixin, ABC):
             return self._current_action.name
         else:
             "None"
+
+    @property
+    @abstractmethod
+    def region(self) -> str:
+        pass
+
+    @property
+    @abstractmethod
+    def brand(self) -> str:
+        pass
