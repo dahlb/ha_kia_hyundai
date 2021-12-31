@@ -301,8 +301,13 @@ class ApiCloudUsHyundai(ApiCloud):
 
         temp_value = safely_get_json_value(api_vehicle_status, "vehicleStatus.airTemp.value")
         if temp_value is not None:
-            temp_value = temp_value.replace("H", "")
-            vehicle.climate_temperature_value = USA_TEMP_RANGE[int(temp_value, 16)]
+            if temp_value == "LO":
+                vehicle.climate_temperature_value = USA_TEMP_RANGE[0]
+            elif temp_value == "HI":
+                vehicle.climate_temperature_value = USA_TEMP_RANGE[-1]
+            else:
+                temp_value = temp_value.replace("H", "")
+                vehicle.climate_temperature_value = USA_TEMP_RANGE[int(temp_value, 16)]
         vehicle.climate_temperature_unit = TEMP_FAHRENHEIT
 
         non_ev_fuel_distance = safely_get_json_value(
