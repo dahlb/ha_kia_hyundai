@@ -16,6 +16,8 @@ from homeassistant.helpers.event import async_track_time_interval
 from homeassistant.helpers.typing import ConfigType
 from homeassistant.helpers import device_registry as dr
 import homeassistant.helpers.config_validation as cv
+from aiohttp.client_exceptions import ClientError
+from asyncio import sleep
 
 from .const import (
     DOMAIN,
@@ -234,9 +236,16 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry):
     if CONF_PIN in config_entry.data and config_entry.data[CONF_PIN] is not None:
         pin = config_entry.data[CONF_PIN]
         api_cloud_instance.pin = pin
-    hass_vehicle: Vehicle = await api_cloud_instance.get_vehicle(
-        identifier=vehicle_identifier
-    )
+    try:
+        hass_vehicle: Vehicle = await api_cloud_instance.get_vehicle(
+            identifier=vehicle_identifier
+        )
+    except ClientError as error:
+        _LOGGER.warning(f"error during setup: {error}, waiting 1 minute and trying again.")
+        sleep(60)
+        hass_vehicle: Vehicle = await api_cloud_instance.get_vehicle(
+            identifier=vehicle_identifier
+        )
 
     data = {
         DATA_VEHICLE_INSTANCE: hass_vehicle,
