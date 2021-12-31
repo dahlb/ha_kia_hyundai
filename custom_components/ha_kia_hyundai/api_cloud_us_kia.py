@@ -222,11 +222,12 @@ class ApiCloudUsKia(ApiCloud):
             "evStatus.drvDistance.0.rangeByFuel.gasModeRange.value",
             float,
         )
-        no_ev_fuel_range_value = safely_get_json_value(vehicle_status, "dte.value")
+        no_ev_fuel_range_value = safely_get_json_value(vehicle_status, "distanceToEmpty.value")
         if hybrid_fuel_range_value is not None:
             vehicle.fuel_range_value = hybrid_fuel_range_value
         else:
             vehicle.fuel_range_value = no_ev_fuel_range_value
+            vehicle.total_range_value = no_ev_fuel_range_value
         vehicle.fuel_range_unit = LENGTH_MILES
 
         ev_max_dc_charge_level = safely_get_json_value(
