@@ -80,7 +80,9 @@ async def async_setup(hass: HomeAssistant, config_entry: ConfigType) -> bool:
         if len(vehicle_identifiers) == 1:
             vehicle_identifier = vehicle_identifiers[0]
         else:
-            _LOGGER.debug(f"multiple vehicles in domain:{vehicle_identifiers}; call.data:{call.data}")
+            _LOGGER.debug(
+                f"multiple vehicles in domain:{vehicle_identifiers}; call.data:{call.data}"
+            )
             if ATTR_DEVICE_ID in call.data:
                 vehicle_identifier = convert_device_id_to_vehicle_identifier(
                     call.data[ATTR_DEVICE_ID]
@@ -241,7 +243,9 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry):
             identifier=vehicle_identifier
         )
     except ClientError as error:
-        _LOGGER.warning(f"error during setup: {error}, waiting 1 minute and trying again.")
+        _LOGGER.warning(
+            f"error during setup: {error}, waiting 1 minute and trying again."
+        )
         sleep(60)
         hass_vehicle: Vehicle = await api_cloud_instance.get_vehicle(
             identifier=vehicle_identifier

@@ -107,9 +107,7 @@ class ApiCloudUsHyundai(ApiCloud):
             access_token=access_token,
             vehicle_vin=vehicle.vin,
         )
-        vehicle.raw_responses = {
-            "status": api_vehicle_status
-        }
+        vehicle.raw_responses = {"status": api_vehicle_status}
 
         updated_vehicle = await self.get_vehicle(identifier=vehicle.identifier)
 
@@ -305,7 +303,9 @@ class ApiCloudUsHyundai(ApiCloud):
             api_vehicle_status, "vehicleStatus.battery.batSoc", int
         )
 
-        temp_value = safely_get_json_value(api_vehicle_status, "vehicleStatus.airTemp.value")
+        temp_value = safely_get_json_value(
+            api_vehicle_status, "vehicleStatus.airTemp.value"
+        )
         if temp_value is not None:
             if temp_value == "LO":
                 vehicle.climate_temperature_value = USA_TEMP_RANGE[0]
@@ -363,12 +363,12 @@ class ApiCloudUsHyundai(ApiCloud):
                     api_vehicle_location, "coord.lon", float
                 )
                 if (
-                        (
-                                vehicle.latitude != previous_latitude
-                                or vehicle.longitude != previous_longitude
-                        )
-                        and vehicle.latitude is not None
-                        and vehicle.longitude is not None
+                    (
+                        vehicle.latitude != previous_latitude
+                        or vehicle.longitude != previous_longitude
+                    )
+                    and vehicle.latitude is not None
+                    and vehicle.longitude is not None
                 ):
                     await vehicle.update_location_name()
             except RateError:
@@ -378,7 +378,9 @@ class ApiCloudUsHyundai(ApiCloud):
                 )
 
     async def request_sync(self, vehicle: Vehicle) -> None:
-        raise NotImplemented(f"request_sync not implemented, api sniffing needed for this feature")
+        raise NotImplemented(
+            f"request_sync not implemented, api sniffing needed for this feature"
+        )
 
     async def lock(self, vehicle: Vehicle, action: VEHICLE_LOCK_ACTION) -> None:
         access_token = await self._get_access_token()

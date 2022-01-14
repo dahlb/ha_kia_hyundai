@@ -107,9 +107,7 @@ class DebugRawEntity(BaseEntity):
 
     @property
     def state_attributes(self):
-        return {
-            "raw_responses": json.dumps(self._vehicle.raw_responses)
-        }
+        return {"raw_responses": json.dumps(self._vehicle.raw_responses)}
 
 
 class DebugMappedEntity(BaseEntity):
