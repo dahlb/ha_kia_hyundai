@@ -288,8 +288,8 @@ class Vehicle:
 
     async def update_location_name(self):
         async with Nominatim(
-                user_agent="ha_kia_hyundai",
-                adapter_factory=AioHTTPAdapter,
+            user_agent="ha_kia_hyundai",
+            adapter_factory=AioHTTPAdapter,
         ) as geolocator:
             try:
                 location: Location = await geolocator.reverse(
