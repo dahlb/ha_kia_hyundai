@@ -139,6 +139,13 @@ class ApiCloudUsKia(ApiCloud):
             vehicle.next_service_value = maintenance_array[current_mileage_index + 1]
             vehicle.next_service_unit = LENGTH_MILES
 
+        vehicle.next_service_mile_value = safely_get_json_value(
+            api_vehicle_status,
+            "vehicleInfoList.0.vehicleConfig.maintenance.nextServiceMile",
+            float,
+        )
+        vehicle.next_service_mile_unit = LENGTH_MILES
+
         vehicle.battery_level = safely_get_json_value(
             vehicle_status, "batteryStatus.stateOfCharge", int
         )

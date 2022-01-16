@@ -91,6 +91,8 @@ class Vehicle:
     last_service_unit: LENGTH_KILOMETERS | LENGTH_MILES = None
     next_service_value: float = None
     next_service_unit: LENGTH_KILOMETERS | LENGTH_MILES = None
+    next_service_mile_value: float = None
+    next_service_mile_unit: LENGTH_KILOMETERS | LENGTH_MILES = None
 
     latitude: float = None
     longitude: float = None
@@ -361,6 +363,8 @@ class Vehicle:
             "last_service_unit": self.last_service_unit,
             "next_service_value": self.next_service_value,
             "next_service_unit": self.next_service_unit,
+            "next_service_mile_value": self.next_service_mile_value,
+            "next_service_mile_unit": self.next_service_mile_unit,
             "latitude": self.latitude,
             "longitude": self.longitude,
             "location_name": self.location_name,
