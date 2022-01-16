@@ -382,6 +382,13 @@ INSTRUMENTS = [
         "mdi:car-wrench",
         None,
     ),
+    (
+        "Miles Until Next Service",
+        "next_service_mile_value",
+        DYNAMIC_UNIT,
+        "mdi:car-wrench",
+        None,
+    ),
 ]
 
 KIA_US_UNSUPPORTED_INSTRUMENT_KEYS = [
