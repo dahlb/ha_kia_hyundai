@@ -134,10 +134,19 @@ class ApiCloudUsKia(ApiCloud):
             maintenance_array.append(vehicle.odometer_value)
             maintenance_array.sort()
             current_mileage_index = maintenance_array.index(vehicle.odometer_value)
-            vehicle.last_service_value = maintenance_array[current_mileage_index - 1]
-            vehicle.last_service_unit = LENGTH_MILES
-            vehicle.next_service_value = maintenance_array[current_mileage_index + 1]
-            vehicle.next_service_unit = LENGTH_MILES
+            if current_mileage_index > 0:
+                vehicle.last_service_value = maintenance_array[current_mileage_index - 1]
+                vehicle.last_service_unit = LENGTH_MILES
+            else:
+                vehicle.last_service_value = 0
+                vehicle.last_service_unit = LENGTH_MILES
+
+            if current_mileage_index != -1:
+                vehicle.next_service_value = maintenance_array[current_mileage_index + 1]
+                vehicle.next_service_unit = LENGTH_MILES
+            else:
+                vehicle.next_service_value = 0
+                vehicle.next_service_unit = LENGTH_MILES
 
         vehicle.next_service_mile_value = safely_get_json_value(
             api_vehicle_status,
