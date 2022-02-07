@@ -74,6 +74,12 @@ class ApiCloudCa(ApiCloud):
             vehicles.append(vehicle)
         return vehicles
 
+    async def get_pin_token(self, access_token: str):
+        pin_token_result = await self.api.get_pin_token(
+            access_token=access_token, pin=self.pin
+        )
+        return pin_token_result["pAuth"]
+
     @request_with_active_session
     async def update(self, vehicle: Vehicle) -> None:
         access_token = await self._get_access_token()
@@ -314,9 +320,7 @@ class ApiCloudCa(ApiCloud):
         )
 
         if previous_odometer_value != vehicle.odometer_value:
-            pin_token = await self.api.get_pin_token(
-                access_token=access_token, pin=self.pin
-            )
+            pin_token = await self.get_pin_token(access_token=access_token)
             api_vehicle_location = await self.api.get_location(
                 access_token=access_token,
                 vehicle_id=vehicle.identifier,
@@ -354,9 +358,7 @@ class ApiCloudCa(ApiCloud):
     async def lock(self, vehicle: Vehicle, action: VEHICLE_LOCK_ACTION) -> None:
         self._start_action(f"Lock {action.value}")
         access_token = await self._get_access_token()
-        pin_token = await self.api.get_pin_token(
-            access_token=access_token, pin=self.pin
-        )
+        pin_token = await self.get_pin_token(access_token=access_token)
         if action == VEHICLE_LOCK_ACTION.LOCK:
             xid = await self.api.lock(
                 access_token=access_token,
@@ -386,9 +388,7 @@ class ApiCloudCa(ApiCloud):
     ) -> None:
         self._start_action(f"Start Climate")
         access_token = await self._get_access_token()
-        pin_token = await self.api.get_pin_token(
-            access_token=access_token, pin=self.pin
-        )
+        pin_token = await self.get_pin_token(access_token=access_token)
         if vehicle.ev_plugged_in is None:
             xid = await self.api.start_climate(
                 saccess_token=access_token,
@@ -421,9 +421,7 @@ class ApiCloudCa(ApiCloud):
     async def stop_climate(self, vehicle: Vehicle) -> None:
         self._start_action(f"Stop Climate")
         access_token = await self._get_access_token()
-        pin_token = await self.api.get_pin_token(
-            access_token=access_token, pin=self.pin
-        )
+        pin_token = await self.get_pin_token(access_token=access_token)
         if vehicle.ev_plugged_in is None:
             xid = await self.api.stop_climate(
                 saccess_token=access_token,
@@ -445,9 +443,7 @@ class ApiCloudCa(ApiCloud):
     async def start_charge(self, vehicle: Vehicle) -> None:
         self._start_action(f"Start Charge")
         access_token = await self._get_access_token()
-        pin_token = await self.api.get_pin_token(
-            access_token=access_token, pin=self.pin
-        )
+        pin_token = await self.get_pin_token(access_token=access_token)
         xid = await self.api.start_charge(
             saccess_token=access_token,
             vehicle_id=vehicle.identifier,
@@ -461,9 +457,7 @@ class ApiCloudCa(ApiCloud):
     async def stop_charge(self, vehicle: Vehicle) -> None:
         self._start_action(f"Stop Charge")
         access_token = await self._get_access_token()
-        pin_token = await self.api.get_pin_token(
-            access_token=access_token, pin=self.pin
-        )
+        pin_token = await self.get_pin_token(access_token=access_token)
         xid = await self.api.stop_charge(
             saccess_token=access_token,
             vehicle_id=vehicle.identifier,
