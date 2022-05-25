@@ -3,6 +3,5 @@
   "render_readme": true,
   "content_in_root": false,
   "country": ["US", "CA"],
-  "homeassistant": "2021.10.0b0",
-  "domains": ["lock", "sensor", "binary_sensor", "device_tracker"]
+  "homeassistant": "2021.10.0b0"
 }
