@@ -2,6 +2,7 @@
 
 A custom integration for Kia Uvo/Hyundai Bluelink in the USA/Canada regions. This project is mostly from looking at other core integrations, the [callbacks](https://github.com/home-assistant/core/tree/dev/homeassistant/components/august) and the [config flow](https://github.com/home-assistant/core/tree/dev/homeassistant/components/vizio) improvements.
 
+WARNING; ssl cert checking disabled for US Kia due to compatability issues between kia weak cert and python 3.10
 Warning ahead; this is beta phase, this is mostly functional for USA Kia, if you notice something missing please open an issue.
 Warning ahead; this is alpha phase for CA and US Hyundai, if you notice something missing please open an issue.
 
