@@ -5,7 +5,7 @@
   "issue_tracker": "https://github.com/dahlb/ha_kia_hyundai/issues",
   "codeowners": ["@dahlb"],
   "requirements": ["kia-hyundai-api==1.2.9","geopy>=2.0"],
-  "version": "1.6.4",
+  "version": "1.6.5",
   "config_flow": true,
   "iot_class": "cloud_polling"
 }
