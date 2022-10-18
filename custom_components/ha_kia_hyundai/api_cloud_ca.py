@@ -368,7 +368,7 @@ class ApiCloudCa(ApiCloud):
             )
         else:
             xid = await self.api.unlock(
-                saccess_token=access_token,
+                access_token=access_token,
                 vehicle_id=vehicle.identifier,
                 pin=self.pin,
                 pin_token=pin_token,
@@ -391,7 +391,7 @@ class ApiCloudCa(ApiCloud):
         pin_token = await self.get_pin_token(access_token=access_token)
         if vehicle.ev_plugged_in is None:
             xid = await self.api.start_climate(
-                saccess_token=access_token,
+                access_token=access_token,
                 vehicle_id=vehicle.identifier,
                 pin=self.pin,
                 pin_token=pin_token,
@@ -403,7 +403,7 @@ class ApiCloudCa(ApiCloud):
             )
         else:
             xid = await self.api.start_climate_ev(
-                saccess_token=access_token,
+                access_token=access_token,
                 vehicle_id=vehicle.identifier,
                 pin=self.pin,
                 pin_token=pin_token,
@@ -424,14 +424,14 @@ class ApiCloudCa(ApiCloud):
         pin_token = await self.get_pin_token(access_token=access_token)
         if vehicle.ev_plugged_in is None:
             xid = await self.api.stop_climate(
-                saccess_token=access_token,
+                access_token=access_token,
                 vehicle_id=vehicle.identifier,
                 pin=self.pin,
                 pin_token=pin_token,
             )
         else:
             xid = await self.api.stop_climate_ev(
-                saccess_token=access_token,
+                access_token=access_token,
                 vehicle_id=vehicle.identifier,
                 pin=self.pin,
                 pin_token=pin_token,
@@ -445,7 +445,7 @@ class ApiCloudCa(ApiCloud):
         access_token = await self._get_access_token()
         pin_token = await self.get_pin_token(access_token=access_token)
         xid = await self.api.start_charge(
-            saccess_token=access_token,
+            access_token=access_token,
             vehicle_id=vehicle.identifier,
             pin=self.pin,
             pin_token=pin_token,
@@ -459,7 +459,7 @@ class ApiCloudCa(ApiCloud):
         access_token = await self._get_access_token()
         pin_token = await self.get_pin_token(access_token=access_token)
         xid = await self.api.stop_charge(
-            saccess_token=access_token,
+            access_token=access_token,
             vehicle_id=vehicle.identifier,
             pin=self.pin,
             pin_token=pin_token,
