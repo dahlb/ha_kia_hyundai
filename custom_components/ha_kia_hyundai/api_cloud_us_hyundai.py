@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 
 from kia_hyundai_api import UsHyundai, AuthError, RateError
-from homeassistant.const import TEMP_FAHRENHEIT, LENGTH_MILES
+from homeassistant.const import UnitOfTemperature, LENGTH_MILES
 from homeassistant.exceptions import ConfigEntryAuthFailed
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
@@ -314,7 +314,7 @@ class ApiCloudUsHyundai(ApiCloud):
             else:
                 temp_value = temp_value.replace("H", "")
                 vehicle.climate_temperature_value = USA_TEMP_RANGE[int(temp_value, 16)]
-        vehicle.climate_temperature_unit = TEMP_FAHRENHEIT
+        vehicle.climate_temperature_unit = UnitOfTemperature.FAHRENHEIT
 
         non_ev_fuel_distance = safely_get_json_value(
             api_vehicle_status, "vehicleStatus.dte.value", float

@@ -6,7 +6,7 @@ from homeassistant.util import dt as dt_util
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryAuthFailed
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
-from homeassistant.const import LENGTH_MILES, TEMP_FAHRENHEIT
+from homeassistant.const import LENGTH_MILES, UnitOfTemperature
 
 from kia_hyundai_api import UsKia, AuthError
 
@@ -200,7 +200,7 @@ class ApiCloudUsKia(ApiCloud):
             vehicle.climate_temperature_value = USA_TEMP_RANGE[0]
         elif vehicle.climate_temperature_value == "0xHIGH":
             vehicle.climate_temperature_value = USA_TEMP_RANGE[-1]
-        vehicle.climate_temperature_unit = TEMP_FAHRENHEIT
+        vehicle.climate_temperature_unit = UnitOfTemperature.FAHRENHEIT
 
         vehicle.climate_heated_steering_wheel_on = safely_get_json_value(
             vehicle_status, "climate.heatingAccessory.steeringWheel", bool

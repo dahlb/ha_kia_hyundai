@@ -7,8 +7,7 @@ from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 from homeassistant.const import (
     LENGTH_MILES,
     LENGTH_KILOMETERS,
-    TEMP_CELSIUS,
-    TEMP_FAHRENHEIT,
+    UnitOfTemperature,
 )
 import asyncio
 from geopy.adapters import AioHTTPAdapter
@@ -59,7 +58,7 @@ class Vehicle:
     climate_hvac_on: bool = None
     climate_defrost_on: bool = None
     climate_temperature_value: float = None
-    climate_temperature_unit: TEMP_CELSIUS | TEMP_FAHRENHEIT = None
+    climate_temperature_unit: UnitOfTemperature = None
     climate_heated_steering_wheel_on: bool = None
     climate_heated_side_mirror_on: bool = None
     climate_heated_rear_window_on: bool = None

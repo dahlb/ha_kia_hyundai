@@ -11,6 +11,9 @@ from homeassistant.const import (
     CONF_USERNAME,
     CONF_REGION,
 )
+from homeassistant.util.unit_system import (
+    METRIC_SYSTEM,
+)
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.helpers.event import async_track_time_interval
 from homeassistant.helpers.typing import ConfigType
@@ -158,7 +161,7 @@ async def async_setup(hass: HomeAssistant, config_entry: ConfigType) -> bool:
             SERVICE_ATTRIBUTE_CLIMATE,
         ): vol.Range(1, 10),
     }
-    if hass.config.units.is_metric:
+    if hass.config.units is METRIC_SYSTEM:
         climate_schema[
             vol.Optional(
                 SERVICE_ATTRIBUTE_TEMPERATURE,
