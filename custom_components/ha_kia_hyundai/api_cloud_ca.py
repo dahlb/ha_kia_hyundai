@@ -4,7 +4,7 @@ import logging
 
 from asyncio import sleep
 from kia_hyundai_api import CaKia, CaHyundai, AuthError
-from homeassistant.const import TEMP_CELSIUS
+from homeassistant.const import UnitOfTemperature
 from homeassistant.exceptions import ConfigEntryAuthFailed
 from homeassistant.util import dt as dt_util
 from datetime import timedelta
@@ -265,7 +265,7 @@ class ApiCloudCa(ApiCloud):
         if temp_value is not None:
             temp_value = temp_value.replace("H", "")
             vehicle.climate_temperature_value = CA_TEMP_RANGE[int(temp_value, 16)]
-        vehicle.climate_temperature_unit = TEMP_CELSIUS
+        vehicle.climate_temperature_unit = UnitOfTemperature.CELSIUS
 
         non_ev_fuel_distance = safely_get_json_value(
             api_vehicle_status, "status.dte.value", float

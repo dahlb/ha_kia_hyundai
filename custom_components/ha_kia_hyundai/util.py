@@ -5,8 +5,7 @@ from datetime import datetime, tzinfo
 from homeassistant.const import (
     LENGTH_MILES,
     LENGTH_KILOMETERS,
-    TEMP_CELSIUS,
-    TEMP_FAHRENHEIT,
+    UnitOfTemperature,
 )
 
 
@@ -39,11 +38,11 @@ def convert_api_unit_to_ha_unit_of_distance(
 
 def convert_api_unit_to_ha_unit_of_temperature(
     api_unit: int,
-) -> TEMP_CELSIUS | TEMP_FAHRENHEIT:
+) -> UnitOfTemperature:
     if api_unit == 0:
-        return TEMP_CELSIUS
+        return UnitOfTemperature.CELSIUS
     if api_unit == 1:
-        return TEMP_FAHRENHEIT
+        return UnitOfTemperature.FAHRENHEIT
 
 
 def safely_get_json_value(json, key, callable_to_cast=None):
