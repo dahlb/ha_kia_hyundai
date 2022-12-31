@@ -1,5 +1,4 @@
 import logging
-import json
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity import Entity
 from homeassistant.helpers.typing import ConfigType
@@ -48,8 +47,6 @@ async def async_setup_entry(
         )
 
     async_add_entities(binary_sensors, True)
-    async_add_entities([DebugRawEntity(vehicle)], True)
-    async_add_entities([DebugMappedEntity(vehicle)], True)
     async_add_entities([APIActionInProgress(vehicle)], True)
 
 
@@ -89,44 +86,6 @@ class InstrumentSensor(BaseEntity):
     @property
     def available(self) -> bool:
         return super() and getattr(self._vehicle, self._key) is not None
-
-
-class DebugRawEntity(BaseEntity):
-    def __init__(self, vehicle: Vehicle):
-        super().__init__(vehicle)
-        self._attr_unique_id = f"{DOMAIN}-{vehicle.identifier}-all-data-raw"
-        self._attr_name = f"{vehicle.name} DEBUG DATA RAW"
-
-    @property
-    def state(self):
-        return "on"
-
-    @property
-    def is_on(self) -> bool:
-        return True
-
-    @property
-    def state_attributes(self):
-        return {"raw_responses": json.dumps(self._vehicle.raw_responses)}
-
-
-class DebugMappedEntity(BaseEntity):
-    def __init__(self, vehicle: Vehicle):
-        super().__init__(vehicle)
-        self._attr_unique_id = f"{DOMAIN}-{vehicle.identifier}-all-data-mapped"
-        self._attr_name = f"{vehicle.name} DEBUG DATA MAPPED"
-
-    @property
-    def state(self):
-        return "on"
-
-    @property
-    def is_on(self) -> bool:
-        return True
-
-    @property
-    def state_attributes(self):
-        return self._vehicle.__repr__()
 
 
 class APIActionInProgress(DeviceInfoMixin, Entity):
