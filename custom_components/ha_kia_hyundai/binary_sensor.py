@@ -2,10 +2,7 @@ import logging
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity import Entity
 from homeassistant.helpers.typing import ConfigType
-from homeassistant.components.binary_sensor import (
-    DEVICE_CLASS_LOCK,
-    DEVICE_CLASS_CONNECTIVITY,
-)
+from homeassistant.components.binary_sensor import BinarySensorDeviceClass
 
 from .vehicle import Vehicle
 from .base_entity import BaseEntity, DeviceInfoMixin
@@ -79,7 +76,7 @@ class InstrumentSensor(BaseEntity):
 
     @property
     def state(self):
-        if self._attr_device_class == DEVICE_CLASS_LOCK:
+        if self._attr_device_class == BinarySensorDeviceClass.LOCK:
             return "off" if self.is_on else "on"
         return "on" if self.is_on else "off"
 
@@ -94,7 +91,7 @@ class APIActionInProgress(DeviceInfoMixin, Entity):
     def __init__(self, vehicle: Vehicle):
         self._vehicle = vehicle
         self._attr_unique_id = f"{DOMAIN}-API-action-in-progress"
-        self._attr_device_class = DEVICE_CLASS_CONNECTIVITY
+        self._attr_device_class = BinarySensorDeviceClass.CONNECTIVITY
         self._attr_available = False
         self._attr_name = None
 
