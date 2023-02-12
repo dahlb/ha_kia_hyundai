@@ -3,6 +3,7 @@ import logging
 from homeassistant.components.lock import LockEntity
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.typing import ConfigType
+from typing import Any
 
 from .vehicle import Vehicle
 from .base_entity import BaseEntity
@@ -42,12 +43,12 @@ class Lock(BaseEntity, LockEntity):
     def icon(self):
         return "mdi:lock" if self.is_locked else "mdi:lock-open-variant"
 
-    async def async_lock(self):
+    async def async_lock(self, **kwargs: Any):
         await self.hass.async_create_task(
             self._vehicle.lock_action(VEHICLE_LOCK_ACTION.LOCK)
         )
 
-    async def async_unlock(self):
+    async def async_unlock(self, **kwargs: Any):
         await self.hass.async_create_task(
             self._vehicle.lock_action(VEHICLE_LOCK_ACTION.UNLOCK)
         )
