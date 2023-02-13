@@ -264,11 +264,6 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry):
     await hass_vehicle.coordinator.async_config_entry_first_refresh()
     _LOGGER.debug("first update finished")
 
-    for platform in PLATFORMS:
-        hass.async_create_task(
-            hass.config_entries.async_forward_entry_setup(config_entry, platform)
-        )
-
     async def update(_event_time_utc: datetime):
         try:
             await hass.async_create_task(hass_vehicle.update(interval=True))
@@ -278,10 +273,12 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry):
     data[DATA_VEHICLE_LISTENER] = async_track_time_interval(
         hass, update, timedelta(minutes=1)
     )
-    data[DATA_CONFIG_UPDATE_LISTENER] = config_entry.add_update_listener(
-        async_update_options
-    )
     hass.data[DOMAIN][vehicle_identifier] = data
+
+    await hass.config_entries.async_forward_entry_setups(config_entry, PLATFORMS)
+
+    if not config_entry.update_listeners:
+        config_entry.add_update_listener(async_update_options)
 
     return True
 
@@ -291,13 +288,9 @@ async def async_update_options(hass: HomeAssistant, config_entry: ConfigEntry):
 
 
 async def async_unload_entry(hass: HomeAssistant, config_entry: ConfigEntry):
-    unload_ok = all(
-        await asyncio.gather(
-            *[
-                hass.config_entries.async_forward_entry_unload(config_entry, platform)
-                for platform in PLATFORMS
-            ]
-        )
+    _LOGGER.debug(f"unload entry")
+    unload_ok = await hass.config_entries.async_unload_platforms(
+        config_entry, PLATFORMS
     )
     if unload_ok:
         vehicle_identifier = config_entry.data[CONF_VEHICLE_IDENTIFIER]
