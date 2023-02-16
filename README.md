@@ -59,4 +59,3 @@ logger:
     custom_components.ha_kia_hyundai: debug
     kia_hyundai_api: debug
 ```
-
