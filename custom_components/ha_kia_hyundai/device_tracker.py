@@ -4,7 +4,6 @@ from homeassistant.components.device_tracker import SOURCE_TYPE_GPS
 from homeassistant.components.device_tracker.config_entry import TrackerEntity
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.typing import ConfigType
-from homeassistant.helpers.entity import Entity
 
 from .const import DOMAIN, DATA_VEHICLE_INSTANCE, CONF_VEHICLE_IDENTIFIER
 from .vehicle import Vehicle

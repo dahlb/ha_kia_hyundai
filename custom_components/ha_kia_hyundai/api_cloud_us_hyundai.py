@@ -378,8 +378,8 @@ class ApiCloudUsHyundai(ApiCloud):
                 )
 
     async def request_sync(self, vehicle: Vehicle) -> None:
-        raise NotImplemented(
-            f"request_sync not implemented, api sniffing needed for this feature"
+        raise NotImplementedError(
+            "request_sync not implemented, api sniffing needed for this feature"
         )
 
     async def lock(self, vehicle: Vehicle, action: VEHICLE_LOCK_ACTION) -> None:
@@ -435,15 +435,15 @@ class ApiCloudUsHyundai(ApiCloud):
         )
 
     async def start_charge(self, vehicle: Vehicle) -> None:
-        raise NotImplemented("Not yet implemented")
+        raise NotImplementedError("Not yet implemented")
 
     async def stop_charge(self, vehicle: Vehicle) -> None:
-        raise NotImplemented("Not yet implemented")
+        raise NotImplementedError("Not yet implemented")
 
     async def set_charge_limits(
         self, vehicle: Vehicle, ac_limit: int, dc_limit: int
     ) -> None:
-        raise NotImplemented("Not yet implemented")
+        raise NotImplementedError("Not yet implemented")
 
     @property
     def region(self) -> str:

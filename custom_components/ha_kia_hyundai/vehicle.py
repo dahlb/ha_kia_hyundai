@@ -141,12 +141,12 @@ class Vehicle:
         ):
             await self.coordinator.async_refresh()
         else:
-            _LOGGER.debug(f"interval update skipping")
+            _LOGGER.debug("interval update skipping")
 
         force_scan_interval: timedelta = self.api_cloud.force_scan_interval
         if self.climate_hvac_on:
             _LOGGER.debug(
-                f"HVAC on, changing force_scan_interval to api_cloud duration of minutes"
+                "HVAC on, changing force_scan_interval to api_cloud duration of minutes"
             )
             force_scan_interval = self.api_cloud.hvac_on_force_scan_interval
         if (

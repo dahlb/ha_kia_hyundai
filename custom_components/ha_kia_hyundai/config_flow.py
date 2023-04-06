@@ -1,5 +1,5 @@
 import logging
-from typing import Dict, Optional, Any
+from typing import Optional, Any
 
 import voluptuous as vol
 from homeassistant.exceptions import ConfigEntryAuthFailed
@@ -28,7 +28,6 @@ from .const import (
     REGION_USA,
     REGION_CANADA,
     REGIONS,
-    BRAND_KIA,
     BRAND_HYUNDAI,
     BRANDS,
     CONF_PIN,
@@ -71,9 +70,9 @@ class KiaUvoOptionFlowHandler(config_entries.OptionsFlow):
             }
         )
 
-    async def async_step_init(self, user_input: Optional[Dict[str, Any]] = None):
+    async def async_step_init(self, user_input: Optional[dict[str, Any]] = None):
         if user_input is not None:
-            _LOGGER.debug(f"user input in option flow : %s", user_input)
+            _LOGGER.debug("user input in option flow : %s", user_input)
             return self.async_create_entry(title="", data=user_input)
 
         return self.async_show_form(step_id="init", data_schema=self.schema)
@@ -85,7 +84,7 @@ class KiaUvoConfigFlowHandler(config_entries.ConfigFlow):
     VERSION = CONFIG_FLOW_VERSION
     CONNECTION_CLASS = config_entries.CONN_CLASS_CLOUD_POLL
 
-    data: Optional[Dict[str, Any]] = {}
+    data: Optional[dict[str, Any]] = {}
 
     @staticmethod
     @callback
@@ -95,7 +94,7 @@ class KiaUvoConfigFlowHandler(config_entries.ConfigFlow):
     def __init__(self):
         pass
 
-    async def async_step_user(self, user_input: Optional[Dict[str, Any]] = None):
+    async def async_step_user(self, user_input: Optional[dict[str, Any]] = None):
         data_schema = {
             vol.Required(CONF_REGION): vol.In(REGIONS),
             vol.Required(CONF_BRAND): vol.In(BRANDS),
@@ -110,7 +109,7 @@ class KiaUvoConfigFlowHandler(config_entries.ConfigFlow):
             return await self.async_step_auth()
         return self.async_show_form(step_id="user", data_schema=vol.Schema(data_schema))
 
-    async def async_step_auth(self, user_input: Optional[Dict[str, Any]] = None):
+    async def async_step_auth(self, user_input: Optional[dict[str, Any]] = None):
         data_schema = {
             vol.Required(CONF_USERNAME): str,
             vol.Required(CONF_PASSWORD): str,
@@ -120,7 +119,7 @@ class KiaUvoConfigFlowHandler(config_entries.ConfigFlow):
             and self.data[CONF_BRAND] == BRAND_HYUNDAI
         ):
             data_schema[vol.Required(CONF_PIN)] = str
-        errors: Dict[str, str] = {}
+        errors: dict[str, str] = {}
 
         if user_input is not None:
             username = user_input[CONF_USERNAME]
@@ -153,13 +152,13 @@ class KiaUvoConfigFlowHandler(config_entries.ConfigFlow):
         )
 
     async def async_step_pick_vehicle(
-        self, user_input: Optional[Dict[str, Any]] = None
+        self, user_input: Optional[dict[str, Any]] = None
     ):
         vehicle_map = {}
         for vehicle in self.data[CONF_VEHICLES]:
             vehicle_map[vehicle.identifier] = f"{vehicle.name} ({vehicle.model})"
 
-        errors: Dict[str, str] = {}
+        errors: dict[str, str] = {}
         data_schema = {
             vol.Required(
                 CONF_VEHICLE_IDENTIFIER,

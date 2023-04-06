@@ -31,7 +31,7 @@ def request_with_active_session(func):
         try:
             return await func(*args, **kwargs)
         except AuthError:
-            _LOGGER.debug(f"got invalid session, attempting to repair and resend")
+            _LOGGER.debug("got invalid session, attempting to repair and resend")
             self = args[0]
             vehicle: Vehicle = kwargs["vehicle"]
             await self.login()
@@ -317,7 +317,7 @@ class ApiCloudUsKia(ApiCloud):
         duration: int,
     ) -> None:
         session_id = await self._get_session_id()
-        self._start_action(f"Start Climate")
+        self._start_action("Start Climate")
         xid = await self.api.start_climate(
             session_id, vehicle.key, set_temp, defrost, climate, heating
         )
@@ -327,7 +327,7 @@ class ApiCloudUsKia(ApiCloud):
     @request_with_active_session
     async def stop_climate(self, vehicle: Vehicle) -> None:
         session_id = await self._get_session_id()
-        self._start_action(f"Stop Climate")
+        self._start_action("Stop Climate")
         xid = await self.api.stop_climate(session_id, vehicle.key)
         self._current_action.set_xid(xid)
         await self._check_action_completed(vehicle=vehicle)
@@ -335,7 +335,7 @@ class ApiCloudUsKia(ApiCloud):
     @request_with_active_session
     async def start_charge(self, vehicle: Vehicle) -> None:
         session_id = await self._get_session_id()
-        self._start_action(f"Start Charge")
+        self._start_action("Start Charge")
         xid = await self.api.start_charge(session_id, vehicle.key)
         self._current_action.set_xid(xid)
         await self._check_action_completed(vehicle=vehicle)
@@ -343,7 +343,7 @@ class ApiCloudUsKia(ApiCloud):
     @request_with_active_session
     async def stop_charge(self, vehicle: Vehicle) -> None:
         session_id = await self._get_session_id()
-        self._start_action(f"Stop Charge")
+        self._start_action("Stop Charge")
         xid = await self.api.stop_charge(session_id, vehicle.key)
         self._current_action.set_xid(xid)
         await self._check_action_completed(vehicle=vehicle)
@@ -353,7 +353,7 @@ class ApiCloudUsKia(ApiCloud):
         self, vehicle: Vehicle, ac_limit: int, dc_limit: int
     ) -> None:
         session_id = await self._get_session_id()
-        self._start_action(f"Set Charge Limits")
+        self._start_action("Set Charge Limits")
         xid = await self.api.set_charge_limits(
             session_id, vehicle.key, ac_limit, dc_limit
         )

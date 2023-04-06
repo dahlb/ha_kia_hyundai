@@ -32,7 +32,7 @@ def request_with_active_session(func):
         try:
             return await func(*args, **kwargs)
         except AuthError:
-            _LOGGER.debug(f"got invalid session, attempting to repair and resend")
+            _LOGGER.debug("got invalid session, attempting to repair and resend")
             self = args[0]
             await self.login()
             response = await func(*args, **kwargs)
@@ -386,7 +386,7 @@ class ApiCloudCa(ApiCloud):
         heating: bool,
         duration: int,
     ) -> None:
-        self._start_action(f"Start Climate")
+        self._start_action("Start Climate")
         access_token = await self._get_access_token()
         pin_token = await self.get_pin_token(access_token=access_token)
         if vehicle.ev_plugged_in is None:
@@ -419,7 +419,7 @@ class ApiCloudCa(ApiCloud):
 
     @request_with_active_session
     async def stop_climate(self, vehicle: Vehicle) -> None:
-        self._start_action(f"Stop Climate")
+        self._start_action("Stop Climate")
         access_token = await self._get_access_token()
         pin_token = await self.get_pin_token(access_token=access_token)
         if vehicle.ev_plugged_in is None:
@@ -441,7 +441,7 @@ class ApiCloudCa(ApiCloud):
 
     @request_with_active_session
     async def start_charge(self, vehicle: Vehicle) -> None:
-        self._start_action(f"Start Charge")
+        self._start_action("Start Charge")
         access_token = await self._get_access_token()
         pin_token = await self.get_pin_token(access_token=access_token)
         xid = await self.api.start_charge(
@@ -455,7 +455,7 @@ class ApiCloudCa(ApiCloud):
 
     @request_with_active_session
     async def stop_charge(self, vehicle: Vehicle) -> None:
-        self._start_action(f"Stop Charge")
+        self._start_action("Stop Charge")
         access_token = await self._get_access_token()
         pin_token = await self.get_pin_token(access_token=access_token)
         xid = await self.api.stop_charge(
@@ -471,7 +471,7 @@ class ApiCloudCa(ApiCloud):
     async def set_charge_limits(
         self, vehicle: Vehicle, ac_limit: int, dc_limit: int
     ) -> None:
-        raise NotImplemented("Not yet implemented")
+        raise NotImplementedError("Not yet implemented")
 
     async def _check_action_completed(self, vehicle: Vehicle, pin_token: str) -> None:
         access_token = await self._get_access_token()

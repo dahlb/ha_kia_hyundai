@@ -1,7 +1,6 @@
 import logging
 
 import voluptuous as vol
-import asyncio
 from datetime import datetime, timedelta
 
 from homeassistant.core import HomeAssistant
@@ -38,7 +37,6 @@ from .const import (
     DEFAULT_NO_FORCE_SCAN_HOUR_START,
     DEFAULT_FORCE_SCAN_INTERVAL,
     CONF_BRAND,
-    REGION_CANADA,
     CONF_PIN,
     CA_TEMP_RANGE,
     USA_TEMP_RANGE,
@@ -268,7 +266,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry):
         try:
             await hass.async_create_task(hass_vehicle.update(interval=True))
         except Exception as ex:
-            _LOGGER.error(f"Exception in interval update : %s", str(ex))
+            _LOGGER.error("Exception in interval update : %s", str(ex))
 
     data[DATA_VEHICLE_LISTENER] = async_track_time_interval(
         hass, update, timedelta(minutes=1)
@@ -288,7 +286,7 @@ async def async_update_options(hass: HomeAssistant, config_entry: ConfigEntry):
 
 
 async def async_unload_entry(hass: HomeAssistant, config_entry: ConfigEntry):
-    _LOGGER.debug(f"unload entry")
+    _LOGGER.debug("unload entry")
     unload_ok = await hass.config_entries.async_unload_platforms(
         config_entry, PLATFORMS
     )
