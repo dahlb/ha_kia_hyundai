@@ -25,7 +25,6 @@ from .const import (
     CONF_VEHICLES,
     CONF_VEHICLE_IDENTIFIER,
     CONF_BRAND,
-    REGION_USA,
     REGIONS,
     BRANDS,
     CONF_PIN,

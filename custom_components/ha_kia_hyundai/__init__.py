@@ -10,9 +10,6 @@ from homeassistant.const import (
     CONF_USERNAME,
     CONF_REGION,
 )
-from homeassistant.util.unit_system import (
-    METRIC_SYSTEM,
-)
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.helpers.event import async_track_time_interval
 from homeassistant.helpers.typing import ConfigType
