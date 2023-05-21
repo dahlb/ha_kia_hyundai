@@ -14,8 +14,26 @@ from .const import DOMAIN, DATA_VEHICLE_INSTANCE, CONF_VEHICLE_IDENTIFIER
 from .vehicle import Vehicle
 
 TO_REDACT = {CONF_USERNAME, CONF_PASSWORD, CONF_UNIQUE_ID, "vehicle_identifier"}
-TO_REDACT_MAPPED = {"identifier", "vin", "key", "latitude", "longitude", "location_name"}
-TO_REDACT_RAW = {"vehicle_identifier", "vinKey", "vin", "meid", "mdn", "iccid", "preferredDealer", "lat", "lon", "invDealerCode"}
+TO_REDACT_MAPPED = {
+    "identifier",
+    "vin",
+    "key",
+    "latitude",
+    "longitude",
+    "location_name",
+}
+TO_REDACT_RAW = {
+    "vehicle_identifier",
+    "vinKey",
+    "vin",
+    "meid",
+    "mdn",
+    "iccid",
+    "preferredDealer",
+    "lat",
+    "lon",
+    "invDealerCode",
+}
 TO_REDACT_DEVICE = {"identifiers"}
 TO_REDACT_ENTITIES = {"latitude", "longitude"}
 

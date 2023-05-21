@@ -144,15 +144,20 @@ async def async_setup(hass: HomeAssistant, config_entry: ConfigType) -> bool:
         DOMAIN, SERVICE_NAME_REQUEST_SYNC, async_handle_request_sync
     )
     hass.services.async_register(DOMAIN, SERVICE_NAME_UPDATE, async_handle_update)
-    climate_schema = {vol.Optional(
-        SERVICE_ATTRIBUTE_CLIMATE,
-    ): vol.Range(1, 10), vol.Optional(
-        SERVICE_ATTRIBUTE_DEFROST,
-    ): cv.boolean, vol.Optional(
-        SERVICE_ATTRIBUTE_HEATING,
-    ): cv.boolean, vol.Optional(
-        SERVICE_ATTRIBUTE_TEMPERATURE,
-    ): vol.All(vol.Coerce(int), vol.In(USA_TEMP_RANGE))}
+    climate_schema = {
+        vol.Optional(
+            SERVICE_ATTRIBUTE_CLIMATE,
+        ): vol.Range(1, 10),
+        vol.Optional(
+            SERVICE_ATTRIBUTE_DEFROST,
+        ): cv.boolean,
+        vol.Optional(
+            SERVICE_ATTRIBUTE_HEATING,
+        ): cv.boolean,
+        vol.Optional(
+            SERVICE_ATTRIBUTE_TEMPERATURE,
+        ): vol.All(vol.Coerce(int), vol.In(USA_TEMP_RANGE)),
+    }
     hass.services.async_register(
         DOMAIN,
         SERVICE_NAME_START_CLIMATE,
