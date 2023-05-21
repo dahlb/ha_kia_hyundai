@@ -26,9 +26,7 @@ from .const import (
     CONF_VEHICLE_IDENTIFIER,
     CONF_BRAND,
     REGION_USA,
-    REGION_CANADA,
     REGIONS,
-    BRAND_HYUNDAI,
     BRANDS,
     CONF_PIN,
 )
@@ -114,11 +112,6 @@ class KiaUvoConfigFlowHandler(config_entries.ConfigFlow):
             vol.Required(CONF_USERNAME): str,
             vol.Required(CONF_PASSWORD): str,
         }
-        if self.data[CONF_REGION] == REGION_CANADA or (
-            self.data[CONF_REGION] == REGION_USA
-            and self.data[CONF_BRAND] == BRAND_HYUNDAI
-        ):
-            data_schema[vol.Required(CONF_PIN)] = str
         errors: dict[str, str] = {}
 
         if user_input is not None:

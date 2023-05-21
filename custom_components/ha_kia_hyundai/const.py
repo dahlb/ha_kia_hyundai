@@ -49,16 +49,13 @@ DATE_FORMAT: str = "%Y-%m-%d %H:%M:%S.%f"
 
 DYNAMIC_UNIT: str = "dynamic_unit"
 
-CA_TEMP_RANGE = [x * 0.5 for x in range(32, 64)]
 USA_TEMP_RANGE = range(62, 82)
 
-REGION_CANADA = "Canada"
 REGION_USA = "USA"
-REGIONS = [REGION_USA, REGION_CANADA]
+REGIONS = [REGION_USA]
 
 BRAND_KIA = "Kia"
-BRAND_HYUNDAI = "Hyundai"
-BRANDS = [BRAND_KIA, BRAND_HYUNDAI]
+BRANDS = [BRAND_KIA]
 
 
 class VEHICLE_LOCK_ACTION(Enum):
