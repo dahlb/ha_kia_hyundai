@@ -26,6 +26,18 @@ from .const import (
 _LOGGER = logging.getLogger(__name__)
 
 
+def mark_used(func):
+    async def mark_used_wrapper(*args, **kwargs):
+        self = args[0]
+        try:
+            await func(*args, **kwargs)
+        finally:
+            if self.calls_today_for_actions is not None:
+                self.calls_today_for_actions.mark_used()
+
+    return mark_used_wrapper
+
+
 class Vehicle:
     identifier: str
     vin: str = None
@@ -201,11 +213,11 @@ class Vehicle:
                 self.calls_today_for_request_sync.mark_failed(error=error)
             raise error
 
+    @mark_used
     async def lock_action(self, action: VEHICLE_LOCK_ACTION):
         await self.api_cloud.lock(vehicle=self, action=action)
-        if self.calls_today_for_actions is not None:
-            self.calls_today_for_actions.mark_used()
 
+    @mark_used
     async def start_climate(self, set_temp, defrost, climate, heating, duration):
         if set_temp is None:
             set_temp = 76
@@ -225,24 +237,20 @@ class Vehicle:
             heating=heating,
             duration=duration,
         )
-        if self.calls_today_for_actions is not None:
-            self.calls_today_for_actions.mark_used()
 
+    @mark_used
     async def stop_climate(self):
         await self.api_cloud.stop_climate(vehicle=self)
-        if self.calls_today_for_actions is not None:
-            self.calls_today_for_actions.mark_used()
 
+    @mark_used
     async def start_charge(self):
         await self.api_cloud.start_charge(vehicle=self)
-        if self.calls_today_for_actions is not None:
-            self.calls_today_for_actions.mark_used()
 
+    @mark_used
     async def stop_charge(self):
         await self.api_cloud.stop_charge(vehicle=self)
-        if self.calls_today_for_actions is not None:
-            self.calls_today_for_actions.mark_used()
 
+    @mark_used
     async def set_charge_limits(self, ac_limit: int, dc_limit: int):
         if ac_limit is None:
             ac_limit = 90
@@ -251,8 +259,6 @@ class Vehicle:
         await self.api_cloud.set_charge_limits(
             vehicle=self, ac_limit=ac_limit, dc_limit=dc_limit
         )
-        if self.calls_today_for_actions is not None:
-            self.calls_today_for_actions.mark_used()
 
     def supported_binary_instruments(self):
         supported_binary_instruments = []

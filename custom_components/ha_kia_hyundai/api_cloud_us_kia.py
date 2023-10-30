@@ -22,6 +22,7 @@ from .const import (
     BRAND_KIA,
     REGION_USA,
 )
+import json
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -44,6 +45,28 @@ def request_with_active_session(func):
             return response
 
     return request_with_active_session_wrapper
+
+
+def action_wrapper(func):
+    async def current_action_wrapper(*args, **kwargs):
+        try:
+            self = args[0]
+            vehicle: Vehicle = kwargs["vehicle"]
+            session_id = await self._get_session_id()
+            kwargs.update({"session_id": session_id})
+            self._start_action(func.__name__)
+            _LOGGER.debug("invoking %s; with " % func.__name__)
+            _LOGGER.debug(kwargs.keys())
+            xid = await func(*args, **kwargs)
+            self._current_action.set_xid(xid)
+            await self._check_action_completed(vehicle=vehicle)
+        finally:
+            if not self._current_action.completed():
+                _LOGGER.debug("cleaning up broken action status")
+                self._current_action.complete()
+                self.publish_updates()
+
+    return current_action_wrapper
 
 
 class ApiCloudUsKia(ApiCloud):
@@ -296,16 +319,21 @@ class ApiCloudUsKia(ApiCloud):
         await vehicle.update()
 
     @request_with_active_session
-    async def lock(self, vehicle: Vehicle, action: VEHICLE_LOCK_ACTION) -> None:
-        session_id = await self._get_session_id()
-        self._start_action(f"Lock {action.value}")
+    async def lock(self, vehicle: Vehicle, action: VEHICLE_LOCK_ACTION) -> str:
         if action == VEHICLE_LOCK_ACTION.LOCK:
-            xid = await self.api.lock(session_id, vehicle.key)
+            await self._lock(vehicle)
         else:
-            xid = await self.api.unlock(session_id, vehicle.key)
-        self._current_action.set_xid(xid)
-        await self._check_action_completed(vehicle=vehicle)
+            await self._unlock(vehicle)
 
+    @action_wrapper
+    async def _lock(self, vehicle: Vehicle, session_id: str = None) -> str:
+        return await self.api.lock(session_id, vehicle.key)
+
+    @action_wrapper
+    async def _unlock(self, vehicle: Vehicle, session_id: str = None) -> str:
+        return await self.api.unlock(session_id, vehicle.key)
+
+    @action_wrapper
     @request_with_active_session
     async def start_climate(
         self,
@@ -315,50 +343,35 @@ class ApiCloudUsKia(ApiCloud):
         climate: bool,
         heating: bool,
         duration: int,
-    ) -> None:
-        session_id = await self._get_session_id()
-        self._start_action("Start Climate")
-        xid = await self.api.start_climate(
+        session_id: str = None
+    ) -> str:
+        return await self.api.start_climate(
             session_id, vehicle.key, set_temp, defrost, climate, heating
         )
-        self._current_action.set_xid(xid)
-        await self._check_action_completed(vehicle=vehicle)
 
+    @action_wrapper
     @request_with_active_session
-    async def stop_climate(self, vehicle: Vehicle) -> None:
-        session_id = await self._get_session_id()
-        self._start_action("Stop Climate")
-        xid = await self.api.stop_climate(session_id, vehicle.key)
-        self._current_action.set_xid(xid)
-        await self._check_action_completed(vehicle=vehicle)
+    async def stop_climate(self, vehicle: Vehicle, session_id: str = None) -> str:
+        return await self.api.stop_climate(session_id, vehicle.key)
 
+    @action_wrapper
     @request_with_active_session
-    async def start_charge(self, vehicle: Vehicle) -> None:
-        session_id = await self._get_session_id()
-        self._start_action("Start Charge")
-        xid = await self.api.start_charge(session_id, vehicle.key)
-        self._current_action.set_xid(xid)
-        await self._check_action_completed(vehicle=vehicle)
+    async def start_charge(self, vehicle: Vehicle, session_id: str = None) -> str:
+        return await self.api.start_charge(session_id, vehicle.key)
 
+    @action_wrapper
     @request_with_active_session
-    async def stop_charge(self, vehicle: Vehicle) -> None:
-        session_id = await self._get_session_id()
-        self._start_action("Stop Charge")
-        xid = await self.api.stop_charge(session_id, vehicle.key)
-        self._current_action.set_xid(xid)
-        await self._check_action_completed(vehicle=vehicle)
+    async def stop_charge(self, vehicle: Vehicle, session_id: str = None) -> str:
+        return await self.api.stop_charge(session_id, vehicle.key)
 
+    @action_wrapper
     @request_with_active_session
     async def set_charge_limits(
-        self, vehicle: Vehicle, ac_limit: int, dc_limit: int
-    ) -> None:
-        session_id = await self._get_session_id()
-        self._start_action("Set Charge Limits")
-        xid = await self.api.set_charge_limits(
+        self, vehicle: Vehicle, ac_limit: int, dc_limit: int, session_id: str = None
+    ) -> str:
+        return await self.api.set_charge_limits(
             session_id, vehicle.key, ac_limit, dc_limit
         )
-        self._current_action.set_xid(xid)
-        await self._check_action_completed(vehicle=vehicle)
 
     async def _check_action_completed(self, vehicle: Vehicle) -> None:
         session_id = await self._get_session_id()
