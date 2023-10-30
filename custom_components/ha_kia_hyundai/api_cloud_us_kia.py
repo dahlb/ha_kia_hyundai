@@ -22,7 +22,6 @@ from .const import (
     BRAND_KIA,
     REGION_USA,
 )
-import json
 
 _LOGGER = logging.getLogger(__name__)
 
