@@ -50,7 +50,7 @@ def action_wrapper(func):
     async def current_action_wrapper(*args, **kwargs):
         try:
             self = args[0]
-            vehicle: Vehicle = kwargs["vehicle"]
+            vehicle: Vehicle = args[1]
             session_id = await self._get_session_id()
             kwargs.update({"session_id": session_id})
             self._start_action(func.__name__)
