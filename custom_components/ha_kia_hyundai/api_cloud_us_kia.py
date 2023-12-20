@@ -50,7 +50,7 @@ def action_wrapper(func):
     async def current_action_wrapper(*args, **kwargs):
         try:
             for index in range(len(args)):
-                _LOGGER.debug("args[%s] = %s" % (index, args[index]))
+                _LOGGER.debug(f"args[{index}] = {args[index]}")
             self = args[0]
             if len(args) > 1:
                 vehicle: Vehicle = args[1]
