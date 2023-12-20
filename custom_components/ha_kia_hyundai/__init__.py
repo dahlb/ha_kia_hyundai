@@ -107,7 +107,6 @@ async def async_setup(hass: HomeAssistant, config_entry: ConfigType) -> bool:
         defrost = call.data.get(SERVICE_ATTRIBUTE_DEFROST)
         climate = call.data.get(SERVICE_ATTRIBUTE_CLIMATE)
         heating = call.data.get(SERVICE_ATTRIBUTE_HEATING)
-        duration = call.data.get(SERVICE_ATTRIBUTE_DURATION)
         hass_vehicle: Vehicle = convert_call_to_vehicle(call)
         await hass.async_create_task(
             hass_vehicle.start_climate(
@@ -115,7 +114,6 @@ async def async_setup(hass: HomeAssistant, config_entry: ConfigType) -> bool:
                 defrost=defrost,
                 climate=climate,
                 heating=heating,
-                duration=duration,
             )
         )
 

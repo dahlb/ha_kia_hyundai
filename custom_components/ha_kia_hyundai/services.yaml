@@ -59,18 +59,6 @@ start_climate:
       default: false
       selector:
         boolean:
-    duration:
-      name: Duration
-      description: On Duration, Ignored by USA Kia API
-      required: false
-      example: 5
-      default: 5
-      selector:
-        number:
-            min: 1
-            max: 10
-            step: 1
-            unit_of_measurement: minutes
 stop_climate:
   description: Stop car climate
   fields:
