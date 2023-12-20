@@ -49,8 +49,13 @@ def request_with_active_session(func):
 def action_wrapper(func):
     async def current_action_wrapper(*args, **kwargs):
         try:
+            for index in range(len(args)):
+                _LOGGER.debug("args[%s] = %s" % (index, args[index]))
             self = args[0]
-            vehicle: Vehicle = args[1]
+            if len(args) > 1:
+                vehicle: Vehicle = args[1]
+            else:
+                vehicle: Vehicle = kwargs["vehicle"]
             session_id = await self._get_session_id()
             kwargs.update({"session_id": session_id})
             self._start_action(func.__name__)
