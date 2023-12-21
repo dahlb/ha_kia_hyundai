@@ -346,7 +346,6 @@ class ApiCloudUsKia(ApiCloud):
         defrost: bool,
         climate: bool,
         heating: bool,
-        duration: int,
         session_id: str = None
     ) -> str:
         return await self.api.start_climate(

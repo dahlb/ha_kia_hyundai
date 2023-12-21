@@ -218,7 +218,7 @@ class Vehicle:
         await self.api_cloud.lock(vehicle=self, action=action)
 
     @mark_used
-    async def start_climate(self, set_temp, defrost, climate, heating, duration):
+    async def start_climate(self, set_temp, defrost, climate, heating):
         if set_temp is None:
             set_temp = 76
         if defrost is None:
@@ -227,15 +227,12 @@ class Vehicle:
             climate = True
         if heating is None:
             heating = False
-        if duration is None:
-            duration = 5
         await self.api_cloud.start_climate(
             vehicle=self,
             set_temp=set_temp,
             defrost=defrost,
             climate=climate,
             heating=heating,
-            duration=duration,
         )
 
     @mark_used

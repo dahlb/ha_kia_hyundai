@@ -78,10 +78,6 @@
         "heating": {
           "name": "Heating Accessories",
           "description": "Turn on heating accessories."
-        },
-        "duration": {
-          "name": "Duration (min)",
-          "description": "Duration, often ignored by API."
         }
       }
     },
