@@ -4,7 +4,7 @@ from homeassistant.components.binary_sensor import BinarySensorDeviceClass
 from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.const import (
     PERCENTAGE,
-    TIME_MINUTES,
+    UnitOfTime,
 )
 
 # Configuration Constants
@@ -266,28 +266,28 @@ INSTRUMENTS = [
     (
         "Estimated Current Charge Duration",
         "ev_charge_current_remaining_duration",
-        TIME_MINUTES,
+        UnitOfTime.MINUTES,
         "mdi:ev-station",
         None,
     ),
     (
         "Estimated Fast Charge Duration",
         "ev_charge_fast_duration",
-        TIME_MINUTES,
+        UnitOfTime.MINUTES,
         "mdi:ev-station",
         None,
     ),
     (
         "Estimated Portable Charge Duration",
         "ev_charge_portable_duration",
-        TIME_MINUTES,
+        UnitOfTime.MINUTES,
         "mdi:ev-station",
         None,
     ),
     (
         "Estimated Station Charge Duration",
         "ev_charge_station_duration",
-        TIME_MINUTES,
+        UnitOfTime.MINUTES,
         "mdi:ev-station",
         None,
     ),
@@ -350,7 +350,7 @@ INSTRUMENTS = [
     (
         "Sync Age",
         "sync_age",
-        TIME_MINUTES,
+        UnitOfTime.MINUTES,
         "mdi:update",
         SensorDeviceClass.DATE,
     ),
