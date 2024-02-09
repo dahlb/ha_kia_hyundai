@@ -5,8 +5,7 @@ from datetime import datetime, timedelta
 from homeassistant.util import dt as dt_util
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 from homeassistant.const import (
-    LENGTH_MILES,
-    LENGTH_KILOMETERS,
+    UnitOfLength,
     UnitOfTemperature,
 )
 import asyncio
@@ -51,11 +50,11 @@ class Vehicle:
     last_sync_requested: datetime = None
 
     fuel_range_value: float = None
-    fuel_range_unit: LENGTH_KILOMETERS | LENGTH_MILES = None
+    fuel_range_unit: UnitOfLength = None
     total_range_value: float = None
-    total_range_unit: LENGTH_KILOMETERS | LENGTH_MILES = None
+    total_range_unit: UnitOfLength = None
     odometer_value: float = None
-    odometer_unit: LENGTH_KILOMETERS | LENGTH_MILES = None
+    odometer_unit: UnitOfLength = None
     battery_level: int = None
     engine_on: bool = None
     low_fuel_light_on: bool = None
@@ -86,24 +85,24 @@ class Vehicle:
     ev_charge_portable_duration: int = None
     ev_charge_station_duration: int = None
     ev_remaining_range_value: int = None
-    ev_remaining_range_unit: LENGTH_KILOMETERS | LENGTH_MILES = None
+    ev_remaining_range_unit: UnitOfLength = None
     ev_max_dc_charge_level: int = None
     ev_max_ac_charge_level: int = None
     ev_max_range_ac_charge_value: float = None
-    ev_max_range_ac_charge_unit: LENGTH_KILOMETERS | LENGTH_MILES = None
+    ev_max_range_ac_charge_unit: UnitOfLength = None
     ev_max_range_dc_charge_value: float = None
-    ev_max_range_dc_charge_unit: LENGTH_KILOMETERS | LENGTH_MILES = None
+    ev_max_range_dc_charge_unit: UnitOfLength = None
     tire_all_on: bool = None
     tire_front_left_on: bool = None
     tire_front_right_on: bool = None
     tire_rear_left_on: bool = None
     tire_rear_right_on: bool = None
     last_service_value: float = None
-    last_service_unit: LENGTH_KILOMETERS | LENGTH_MILES = None
+    last_service_unit: UnitOfLength = None
     next_service_value: float = None
-    next_service_unit: LENGTH_KILOMETERS | LENGTH_MILES = None
+    next_service_unit: UnitOfLength = None
     next_service_mile_value: float = None
-    next_service_mile_unit: LENGTH_KILOMETERS | LENGTH_MILES = None
+    next_service_mile_unit: UnitOfLength = None
 
     latitude: float = None
     longitude: float = None

@@ -3,8 +3,7 @@ from __future__ import annotations
 import re
 from datetime import datetime, tzinfo
 from homeassistant.const import (
-    LENGTH_MILES,
-    LENGTH_KILOMETERS,
+    UnitOfLength,
     UnitOfTemperature,
 )
 
@@ -29,11 +28,11 @@ def convert_last_updated_str_to_datetime(
 
 def convert_api_unit_to_ha_unit_of_distance(
     api_unit: int,
-) -> LENGTH_MILES | LENGTH_KILOMETERS | None:
+) -> UnitOfLength | None:
     if api_unit == 1:
-        return LENGTH_KILOMETERS
+        return UnitOfLength.KILOMETERS
     if api_unit == 3:
-        return LENGTH_MILES
+        return UnitOfLength.MILES
 
 
 def convert_api_unit_to_ha_unit_of_temperature(
