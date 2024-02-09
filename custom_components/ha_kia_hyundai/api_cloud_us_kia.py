@@ -6,7 +6,7 @@ from homeassistant.util import dt as dt_util
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryAuthFailed
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
-from homeassistant.const import LENGTH_MILES, UnitOfTemperature
+from homeassistant.const import UnitOfLength, UnitOfTemperature
 
 from kia_hyundai_api import UsKia, AuthError
 
@@ -151,7 +151,7 @@ class ApiCloudUsKia(ApiCloud):
             "vehicleInfoList.0.vehicleConfig.vehicleDetail.vehicle.mileage",
             float,
         )
-        vehicle.odometer_unit = LENGTH_MILES
+        vehicle.odometer_unit = UnitOfLength.MILES
 
         maintenance_array = safely_get_json_value(
             api_vehicle_status,
@@ -165,26 +165,26 @@ class ApiCloudUsKia(ApiCloud):
                 vehicle.last_service_value = maintenance_array[
                     current_mileage_index - 1
                 ]
-                vehicle.last_service_unit = LENGTH_MILES
+                vehicle.last_service_unit = UnitOfLength.MILES
             else:
                 vehicle.last_service_value = 0
-                vehicle.last_service_unit = LENGTH_MILES
+                vehicle.last_service_unit = UnitOfLength.MILES
 
             if current_mileage_index != -1:
                 vehicle.next_service_value = maintenance_array[
                     current_mileage_index + 1
                 ]
-                vehicle.next_service_unit = LENGTH_MILES
+                vehicle.next_service_unit = UnitOfLength.MILES
             else:
                 vehicle.next_service_value = 0
-                vehicle.next_service_unit = LENGTH_MILES
+                vehicle.next_service_unit = UnitOfLength.MILES
 
         vehicle.next_service_mile_value = safely_get_json_value(
             api_vehicle_status,
             "vehicleInfoList.0.vehicleConfig.maintenance.nextServiceMile",
             float,
         )
-        vehicle.next_service_mile_unit = LENGTH_MILES
+        vehicle.next_service_mile_unit = UnitOfLength.MILES
 
         vehicle.battery_level = safely_get_json_value(
             vehicle_status, "batteryStatus.stateOfCharge", int
@@ -257,13 +257,13 @@ class ApiCloudUsKia(ApiCloud):
             "evStatus.drvDistance.0.rangeByFuel.evModeRange.value",
             int,
         )
-        vehicle.ev_remaining_range_unit = LENGTH_MILES
+        vehicle.ev_remaining_range_unit = UnitOfLength.MILES
         vehicle.total_range_value = safely_get_json_value(
             vehicle_status,
             "evStatus.drvDistance.0.rangeByFuel.totalAvailableRange.value",
             int,
         )
-        vehicle.total_range_unit = LENGTH_MILES
+        vehicle.total_range_unit = UnitOfLength.MILES
         hybrid_fuel_range_value = safely_get_json_value(
             vehicle_status,
             "evStatus.drvDistance.0.rangeByFuel.gasModeRange.value",
@@ -277,7 +277,7 @@ class ApiCloudUsKia(ApiCloud):
         else:
             vehicle.fuel_range_value = no_ev_fuel_range_value
             vehicle.total_range_value = no_ev_fuel_range_value
-        vehicle.fuel_range_unit = LENGTH_MILES
+        vehicle.fuel_range_unit = UnitOfLength.MILES
 
         ev_max_dc_charge_level = safely_get_json_value(
             vehicle_status, "evStatus.targetSOC.0.targetSOClevel", int
