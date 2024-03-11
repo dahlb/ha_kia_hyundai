@@ -61,7 +61,7 @@ async def async_setup_entry(
     usage_sensors = []
 
     for description, key in usage_counters:
-        sensors.append(
+        usage_sensors.append(
             ApiUsageSensor(
                 vehicle,
                 description,
