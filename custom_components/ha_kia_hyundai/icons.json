@@ -1,0 +1,11 @@
+{
+  "services": {
+    "request_sync": "mdi:sync",
+    "update": "mdi:update",
+    "start_climate": "mdi:home-thermometer",
+    "stop_climate": "mdi:home-thermometer-outline",
+    "start_charge": "mdi:ev-station",
+    "stop_charge": "mdi:ev-station",
+    "set_charge_limits": "mdi:car-turbocharger"
+  }
+}
