@@ -59,7 +59,7 @@ def action_wrapper(func):
             session_id = await self._get_session_id()
             kwargs.update({"session_id": session_id})
             self._start_action(func.__name__)
-            _LOGGER.debug("invoking {}; with ".format(func.__name__))
+            _LOGGER.debug(f"invoking {func.__name__}; with ")
             _LOGGER.debug(kwargs.keys())
             xid = await func(*args, **kwargs)
             self._current_action.set_xid(xid)
