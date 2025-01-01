@@ -59,7 +59,7 @@ SENSOR_DESCRIPTIONS: Final[tuple[KiaSensorEntityDescription, ...]] = (
         name="Next Service Mile",
         icon="mdi:car-wrench",
         device_class=None,
-        suggested_display_precision=1,
+        suggested_display_precision=0,
         native_unit_of_measurement=UnitOfLength.MILES,
     ),
     KiaSensorEntityDescription(
