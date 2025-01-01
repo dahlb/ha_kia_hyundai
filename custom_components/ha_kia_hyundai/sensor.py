@@ -56,7 +56,7 @@ SENSOR_DESCRIPTIONS: Final[tuple[KiaSensorEntityDescription, ...]] = (
     ),
     KiaSensorEntityDescription(
         key="next_service_mile_value",
-        name="Miles Until Next Service",
+        name="Next Service Mile",
         icon="mdi:car-wrench",
         device_class=None,
         suggested_display_precision=1,
