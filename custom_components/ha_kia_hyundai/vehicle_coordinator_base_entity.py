@@ -15,7 +15,7 @@ class VehicleCoordinatorBaseEntity(CoordinatorEntity[VehicleCoordinator]):
         return {
             "identifiers": {(DOMAIN, self.coordinator.vehicle_id)},
             "name": self.coordinator.vehicle_name,
-            "manufacturer": f"US Kia",
+            "manufacturer": "US Kia",
             "model": self.coordinator.vehicle_model,
             "via_device": (DOMAIN, self.coordinator.vehicle_id),
         }

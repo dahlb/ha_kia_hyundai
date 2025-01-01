@@ -4,7 +4,7 @@ from typing import Final
 
 from homeassistant.components.sensor import SensorDeviceClass, SensorEntity, SensorEntityDescription
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import PERCENTAGE, UnitOfLength, UnitOfTemperature, UnitOfTime, STATE_UNAVAILABLE
+from homeassistant.const import PERCENTAGE, UnitOfLength, UnitOfTemperature, STATE_UNAVAILABLE
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.restore_state import RestoreEntity
 

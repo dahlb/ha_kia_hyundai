@@ -6,13 +6,13 @@
 ![Project Maintenance][maintenance-shield]
 [![BuyMeCoffee][buymecoffeebadge]][buymecoffee]
 
-A custom integration for Kia Uvo in the USA region. This implementation focuses on providing tracking of api actions as the api is asynchronous and avoiding draining the 12v battery (starting with a rewrite in v2).
+A custom integration for Kia Uvo in the USA region. This implementation focuses on providing tracking of api actions as the api is asynchronous and avoiding draining the 12v battery (starting with a rewrite in v1.9).
 
 ## Warnings ##
 - this is only functional for USA Kia, if you are in another region or use hyundai try [kia_uvo](https://github.com/Hyundai-Kia-Connect/kia_uvo).
 - charging switch is only available while the vehicle is plugged in
 - use desired defrost and desired Heating acc switches to indicate which you want started when you change climate from off to auto
-- 2.x is a rewrite, there will likely be a few bugs in 2.1.0
+- 1.9.0 is a rewrite, there will likely be a few bugs in 1.9.0
 
 ## Feature Highlights ##
 - Minimizing UI thread workload to allow things like Google Home to function correctly

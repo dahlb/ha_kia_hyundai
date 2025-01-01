@@ -3,8 +3,7 @@ from logging import getLogger
 from homeassistant.components.switch import SwitchEntity, SwitchDeviceClass
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import STATE_UNAVAILABLE, STATE_ON
-from homeassistant.core import HomeAssistant, callback
-from homeassistant.helpers.entity import CalculatedState
+from homeassistant.core import HomeAssistant
 from homeassistant.helpers.restore_state import RestoreEntity
 
 from . import VehicleCoordinator
