@@ -6,28 +6,28 @@
 ![Project Maintenance][maintenance-shield]
 [![BuyMeCoffee][buymecoffeebadge]][buymecoffee]
 
-A custom integration for Kia Uvo Bluelink in the USA region. This project is mostly from looking at other core integrations, the [callbacks](https://github.com/home-assistant/core/tree/dev/homeassistant/components/august) and the [config flow](https://github.com/home-assistant/core/tree/dev/homeassistant/components/vizio) improvements.
+A custom integration for Kia Uvo in the USA region. This implementation focuses on providing tracking of api actions as the api is asynchronous and avoiding draining the 12v battery (starting with a rewrite in v2).
 
-Warning ahead; this is beta phase, this is mostly functional for USA Kia, if you notice something missing please open an issue.
+## Warnings ##
+- this is only functional for USA Kia, if you are in another region or use hyundai try [kia_uvo](https://github.com/Hyundai-Kia-Connect/kia_uvo).
+- charging switch is only available while the vehicle is plugged in
+- use desired defrost and desired Heating acc switches to indicate which you want started when you change climate from off to auto
+- 2.x is a rewrite, there will likely be a few bugs in 2.1.0
 
 ## Feature Highlights ##
 - Minimizing UI thread workload to allow things like Google Home to function correctly
-- Multiple vehicle support, both within same login and across brands
+- Multiple vehicle support
 - Clean easy to maintain MVC design
-- Isolation of Region/Brand idiosyncrasy
 - Published PyPi for all API interactions to help full python community
 - Action locks to prevent attempts to call two actions at the same time, the api doesn't support parallel actions.
 - Tracking results of asynchronous vehicle APIs through to conclusion.
 
 ## Installation ##
-You can install this either manually copying files or using HACS. Configuration can be done on UI, you need to enter your username and password, (I know, translations are missing!). 
+You can install this either manually copying files or using HACS. Configuration can be done on UI, you need to enter your username and password, (I know, translations are missing!).
 
-- Expects your HA metric setting to match region defaults. AKA in the USA not metric, in Canada is metric
 - It will allow selection during setup of which vehicle to fetch values for.
 - To set up two vehicles add the integration through HA UI twice.
 - refresh - It will fetch the cached information every 30 minutes from Kia Servers. **Now Configurable**
-- request sync - It will ask your car for the latest data every 4 hours. **Now Configurable**
-- It will not force update between 6PM to 6AM. **Now Configurable**
 
 ## Supported entities ##
 - Air Conditioner Status, Defroster Status, Set Temperature
@@ -48,8 +48,7 @@ You can install this either manually copying files or using HACS. Configuration 
 this integration aims to automate what you can do in the official app, if you can't do it in the app because your subscription is expired then this integration won't be able to do it either.
 
 device id is optional unless you have two vehicles setup then it becomes required, this is for common convenience but if you plan to add a second vehicle use the device_id parameter always.
-- update: get latest **cached** vehicle data
-- request_sync: this will make a call to your vehicle to get its latest data, watch sync age to tell if you are over using this! (unavailable in US Hyundai)
+- request_sync: this will make a call to your vehicle to get its latest data, watch sync age to tell if you are over using this!
 - start_climate / stop_climate: Control the HVAC car services
 - start_charge / stop_charge: You can control your charging using these services
 - set_charge_limits: You can control your charging capacity limits using this services

@@ -1,6 +1,3 @@
-from __future__ import annotations
-from typing import Any
-
 import attr
 import logging
 
@@ -10,8 +7,8 @@ from homeassistant.const import CONF_UNIQUE_ID, CONF_USERNAME, CONF_PASSWORD
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import device_registry as dr, entity_registry as er
 
-from .const import DOMAIN, DATA_VEHICLE_INSTANCE, CONF_VEHICLE_IDENTIFIER
-from .vehicle import Vehicle
+from . import VehicleCoordinator
+from .const import DOMAIN, CONF_VEHICLE_ID
 
 TO_REDACT = {CONF_USERNAME, CONF_PASSWORD, CONF_UNIQUE_ID, "vehicle_identifier"}
 TO_REDACT_MAPPED = {
@@ -42,21 +39,18 @@ _LOGGER = logging.getLogger(__name__)
 
 async def async_get_config_entry_diagnostics(
     hass: HomeAssistant, config_entry: ConfigEntry
-) -> dict[str, dict[str, Any]]:
+) -> dict[str, dict[str, any]]:
     """Return diagnostics for a config entry."""
-    vehicle: Vehicle = hass.data[DOMAIN][config_entry.data[CONF_VEHICLE_IDENTIFIER]][
-        DATA_VEHICLE_INSTANCE
-    ]
+    coordinator: VehicleCoordinator = hass.data[DOMAIN][config_entry.data[CONF_VEHICLE_ID]]
     data = {
         "entry": async_redact_data(config_entry.as_dict(), TO_REDACT),
-        "vehicle_mapped_data": async_redact_data(vehicle.__repr__(), TO_REDACT_MAPPED),
-        "vehicle_raw_response": async_redact_data(vehicle.raw_responses, TO_REDACT_RAW),
+        "vehicle_raw_response": async_redact_data(coordinator.data, TO_REDACT_RAW),
     }
 
     device_registry = dr.async_get(hass)
     entity_registry = er.async_get(hass)
     hass_device = device_registry.async_get_device(
-        identifiers={(DOMAIN, str(vehicle.identifier))}
+        identifiers={(DOMAIN, str(coordinator.vehicle_id))}
     )
     if not hass_device:
         return data

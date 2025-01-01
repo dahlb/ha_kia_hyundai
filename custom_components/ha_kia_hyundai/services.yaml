@@ -1,128 +1,48 @@
-request_sync:
-  description: Request your vehicle to sync its data to cloud
-  fields:
-    device_id:
-      name: Device
-      description: Device id of the vehicle.
-      required: false
-      selector:
-        device:
-          integration: ha_kia_hyundai
-update:
-  description: Update vehicle data from cloud cache
-  fields:
-    device_id:
-      name: Device
-      description: Device id of the vehicle.
-      required: false
-      selector:
-        device:
-          integration: ha_kia_hyundai
 start_climate:
-  description: Start car climate. Not all items available for all cars.  Refer to Kia app for which are supported for your car.
   fields:
     device_id:
-      name: Device
-      description: Device id of the vehicle.
-      required: false
+      required: true
       selector:
         device:
           integration: ha_kia_hyundai
     climate:
-      name: Climate
-      description: Enable the HVAC System
-      required: false
+      required: true
       example: true
       default: true
       selector:
         boolean:
     temperature:
-      name: Temperature
-      description: Set temperature of climate control.
       required: false
-      example: 76 for Fahrenheit or 21 for Celsius
+      example: 72
+      default: 72
       selector:
-        text:
+        number:
+          min: 62
+          max: 82
+          step: 1
+          mode: box
+          unit_of_measurement: Degrees
     defrost:
-      name: Defrost
-      description: Front Windshield Defrost
-      required: false
+      required: true
       example: false
       default: false
       selector:
         boolean:
     heating:
-      name: Heating
-      description: Heated features like the steering wheel and rear window
-      required: false
+      required: true
       example: false
       default: false
       selector:
         boolean:
-stop_climate:
-  description: Stop car climate
-  fields:
-    device_id:
-      name: Device
-      description: Device id of the vehicle.
-      required: false
-      selector:
-        device:
-          integration: ha_kia_hyundai
-start_charge:
-  description: Start charging
-  fields:
-    device_id:
-      name: Device
-      description: Device id of the vehicle.
-      required: false
-      selector:
-        device:
-          integration: ha_kia_hyundai
-stop_charge:
-  description: Stop charging
-  fields:
-    device_id:
-      name: Device
-      description: Device id of the vehicle.
-      required: false
-      selector:
-        device:
-          integration: ha_kia_hyundai
-lock:
-  description: Lock the vehicle
-  fields:
-    device_id:
-      name: Device
-      description: Device id of the vehicle.
-      required: false
-      selector:
-        device:
-          integration: ha_kia_hyundai
-unlock:
-  description: Unlock the vehicle
-  fields:
-    device_id:
-      name: Device
-      description: Device id of the vehicle.
-      required: false
-      selector:
-        device:
-          integration: ha_kia_hyundai
 set_charge_limits:
-  description: sets ac and dc charge capacity limits
   fields:
     device_id:
-      name: Device
-      description: Device id of the vehicle.
-      required: false
+      required: true
       selector:
         device:
           integration: ha_kia_hyundai
     dc_limit:
-      name: DC Charge limit
-      description: max charge capacity using DC charger
-      required: false
+      required: true
       example: 50
       default: 90
       selector:
@@ -130,11 +50,9 @@ set_charge_limits:
           min: 50
           max: 100
           step: 10
-          unit_of_measurement: '%'
+          unit_of_measurement: "%"
     ac_limit:
-      name: AC Charge limit
-      description: max charge capacity using AC charger
-      required: false
+      required: true
       example: 50
       default: 90
       selector:
@@ -142,4 +60,4 @@ set_charge_limits:
           min: 50
           max: 100
           step: 10
-          unit_of_measurement: '%'
+          unit_of_measurement: "%"

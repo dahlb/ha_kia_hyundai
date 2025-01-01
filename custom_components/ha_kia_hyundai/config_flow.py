@@ -2,68 +2,38 @@ import logging
 from typing import Any
 
 import voluptuous as vol
+from homeassistant.config_entries import ConfigEntry, OptionsFlow
 from homeassistant.exceptions import ConfigEntryAuthFailed
 from homeassistant import config_entries
 from homeassistant.const import (
-    CONF_PASSWORD,
     CONF_USERNAME,
-    CONF_REGION,
+    CONF_PASSWORD,
+    CONF_SCAN_INTERVAL,
 )
 from homeassistant.core import callback
+from kia_hyundai_api import UsKia
 
 from .const import (
-    CONF_SCAN_INTERVAL,
-    DEFAULT_SCAN_INTERVAL,
-    CONF_FORCE_SCAN_INTERVAL,
-    DEFAULT_FORCE_SCAN_INTERVAL,
-    CONF_NO_FORCE_SCAN_HOUR_START,
-    DEFAULT_NO_FORCE_SCAN_HOUR_START,
-    CONF_NO_FORCE_SCAN_HOUR_FINISH,
-    DEFAULT_NO_FORCE_SCAN_HOUR_FINISH,
     DOMAIN,
     CONFIG_FLOW_VERSION,
-    CONF_VEHICLES,
-    CONF_VEHICLE_IDENTIFIER,
-    CONF_BRAND,
-    REGIONS,
-    BRANDS,
-    CONF_PIN,
+    CONF_VEHICLE_ID,
+    DEFAULT_SCAN_INTERVAL,
+    CONFIG_FLOW_TEMP_VEHICLES,
 )
-from .api_cloud_util import api_cloud_for_region_and_brand
 
 _LOGGER = logging.getLogger(__name__)
 
 
-class KiaUvoOptionFlowHandler(config_entries.OptionsFlow):
-    def __init__(self, config_entry: config_entries.ConfigEntry) -> None:
-        self.config_entry = config_entry
+class KiaUvoOptionFlowHandler(OptionsFlow):
+    def __init__(self, config_entry: ConfigEntry) -> None:
         self.schema = vol.Schema(
             {
                 vol.Optional(
                     CONF_SCAN_INTERVAL,
-                    default=self.config_entry.options.get(
+                    default=config_entry.options.get(
                         CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL
                     ),
                 ): vol.All(vol.Coerce(int), vol.Range(min=1, max=999)),
-                vol.Optional(
-                    CONF_FORCE_SCAN_INTERVAL,
-                    default=self.config_entry.options.get(
-                        CONF_FORCE_SCAN_INTERVAL, DEFAULT_FORCE_SCAN_INTERVAL
-                    ),
-                ): vol.All(vol.Coerce(int), vol.Range(min=1, max=999)),
-                vol.Optional(
-                    CONF_NO_FORCE_SCAN_HOUR_START,
-                    default=self.config_entry.options.get(
-                        CONF_NO_FORCE_SCAN_HOUR_START, DEFAULT_NO_FORCE_SCAN_HOUR_START
-                    ),
-                ): vol.All(vol.Coerce(int), vol.Range(min=1, max=23)),
-                vol.Optional(
-                    CONF_NO_FORCE_SCAN_HOUR_FINISH,
-                    default=self.config_entry.options.get(
-                        CONF_NO_FORCE_SCAN_HOUR_FINISH,
-                        DEFAULT_NO_FORCE_SCAN_HOUR_FINISH,
-                    ),
-                ): vol.All(vol.Coerce(int), vol.Range(min=1, max=23)),
             }
         )
 
@@ -93,21 +63,6 @@ class KiaUvoConfigFlowHandler(config_entries.ConfigFlow):
 
     async def async_step_user(self, user_input: dict[str, Any] | None = None):
         data_schema = {
-            vol.Required(CONF_REGION): vol.In(REGIONS),
-            vol.Required(CONF_BRAND): vol.In(BRANDS),
-        }
-        if user_input is not None:
-            self.data.update(user_input)
-            region = self.data[CONF_REGION]
-            brand = self.data[CONF_BRAND]
-            api_cloud_class = api_cloud_for_region_and_brand(region=region, brand=brand)
-            if api_cloud_class is None:
-                return self.async_abort(reason="unsupported_brand_region")
-            return await self.async_step_auth()
-        return self.async_show_form(step_id="user", data_schema=vol.Schema(data_schema))
-
-    async def async_step_auth(self, user_input: dict[str, Any] | None = None):
-        data_schema = {
             vol.Required(CONF_USERNAME): str,
             vol.Required(CONF_PASSWORD): str,
         }
@@ -116,28 +71,19 @@ class KiaUvoConfigFlowHandler(config_entries.ConfigFlow):
         if user_input is not None:
             username = user_input[CONF_USERNAME]
             password = user_input[CONF_PASSWORD]
-            region = self.data[CONF_REGION]
-            brand = self.data[CONF_BRAND]
 
-            api_cloud = None
             try:
-                api_cloud_class = api_cloud_for_region_and_brand(
-                    region=region, brand=brand
+                api_connection = UsKia(
+                    username=username,
+                    password=password,
                 )
-                api_cloud = api_cloud_class(
-                    username=username, password=password, hass=self.hass
-                )
-                if user_input.get(CONF_PIN) is not None:
-                    api_cloud.pin = user_input[CONF_PIN]
-                await api_cloud.login()
+                await api_connection.login()
                 self.data.update(user_input)
-                self.data[CONF_VEHICLES] = await api_cloud.get_vehicles()
+                await api_connection.get_vehicles()
+                self.data[CONFIG_FLOW_TEMP_VEHICLES] = api_connection.vehicles
                 return await self.async_step_pick_vehicle()
             except ConfigEntryAuthFailed:
                 errors["base"] = "auth"
-            finally:
-                if api_cloud is not None:
-                    await api_cloud.cleanup()
 
         return self.async_show_form(
             step_id="auth", data_schema=vol.Schema(data_schema), errors=errors
@@ -147,26 +93,26 @@ class KiaUvoConfigFlowHandler(config_entries.ConfigFlow):
         self, user_input: dict[str, Any] | None = None
     ):
         vehicle_map = {}
-        for vehicle in self.data[CONF_VEHICLES]:
-            vehicle_map[vehicle.identifier] = f"{vehicle.name} ({vehicle.model})"
+        for vehicle in self.data[CONFIG_FLOW_TEMP_VEHICLES]:
+            vehicle_map[vehicle["vehicleIdentifier"]] = f"{vehicle["nickName"]} ({vehicle["modelName"]})"
 
         errors: dict[str, str] = {}
         data_schema = {
             vol.Required(
-                CONF_VEHICLE_IDENTIFIER,
+                CONF_VEHICLE_ID,
             ): vol.In(vehicle_map),
         }
-        if len(self.data[CONF_VEHICLES]) == 1:
+        if len(self.data[CONFIG_FLOW_TEMP_VEHICLES]) == 1:
             user_input = {
-                CONF_VEHICLE_IDENTIFIER: self.data[CONF_VEHICLES][0].identifier
+                CONF_VEHICLE_ID: vehicle_map.keys()[0]
             }
         if user_input is not None:
-            await self.async_set_unique_id(user_input[CONF_VEHICLE_IDENTIFIER])
+            await self.async_set_unique_id(user_input[CONF_VEHICLE_ID])
             self._abort_if_unique_id_configured()
-            del self.data[CONF_VEHICLES]
-            self.data[CONF_VEHICLE_IDENTIFIER] = user_input[CONF_VEHICLE_IDENTIFIER]
+            del self.data[CONFIG_FLOW_TEMP_VEHICLES]
+            self.data[CONF_VEHICLE_ID] = user_input[CONF_VEHICLE_ID]
             return self.async_create_entry(
-                title=vehicle_map[user_input[CONF_VEHICLE_IDENTIFIER]],
+                title=vehicle_map[user_input[CONF_VEHICLE_ID]],
                 data=self.data,
             )
         else:

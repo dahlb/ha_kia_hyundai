@@ -1,6 +1,3 @@
-colorlog==6.9.0
-homeassistant==2024.2.0
-pip>=8.0.3,<24.4
+homeassistant==2024.12.0
 ruff==0.8.4
-kia-hyundai-api==1.3.2
-geopy>=2.0
+kia-hyundai-api==1.4.2

@@ -1,161 +1,169 @@
-from __future__ import annotations
+from dataclasses import dataclass
+from logging import getLogger
+from typing import Final
 
-import logging
-
+from homeassistant.components.sensor import SensorDeviceClass, SensorEntity, SensorEntityDescription
+from homeassistant.config_entries import ConfigEntry
+from homeassistant.const import PERCENTAGE, UnitOfLength, UnitOfTemperature, UnitOfTime, STATE_UNAVAILABLE
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers.entity import Entity
-from homeassistant.helpers.typing import ConfigType
-import homeassistant.util.dt as dt_util
-from datetime import datetime
+from homeassistant.helpers.restore_state import RestoreEntity
 
-from .vehicle import Vehicle
-from .base_entity import BaseEntity, DeviceInfoMixin
+from . import VehicleCoordinator
+from .vehicle_coordinator_base_entity import VehicleCoordinatorBaseEntity
 from .const import (
-    CONF_VEHICLE_IDENTIFIER,
-    DATA_VEHICLE_INSTANCE,
+    CONF_VEHICLE_ID,
     DOMAIN,
-    DYNAMIC_UNIT,
 )
 
-_LOGGER = logging.getLogger(__name__)
+_LOGGER = getLogger(__name__)
 PARALLEL_UPDATES: int = 1
 
+@dataclass(frozen=True)
+class KiaSensorEntityDescription(SensorEntityDescription):
+    """A class that describes custom sensor entities."""
+    preserve_state: bool = False
+
+
+SENSOR_DESCRIPTIONS: Final[tuple[KiaSensorEntityDescription, ...]] = (
+    KiaSensorEntityDescription( # TODO maybe none sometimes?
+        key="ev_battery_level",
+        name="EV Battery",
+        icon="mdi:car-electric",
+        device_class=SensorDeviceClass.BATTERY,
+        native_unit_of_measurement=PERCENTAGE,
+        preserve_state=True,
+    ),
+    KiaSensorEntityDescription(
+        key="odometer_value",
+        name="Odometer",
+        icon="mdi:speedometer",
+        device_class=None,
+        native_unit_of_measurement=UnitOfLength.MILES,
+    ),
+    KiaSensorEntityDescription(
+        key="last_synced_to_cloud",
+        name="Last Synced To Cloud",
+        icon="mdi:update",
+        device_class=SensorDeviceClass.TIMESTAMP,
+        native_unit_of_measurement=None,
+    ),
+    KiaSensorEntityDescription(
+        key="last_synced_from_cloud",
+        name="Last Synced from Cloud",
+        icon="mdi:update",
+        device_class=SensorDeviceClass.TIMESTAMP,
+        native_unit_of_measurement=None,
+    ),
+    KiaSensorEntityDescription(
+        key="next_service_mile_value",
+        name="Miles Until Next Service",
+        icon="mdi:car-wrench",
+        device_class=None,
+        suggested_display_precision=1,
+        native_unit_of_measurement=UnitOfLength.MILES,
+    ),
+    KiaSensorEntityDescription(
+        key="climate_temperature_value",
+        name="Set Temperature",
+        device_class=SensorDeviceClass.TEMPERATURE,
+        native_unit_of_measurement=UnitOfTemperature.FAHRENHEIT,
+    ),
+#    KiaSensorEntityDescription(
+#        key="ev_charge_current_remaining_duration",
+#        name="Estimated Current Charge Duration",
+#        device_class=SensorDeviceClass.DURATION,
+#        icon="mdi:ev-station",
+#        native_unit_of_measurement=UnitOfTime.MINUTES,
+#    ),
+    KiaSensorEntityDescription(
+        key="ev_remaining_range_value",
+        name="Range by EV",
+        device_class=SensorDeviceClass.DISTANCE,
+        icon="mdi:road-variant",
+        native_unit_of_measurement=UnitOfLength.MILES,
+    ),
+    KiaSensorEntityDescription(
+        key="car_battery_level",
+        name="12v Battery",
+        device_class=None,
+        icon="mdi:car-battery",
+        native_unit_of_measurement=PERCENTAGE,
+    ),
+)
 
 async def async_setup_entry(
-    hass: HomeAssistant, config_entry: ConfigType, async_add_entities
+    hass: HomeAssistant, config_entry: ConfigEntry, async_add_entities
 ):
-    vehicle_identifier = config_entry.data[CONF_VEHICLE_IDENTIFIER]
-    vehicle: Vehicle = hass.data[DOMAIN][vehicle_identifier][DATA_VEHICLE_INSTANCE]
+    vehicle_id = config_entry.data[CONF_VEHICLE_ID]
+    coordinator: VehicleCoordinator = hass.data[DOMAIN][vehicle_id]
 
     sensors = []
-
-    for description, key, unit, icon, device_class in vehicle.supported_instruments():
-        sensors.append(
-            InstrumentSensor(
-                vehicle,
-                description,
-                key,
-                unit,
-                icon,
-                device_class,
+    for sensor_description in SENSOR_DESCRIPTIONS:
+        if getattr(coordinator, sensor_description.key) is not None:
+            sensors.append(
+                InstrumentSensor(
+                    coordinator,
+                    sensor_description,
+                )
             )
-        )
-
     async_add_entities(sensors, True)
 
-    usage_counters = [
-        (
-            "Action Calls Today",
-            "calls_today_for_actions",
-        ),
-        (
-            "Update Calls Today",
-            "calls_today_for_update",
-        ),
-        (
-            "Sync Requests Today",
-            "calls_today_for_request_sync",
-        ),
-    ]
-
-    usage_sensors = []
-
-    for description, key in usage_counters:
-        usage_sensors.append(
-            ApiUsageSensor(
-                vehicle,
-                description,
-                key,
-            )
-        )
-
-    async_add_entities(usage_sensors, True)
+    async_add_entities([
+        APIActionInProgress(coordinator=coordinator),
+    ], True)
 
 
-class InstrumentSensor(BaseEntity):
+class InstrumentSensor(VehicleCoordinatorBaseEntity, SensorEntity, RestoreEntity):
     def __init__(
-        self,
-        vehicle: Vehicle,
-        description,
-        key,
-        unit,
-        icon,
-        device_class,
+            self,
+            coordinator: VehicleCoordinator,
+            description: KiaSensorEntityDescription,
     ):
-        super().__init__(vehicle)
-        self._attr_unique_id = f"{DOMAIN}-{vehicle.identifier}-{key}"
-        self._attr_device_class = device_class
-        self._attr_icon = icon
-        self._attr_unit_of_measurement = unit
-        self._attr_name = f"{vehicle.name} {description}"
-
-        self._key = key
+        super().__init__(coordinator)
+        self.entity_description: KiaSensorEntityDescription = description
+        self._attr_unique_id = f"{DOMAIN}-{coordinator.vehicle_id}-{description.key}"
 
     @property
-    def state(self):
-        if self._key == "last_synced_to_cloud":
-            return dt_util.as_local(self._vehicle.last_synced_to_cloud).isoformat()
-        if self._key == "sync_age":
-            local_timezone = dt_util.UTC
-            age_of_last_sync = (
-                datetime.now(local_timezone) - self._vehicle.last_synced_to_cloud
-            )
-            return int(age_of_last_sync.total_seconds() / 60)
-
-        value = getattr(self._vehicle, self._key)
-        return value
+    def native_value(self):
+        value = getattr(self.coordinator, self.entity_description.key)
+        if value is None or value == 0:
+            return self._attr_native_value
+        else:
+            self._attr_native_value = value
+            return value
 
     @property
     def available(self) -> bool:
         """Return if entity is available."""
-        key_to_check = self._key
-        if self._key == "sync_age":
-            key_to_check = "last_synced_to_cloud"
-        return super() and getattr(self._vehicle, key_to_check) is not None
+        return super() and self.native_value is not None
+
+    async def async_internal_added_to_hass(self) -> None:
+        """Call when the button is added to hass."""
+        await super().async_internal_added_to_hass()
+        if self.entity_description.preserve_state:
+            state = await self.async_get_last_state()
+            if state is not None and state.state not in (STATE_UNAVAILABLE, None):
+                self.__set_state(state.state)
+
+    def __set_state(self, state: str | None) -> None:
+        """Set the entity state."""
+        # Invalidate the cache of the cached property
+        self.__dict__.pop("state", None)
+        self._attr_native_value = state
+
+
+class APIActionInProgress(VehicleCoordinatorBaseEntity, SensorEntity):
+    def __init__(self, coordinator: VehicleCoordinator):
+        super().__init__(coordinator)
+        self._attr_unique_id = f"{DOMAIN}-{coordinator.vehicle_id}-API-action-in-progress"
+        self._attr_device_class = SensorDeviceClass.ENUM
+        self._attr_name = "API Action In Progress"
 
     @property
-    def unit_of_measurement(self) -> str | None:
-        if self._attr_unit_of_measurement != DYNAMIC_UNIT:
-            return self._attr_unit_of_measurement
-        key_unit = self._key.replace("_value", "_unit")
-        return getattr(self._vehicle, key_unit)
-
-
-class ApiUsageSensor(DeviceInfoMixin, Entity):
-    _attr_should_poll: bool = False
-    _attr_icon = "mdi:api"
-    _attr_state = 0
-    failed_today = False
-    failed_error = None
-
-    def __init__(
-        self,
-        vehicle: Vehicle,
-        description,
-        key,
-    ):
-        self._vehicle = vehicle
-        self._attr_unique_id = f"{DOMAIN}-{vehicle.identifier}-{key}"
-        self._attr_name = f"{vehicle.name} {description}"
-        self._counter_date = dt_util.as_local(dt_util.utcnow())
-        setattr(vehicle, key, self)
-
-    def mark_used(self):
-        event_time_local = dt_util.as_local(dt_util.utcnow())
-        if dt_util.start_of_local_day(self._counter_date) != dt_util.start_of_local_day(
-            event_time_local
-        ):
-            self._counter_date = event_time_local
-            self._attr_state = 0
-            self.failed_today = False
-            self.failed_error = None
-        self._attr_state += 1
-        self.async_write_ha_state()
-
-    def mark_failed(self, error):
-        self.failed_today = True
-        self.failed_error = error
+    def icon(self):
+        return "mdi:api-off" if self.coordinator.last_action_name is None else "mdi:api"
 
     @property
-    def state_attributes(self):
-        return {"failed_today": self.failed_today}
+    def native_value(self):
+        """Return the value reported by the sensor."""
+        return self.coordinator.last_action_name if self.coordinator.last_action_name is not None else "None"

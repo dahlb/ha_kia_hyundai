@@ -1,11 +1,5 @@
-from __future__ import annotations
-
 import re
 from datetime import datetime, tzinfo
-from homeassistant.const import (
-    UnitOfLength,
-    UnitOfTemperature,
-)
 
 
 def convert_last_updated_str_to_datetime(
@@ -24,24 +18,6 @@ def convert_last_updated_str_to_datetime(
         second=int(m.group(6)),
         tzinfo=timezone_of_str,
     )
-
-
-def convert_api_unit_to_ha_unit_of_distance(
-    api_unit: int,
-) -> UnitOfLength | None:
-    if api_unit == 1:
-        return UnitOfLength.KILOMETERS
-    if api_unit == 3:
-        return UnitOfLength.MILES
-
-
-def convert_api_unit_to_ha_unit_of_temperature(
-    api_unit: int,
-) -> UnitOfTemperature:
-    if api_unit == 0:
-        return UnitOfTemperature.CELSIUS
-    if api_unit == 1:
-        return UnitOfTemperature.FAHRENHEIT
 
 
 def safely_get_json_value(json, key, callable_to_cast=None):
