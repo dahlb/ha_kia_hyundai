@@ -4,7 +4,7 @@ from typing import Final
 
 from homeassistant.components.sensor import SensorDeviceClass, SensorEntity, SensorEntityDescription
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import PERCENTAGE, UnitOfLength, UnitOfTemperature, STATE_UNAVAILABLE
+from homeassistant.const import PERCENTAGE, UnitOfLength, UnitOfTemperature, STATE_UNAVAILABLE, UnitOfTime
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.restore_state import RestoreEntity
 
@@ -68,13 +68,13 @@ SENSOR_DESCRIPTIONS: Final[tuple[KiaSensorEntityDescription, ...]] = (
         device_class=SensorDeviceClass.TEMPERATURE,
         native_unit_of_measurement=UnitOfTemperature.FAHRENHEIT,
     ),
-#    KiaSensorEntityDescription(
-#        key="ev_charge_current_remaining_duration",
-#        name="Estimated Current Charge Duration",
-#        device_class=SensorDeviceClass.DURATION,
-#        icon="mdi:ev-station",
-#        native_unit_of_measurement=UnitOfTime.MINUTES,
-#    ),
+    KiaSensorEntityDescription(
+        key="ev_charge_current_remaining_duration",
+        name="Estimated Current Charge Duration",
+        device_class=SensorDeviceClass.DURATION,
+        icon="mdi:ev-station",
+        native_unit_of_measurement=UnitOfTime.MINUTES,
+    ),
     KiaSensorEntityDescription(
         key="ev_remaining_range_value",
         name="Range by EV",

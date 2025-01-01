@@ -310,7 +310,7 @@ class VehicleCoordinator(DataUpdateCoordinator):
     def ev_charge_current_remaining_duration(self) -> int:
         return safely_get_json_value(
             self.data,
-            "lastVehicleInfo.vehicleStatusRpt.vehicleStatus.evStatus.remainChargeTime.1.timeInterval.value",
+            "lastVehicleInfo.vehicleStatusRpt.vehicleStatus.evStatus.remainChargeTime.0.timeInterval.value",
             int
         )
 
