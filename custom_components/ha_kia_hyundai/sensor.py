@@ -25,7 +25,7 @@ class KiaSensorEntityDescription(SensorEntityDescription):
 
 
 SENSOR_DESCRIPTIONS: Final[tuple[KiaSensorEntityDescription, ...]] = (
-    KiaSensorEntityDescription( # TODO maybe none sometimes?
+    KiaSensorEntityDescription(
         key="ev_battery_level",
         name="EV Battery",
         icon="mdi:car-electric",

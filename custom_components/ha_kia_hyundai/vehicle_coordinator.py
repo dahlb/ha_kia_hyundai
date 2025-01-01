@@ -18,7 +18,6 @@ _LOGGER = getLogger(__name__)
 
 class VehicleCoordinator(DataUpdateCoordinator):
     """Kia Us device object."""
-    _ev_battery_level: int = None
     climate_desired_defrost: bool = False
     climate_desired_heating_acc: bool = False
 
@@ -101,14 +100,11 @@ class VehicleCoordinator(DataUpdateCoordinator):
 
     @property
     def ev_battery_level(self) -> float:
-        new_ev_battery_level = safely_get_json_value(
+        return safely_get_json_value(
             self.data,
             "lastVehicleInfo.vehicleStatusRpt.vehicleStatus.evStatus.batteryStatus",
             int
         )
-        if new_ev_battery_level != 0:
-            self._ev_battery_level = new_ev_battery_level
-        return self._ev_battery_level
 
     @property
     def odometer_value(self) -> float:
