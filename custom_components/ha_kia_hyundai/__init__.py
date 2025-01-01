@@ -48,13 +48,10 @@ async def async_migrate_entry(hass: HomeAssistant, config_entry: ConfigEntry):
 
     return True
 
-async def async_setup(hass: HomeAssistant, _processed_config):
+async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry):
     hass.data.setdefault(DOMAIN, {})
     async_setup_services(hass)
 
-    return True
-
-async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry):
     vehicle_id = config_entry.data[CONF_VEHICLE_ID]
     username = config_entry.data[CONF_USERNAME]
     password = config_entry.data[CONF_PASSWORD]
@@ -90,7 +87,6 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry):
     await coordinator.async_config_entry_first_refresh()
     _LOGGER.debug("first update finished")
 
-    hass.data.setdefault(DOMAIN, {})
     hass.data[DOMAIN][vehicle_id] = coordinator
 
     await hass.config_entries.async_forward_entry_setups(config_entry, PLATFORMS)

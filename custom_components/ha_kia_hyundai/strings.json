@@ -6,7 +6,7 @@
         "description": "Configure your Credentials.",
         "data": {
           "username": "Username",
-          "password": "Password",
+          "password": "Password"
         }
       },
       "pick_vehicle": {
@@ -30,7 +30,7 @@
       "init": {
         "title": "Kia US: Configuration",
         "data": {
-          "scan_interval": "Scan Interval in Minutes",
+          "scan_interval": "Scan Interval in Minutes"
         }
       }
     }

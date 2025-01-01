@@ -56,7 +56,8 @@
       "description": "Start climate control.",
       "fields": {
         "device_id": {
-          "name": "Vehicle Device"
+          "name": "Vehicle Device",
+          "description": ""
         },
         "temperature": {
           "name": "Temperature",
@@ -81,7 +82,8 @@
       "description": "Maximum allowed charge for DC and AC charging.",
       "fields": {
         "device_id": {
-          "name": "Vehicle Device"
+          "name": "Vehicle Device",
+          "description": ""
         },
         "ac_limit": {
           "name": "AC Limit",
