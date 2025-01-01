@@ -126,11 +126,9 @@ class InstrumentSensor(VehicleCoordinatorBaseEntity, SensorEntity, RestoreEntity
     @property
     def native_value(self):
         value = getattr(self.coordinator, self.entity_description.key)
-        if value is None or value == 0:
-            return self._attr_native_value
-        else:
+        if value is not None and value != 0:
             self._attr_native_value = value
-            return value
+        return self._attr_native_value
 
     @property
     def available(self) -> bool:
