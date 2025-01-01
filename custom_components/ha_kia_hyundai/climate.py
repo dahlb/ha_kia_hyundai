@@ -88,6 +88,7 @@ class Thermostat(VehicleCoordinatorBaseEntity, ClimateEntity):
                     defrost=self.coordinator.climate_desired_defrost,
                     heating=self.coordinator.climate_desired_heating_acc,
                 )
+        self.coordinator.async_update_listeners()
         await self.coordinator.async_request_refresh()
 
     async def async_set_temperature(self, **kwargs: Any) -> None:
