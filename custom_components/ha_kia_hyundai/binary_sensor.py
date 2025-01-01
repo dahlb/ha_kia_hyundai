@@ -178,4 +178,4 @@ class InstrumentSensor(VehicleCoordinatorBaseEntity, BinarySensorEntity):
 
     @property
     def available(self) -> bool:
-        return super() and getattr(self.coordinator, self.entity_description.key) is not None
+        return super().available and getattr(self.coordinator, self.entity_description.key) is not None

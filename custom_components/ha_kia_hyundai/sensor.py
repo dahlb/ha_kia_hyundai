@@ -99,7 +99,7 @@ async def async_setup_entry(
 
     sensors = []
     for sensor_description in SENSOR_DESCRIPTIONS:
-        if getattr(coordinator, sensor_description.key) is not None:
+        if sensor_description.preserve_state or getattr(coordinator, sensor_description.key) is not None:
             sensors.append(
                 InstrumentSensor(
                     coordinator,
@@ -133,7 +133,7 @@ class InstrumentSensor(VehicleCoordinatorBaseEntity, SensorEntity, RestoreEntity
     @property
     def available(self) -> bool:
         """Return if entity is available."""
-        return super() and self.native_value is not None
+        return super().available and self.native_value is not None
 
     async def async_internal_added_to_hass(self) -> None:
         """Call when the button is added to hass."""

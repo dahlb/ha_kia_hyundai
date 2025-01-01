@@ -118,7 +118,7 @@ class ChargingSwitch(VehicleCoordinatorBaseEntity, SwitchEntity):
 
     @property
     def available(self) -> bool:
-        return super() and self.coordinator.ev_plugged_in
+        return super().available and self.coordinator.ev_plugged_in
 
     @property
     def is_on(self) -> bool | None:

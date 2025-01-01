@@ -43,4 +43,4 @@ class LocationTracker(VehicleCoordinatorBaseEntity, TrackerEntity):
 
     @property
     def available(self) -> bool:
-        return super() and self.latitude is not None and self.longitude is not None
+        return super().available and self.latitude is not None and self.longitude is not None
