@@ -2,50 +2,35 @@
   "config": {
     "step": {
       "user": {
-        "title": "Kia/Hyundai Locale",
-        "description": "Set up your Kia/Hyundai to integrate with Home Assistant.",
-        "data": {
-          "region": "Region",
-          "brand": "Brand"
-        }
-      },
-      "auth": {
-        "title": "Kia/Hyundai Auth",
+        "title": "Kia US Auth",
         "description": "Configure your Credentials.",
         "data": {
           "username": "Username",
-          "password": "Password",
-          "pin": "PIN"
+          "password": "Password"
         }
       },
       "pick_vehicle": {
-        "title": "Kia/Hyundai Vehicle",
+        "title": "Kia US Vehicle",
         "description": "Pick which vehicle to use.",
         "data": {
-          "vehicle_str": "Vehicle"
+          "vehicle_id": "Vehicle"
         }
       },
       "reauth_confirm": {
         "title": "[%key:common::config_flow::title::reauth%]",
-        "description": "The Kia/Hyundai integration needs to re-authenticate your account."
+        "description": "The Kia US integration needs to re-authenticate your account."
       }
     },
     "error": {
-      "auth": "Login failed into Kia/Hyundai. Please use official Kia/Hyundai app to logout and log back in and try again."
-    },
-    "abort": {
-      "unsupported_brand_region": "Your Region/Brand combination is not yet supported, please check open tickets."
+      "auth": "Login failed into Kia US. Please use official Kia US app to logout and log back in and try again."
     }
   },
   "options": {
     "step": {
       "init": {
-        "title": "Kia/Hyundai: Configuration",
+        "title": "Kia US: Configuration",
         "data": {
-          "scan_interval": "Scan Interval in Minutes",
-          "force_scan_interval": "Max Sync Age (Force Scan Interval) in Minutes",
-          "no_force_scan_hour_start": "Blackout Start Hour - (No Force Scan)",
-          "no_force_scan_hour_finish": "Blackout Finish Hour - (No Force Scan)"
+          "scan_interval": "Scan Interval in Minutes"
         }
       }
     }

@@ -13,7 +13,7 @@
         "title": "Kia US Vehicle",
         "description": "Pick which vehicle to use.",
         "data": {
-          "vehicle_str": "Vehicle"
+          "vehicle_id": "Vehicle"
         }
       },
       "reauth_confirm": {
@@ -36,18 +36,14 @@
     }
   },
   "services": {
-    "request_sync": {
-      "name": "Request Sync",
-      "description": "Ask API to request updated data from vehicle."
-    },
-    "update": {
-      "name": "Update",
-      "description": "Update HA with latest data available from the API."
-    },
     "start_climate": {
       "name": "Start Climate",
       "description": "Start climate control.",
       "fields": {
+        "device_id": {
+          "name": "Vehicle Device",
+          "description": ""
+        },
         "temperature": {
           "name": "Temperature",
           "description": "The speed to set."
@@ -66,22 +62,14 @@
         }
       }
     },
-    "stop_climate": {
-      "name": "Stop Climate",
-      "description": "Stop climate control."
-    },
-    "start_charge": {
-      "name": "Start Charge",
-      "description": "Start Charging, if plugged in."
-    },
-    "stop_charge": {
-      "name": "Stop Charge",
-      "description": "Stop charging."
-    },
     "set_charge_limits": {
       "name": "Set Charge Limits",
       "description": "Maximum allowed charge for DC and AC charging.",
       "fields": {
+        "device_id": {
+          "name": "Vehicle Device",
+          "description": ""
+        },
         "ac_limit": {
           "name": "AC Limit",
           "description": "Percent of battery allowed to fill."
@@ -91,14 +79,6 @@
           "description": "Percent of battery allowed to fill."
         }
       }
-    },
-    "lock": {
-      "name": "Lock",
-      "description": "Lock the doors."
-    },
-    "unlock": {
-      "name": "Unlock",
-      "description": "Unlock the doors, often the car will instantly re-lock itself."
     }
   }
 }
