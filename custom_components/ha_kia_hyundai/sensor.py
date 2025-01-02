@@ -83,6 +83,20 @@ SENSOR_DESCRIPTIONS: Final[tuple[KiaSensorEntityDescription, ...]] = (
         native_unit_of_measurement=UnitOfLength.MILES,
     ),
     KiaSensorEntityDescription(
+        key="fuel_current_remaining_duration",
+        name="Range by Fuel",
+        device_class=SensorDeviceClass.DISTANCE,
+        icon="mdi:road-variant",
+        native_unit_of_measurement=UnitOfLength.MILES,
+    ),
+    KiaSensorEntityDescription(
+        key="total_current_remaining_duration",
+        name="Range Total",
+        device_class=SensorDeviceClass.DISTANCE,
+        icon="mdi:road-variant",
+        native_unit_of_measurement=UnitOfLength.MILES,
+    ),
+    KiaSensorEntityDescription(
         key="car_battery_level",
         name="12v Battery",
         device_class=None,

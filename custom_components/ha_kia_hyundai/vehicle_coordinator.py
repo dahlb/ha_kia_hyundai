@@ -321,3 +321,19 @@ class VehicleCoordinator(DataUpdateCoordinator):
             "lastVehicleInfo.vehicleStatusRpt.vehicleStatus.evStatus.drvDistance.0.rangeByFuel.evModeRange.value",
             int
         )
+
+    @property
+    def fuel_current_remaining_duration(self) -> int:
+        return safely_get_json_value(
+            self.data,
+            "lastVehicleInfo.vehicleStatusRpt.vehicleStatus.evStatus.drvDistance.0.rangeByFuel.gasModeRange.value",
+            int
+        )
+
+    @property
+    def total_current_remaining_duration(self) -> int:
+        return safely_get_json_value(
+            self.data,
+            "lastVehicleInfo.vehicleStatusRpt.vehicleStatus.evStatus.drvDistance.0.rangeByFuel.totalAvailableRange.value",
+            int
+        )
