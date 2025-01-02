@@ -88,6 +88,7 @@ SENSOR_DESCRIPTIONS: Final[tuple[KiaSensorEntityDescription, ...]] = (
         device_class=None,
         icon="mdi:car-battery",
         native_unit_of_measurement=PERCENTAGE,
+        preserve_state=True
     ),
 )
 
