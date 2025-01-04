@@ -328,6 +328,10 @@ class VehicleCoordinator(DataUpdateCoordinator):
             self.data,
             "lastVehicleInfo.vehicleStatusRpt.vehicleStatus.evStatus.drvDistance.0.rangeByFuel.gasModeRange.value",
             int
+        ) or safely_get_json_value(
+            self.data,
+            "lastVehicleInfo.vehicleStatusRpt.vehicleStatus.distanceToEmpty.value",
+            int
         )
 
     @property
