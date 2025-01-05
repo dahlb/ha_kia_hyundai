@@ -41,16 +41,17 @@ You can install this either manually copying files or using HACS. Configuration 
 - Engine Status
 - Odometer, EV Range
 - Last Updated from Cloud: Timestamp this integration last attempted to retrieve data from the cloud
-- *Sync Age*: Minutes since car synced to cloud during last update
-- Api Call Counts: Updates, Sync Requests, and Action calls counted daily
+- Last Updated to Cloud: Minutes since car synced to cloud during last update
+- Button: Request Wake Up from Car (hurts 12v battery) which requests the vehicle update the Last Updated to Cloud timestamp
+- Numbers: Charge limits for AC and DC
+- Switch: Charging (disabled unless plugged in) changing from off/on stops/starts charging 
+- Climate: remote starts HVAC, before changing mode to auto, set the Climate Desired Defrost/Heating Acc, and the climate temperature which are used to start the climate
 
 ## Supported services ##
 this integration aims to automate what you can do in the official app, if you can't do it in the app because your subscription is expired then this integration won't be able to do it either.
 
 device id is optional unless you have two vehicles setup then it becomes required, this is for common convenience but if you plan to add a second vehicle use the device_id parameter always.
-- request_sync: this will make a call to your vehicle to get its latest data, watch sync age to tell if you are over using this!
 - start_climate / stop_climate: Control the HVAC car services
-- start_charge / stop_charge: You can control your charging using these services
 - set_charge_limits: You can control your charging capacity limits using this services
 
 ## Troubleshooting ##
