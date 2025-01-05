@@ -22,6 +22,8 @@ from .vehicle_coordinator_base_entity import VehicleCoordinatorBaseEntity
 from .const import (
     CONF_VEHICLE_ID,
     DOMAIN,
+    TEMPERATURE_MIN,
+    TEMPERATURE_MAX,
 )
 
 _LOGGER = getLogger(__name__)
@@ -63,8 +65,8 @@ class Thermostat(VehicleCoordinatorBaseEntity, ClimateEntity):
         ]
         self._attr_target_temperature_step = PRECISION_WHOLE
         self._attr_temperature_unit = UnitOfTemperature.FAHRENHEIT
-        self._attr_max_temp = 82
-        self._attr_min_temp = 62
+        self._attr_max_temp = TEMPERATURE_MAX
+        self._attr_min_temp = TEMPERATURE_MIN
 
     @property
     def hvac_mode(self) -> HVACMode | str | None:

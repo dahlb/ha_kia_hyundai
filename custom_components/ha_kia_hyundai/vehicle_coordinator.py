@@ -10,7 +10,11 @@ from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, REQU
 from kia_hyundai_api import UsKia
 
 from custom_components.ha_kia_hyundai import DOMAIN
-from custom_components.ha_kia_hyundai.const import DELAY_BETWEEN_ACTION_IN_PROGRESS_CHECKING
+from custom_components.ha_kia_hyundai.const import (
+    DELAY_BETWEEN_ACTION_IN_PROGRESS_CHECKING,
+    TEMPERATURE_MAX,
+    TEMPERATURE_MIN
+)
 from custom_components.ha_kia_hyundai.util import safely_get_json_value, convert_last_updated_str_to_datetime
 
 _LOGGER = getLogger(__name__)
@@ -164,11 +168,16 @@ class VehicleCoordinator(DataUpdateCoordinator):
 
     @property
     def climate_temperature_value(self) -> int:
-        return safely_get_json_value(
+        temperature = safely_get_json_value(
             self.data,
             "lastVehicleInfo.vehicleStatusRpt.vehicleStatus.climate.airTemp.value",
             int
         )
+        if temperature == "LOW":
+            return TEMPERATURE_MIN
+        if temperature == "HIGH":
+            return TEMPERATURE_MAX
+        return temperature
 
     @property
     def climate_defrost_on(self) -> bool:
