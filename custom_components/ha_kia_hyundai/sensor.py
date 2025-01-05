@@ -112,7 +112,9 @@ async def async_setup_entry(
     vehicle_id = config_entry.data[CONF_VEHICLE_ID]
     coordinator: VehicleCoordinator = hass.data[DOMAIN][vehicle_id]
 
-    sensors = []
+    sensors = [
+        APIActionInProgress(coordinator=coordinator),
+    ]
     for sensor_description in SENSOR_DESCRIPTIONS:
         if sensor_description.preserve_state or getattr(coordinator, sensor_description.key) is not None:
             sensors.append(
@@ -122,10 +124,6 @@ async def async_setup_entry(
                 )
             )
     async_add_entities(sensors, True)
-
-    async_add_entities([
-        APIActionInProgress(coordinator=coordinator),
-    ], True)
 
 
 class InstrumentSensor(VehicleCoordinatorBaseEntity, SensorEntity, RestoreEntity):
