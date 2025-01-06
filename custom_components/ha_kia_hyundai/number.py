@@ -29,6 +29,7 @@ NUMBER_DESCRIPTIONS: Final[tuple[NumberEntityDescription, ...]] = (
         native_max_value=100,
         native_step=10,
         native_unit_of_measurement=PERCENTAGE,
+        mode=NumberMode.SLIDER,
     ),
     NumberEntityDescription(
         key=DC_CHARGING_LIMIT_KEY,
@@ -38,6 +39,7 @@ NUMBER_DESCRIPTIONS: Final[tuple[NumberEntityDescription, ...]] = (
         native_max_value=100,
         native_step=10,
         native_unit_of_measurement=PERCENTAGE,
+        mode=NumberMode.SLIDER,
     ),
 )
 
@@ -66,25 +68,14 @@ class ChargeLimitNumber(VehicleCoordinatorBaseEntity, NumberEntity, RestoreEntit
         coordinator: VehicleCoordinator,
         description: NumberEntityDescription,
     ) -> None:
-        super().__init__(coordinator)
-        self._description = description
-        self._key = self._description.key
-        self._attr_unique_id = f"{DOMAIN}_{coordinator.vehicle_id}_{self._key}"
-        self._attr_icon = self._description.icon
-        self._attr_mode = NumberMode.SLIDER
-        self._attr_name = f"{coordinator.vehicle_name} {self._description.name}"
-        self._attr_device_class = self._description.device_class
-        self._attr_native_unit_of_measurement = PERCENTAGE
-        self._attr_native_min_value = self._description.native_min_value
-        self._attr_native_max_value = self._description.native_max_value
-        self._attr_native_step = self._description.native_step
+        super().__init__(coordinator, description)
 
     @property
     def native_value(self) -> float | None:
         """Return the entity value to represent the entity state."""
-        value = getattr(self.coordinator, self._key)
+        value = getattr(self.coordinator, self.entity_description.key)
         if value is None or value == 0:
-            _LOGGER.debug(f"invalid value found for {self._key} = {value}, returning stored value of {self._attr_native_value})")
+            _LOGGER.debug(f"invalid value found for {self.entity_description.key} = {value}, returning stored value of {self._attr_native_value})")
             return self._attr_native_value
         else:
             self._attr_native_value = value
@@ -92,20 +83,20 @@ class ChargeLimitNumber(VehicleCoordinatorBaseEntity, NumberEntity, RestoreEntit
 
     async def async_set_native_value(self, value: float) -> None:
         """Set new charging limit."""
-        _LOGGER.debug(f"Setting charging limit to {value} for {self._description.key}")
+        _LOGGER.debug(f"Setting charging limit to {value} for {self.entity_description.key}")
         if (
-            self._description.key == AC_CHARGING_LIMIT_KEY
+            self.entity_description.key == AC_CHARGING_LIMIT_KEY
             and self.coordinator.ev_charge_limits_ac == int(value)
         ):
             return
         if (
-            self._description.key == DC_CHARGING_LIMIT_KEY
+            self.entity_description.key == DC_CHARGING_LIMIT_KEY
             and self.coordinator.ev_charge_limits_dc == int(value)
         ):
             return
 
         # set new limits
-        if self._description.key == AC_CHARGING_LIMIT_KEY:
+        if self.entity_description.key == AC_CHARGING_LIMIT_KEY:
             ac_limit = int(value)
             dc_limit = self.coordinator.ev_charge_limits_dc
         else:

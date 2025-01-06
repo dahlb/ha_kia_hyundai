@@ -51,14 +51,11 @@ class Thermostat(VehicleCoordinatorBaseEntity, ClimateEntity):
 
     def __init__(self, coordinator: VehicleCoordinator):
         """Create thermostat."""
-        super().__init__(coordinator)
-        self._attr_unique_id = f"{DOMAIN}-{coordinator.vehicle_id}-climate"
-        self._attr_name = f"{coordinator.vehicle_name} Climate"
-        self.entity_description = ClimateEntityDescription(
-            key=f"{DOMAIN}-{coordinator.vehicle_id}-climate",
-        )
+        super().__init__(coordinator, ClimateEntityDescription(
+            name="Climate",
+            key="climate",
+        ))
         self._attr_target_temperature = int(self.coordinator.climate_temperature_value)
-
         self._attr_hvac_modes = [
             HVACMode.OFF,
             HVACMode.HEAT_COOL,

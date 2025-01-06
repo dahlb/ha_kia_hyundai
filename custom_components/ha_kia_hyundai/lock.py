@@ -1,15 +1,15 @@
 from logging import getLogger
 
-from homeassistant.components.lock import LockEntity
+from homeassistant.components.lock import LockEntity, LockEntityDescription
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 
-from . import VehicleCoordinator
-from .vehicle_coordinator_base_entity import VehicleCoordinatorBaseEntity
 from .const import (
     DOMAIN,
     CONF_VEHICLE_ID,
 )
+from .vehicle_coordinator import VehicleCoordinator
+from .vehicle_coordinator_base_entity import VehicleCoordinatorBaseEntity
 
 _LOGGER = getLogger(__name__)
 PARALLEL_UPDATES: int = 1
@@ -29,9 +29,10 @@ class Lock(VehicleCoordinatorBaseEntity, LockEntity):
         self,
         coordinator: VehicleCoordinator,
     ):
-        super().__init__(coordinator)
-        self._attr_unique_id = f"{DOMAIN}-{self.coordinator.vehicle_id}-doorLock"
-        self._attr_name = f"{self.coordinator.vehicle_name} Door Lock"
+        super().__init__(coordinator, LockEntityDescription(
+            key="doors_locked",
+            name="Door Lock",
+        ))
 
     @property
     def is_locked(self) -> bool:

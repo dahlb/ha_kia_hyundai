@@ -1,6 +1,6 @@
 from logging import getLogger
 
-from homeassistant.components.button import ButtonEntity, ButtonDeviceClass
+from homeassistant.components.button import ButtonEntity, ButtonDeviceClass, ButtonEntityDescription
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 
@@ -27,15 +27,15 @@ async def async_setup_entry(
 
 
 class RequestUpdateFromCarButton(VehicleCoordinatorBaseEntity, ButtonEntity):
-    _attr_device_class = ButtonDeviceClass.UPDATE
-
     def __init__(
             self,
             coordinator: VehicleCoordinator,
     ):
-        super().__init__(coordinator)
-        self._attr_unique_id = f"{DOMAIN}-{coordinator.vehicle_id}-request-update-from-car-button"
-        self._attr_name = f"{coordinator.vehicle_name} Request Wake Up from Car (hurts 12v battery)"
+        super().__init__(coordinator, ButtonEntityDescription(
+            key="request_vehicle_data_sync",
+            name="Request Wake Up from Car (hurts 12v battery)",
+            device_class=ButtonDeviceClass.UPDATE,
+        ))
 
     async def async_press(self) -> None:
         """Press the button."""

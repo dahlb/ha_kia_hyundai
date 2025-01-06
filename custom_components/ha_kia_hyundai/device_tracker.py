@@ -1,12 +1,12 @@
 from logging import getLogger
 
-from homeassistant.components.device_tracker import SourceType
+from homeassistant.components.device_tracker import SourceType, TrackerEntityDescription
 from homeassistant.components.device_tracker.config_entry import TrackerEntity
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 
-from . import VehicleCoordinator
 from .const import DOMAIN, CONF_VEHICLE_ID
+from .vehicle_coordinator import VehicleCoordinator
 from .vehicle_coordinator_base_entity import VehicleCoordinatorBaseEntity
 
 _LOGGER = getLogger(__name__)
@@ -24,10 +24,11 @@ async def async_setup_entry(
 
 class LocationTracker(VehicleCoordinatorBaseEntity, TrackerEntity):
     def __init__(self, coordinator: VehicleCoordinator):
-        super().__init__(coordinator)
-        self._attr_unique_id = f"{DOMAIN}-{coordinator.vehicle_id}-location"
-        self._attr_name = f"{coordinator.vehicle_name} Location"
-        self._attr_icon = "mdi:map-marker-outline"
+        super().__init__(coordinator, TrackerEntityDescription(
+            key="location",
+            name="Location",
+            icon="mdi:map-marker-outline",
+        ))
 
     @property
     def source_type(self):

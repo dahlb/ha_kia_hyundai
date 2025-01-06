@@ -1,6 +1,6 @@
 from logging import getLogger
 
-from homeassistant.components.switch import SwitchEntity, SwitchDeviceClass
+from homeassistant.components.switch import SwitchEntity, SwitchDeviceClass, SwitchEntityDescription
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import STATE_UNAVAILABLE, STATE_ON
 from homeassistant.core import HomeAssistant
@@ -28,17 +28,16 @@ async def async_setup_entry(
 
 
 class ClimateDesiredDefrostSwitch(VehicleCoordinatorBaseEntity, SwitchEntity, RestoreEntity):
-    _attr_device_class = SwitchDeviceClass.SWITCH
-    _attr_icon = "mdi:car-defrost-front"
-    _attr_name = "Climate Desired Defrost"
-    _attr_is_on = False
-
     def __init__(
             self,
             coordinator: VehicleCoordinator,
     ):
-        super().__init__(coordinator)
-        self._attr_unique_id = f"{DOMAIN}-{coordinator.vehicle_id}-climate-desired-defrost"
+        super().__init__(coordinator, SwitchEntityDescription(
+            key="climate_desired_defrost",
+            name="Climate Desired Defrost",
+            icon="mdi:car-defrost-front",
+            device_class=SwitchDeviceClass.SWITCH,
+        ))
 
     @property
     def is_on(self) -> bool | None:
@@ -67,16 +66,16 @@ class ClimateDesiredDefrostSwitch(VehicleCoordinatorBaseEntity, SwitchEntity, Re
 
 
 class ClimateDesiredHeatingAccSwitch(VehicleCoordinatorBaseEntity, SwitchEntity, RestoreEntity):
-    _attr_device_class = SwitchDeviceClass.SWITCH
-    _attr_icon = "mdi:steering"
-    _attr_name = "Climate Desired Heating Acc"
-
     def __init__(
             self,
-            coordinator: VehicleCoordinator,
+            coordinator: VehicleCoordinator
     ):
-        super().__init__(coordinator)
-        self._attr_unique_id = f"{DOMAIN}-{coordinator.vehicle_id}-climate-desired-heating-acc"
+        super().__init__(coordinator, SwitchEntityDescription(
+            key="climate_desired_heating_acc",
+            name="Climate Desired Heating Acc",
+            icon="mdi:steering",
+            device_class=SwitchDeviceClass.SWITCH,
+        ))
 
     @property
     def is_on(self) -> bool | None:
@@ -104,17 +103,16 @@ class ClimateDesiredHeatingAccSwitch(VehicleCoordinatorBaseEntity, SwitchEntity,
         self.coordinator.climate_desired_heating_acc = state == STATE_ON
 
 class ChargingSwitch(VehicleCoordinatorBaseEntity, SwitchEntity):
-    _attr_device_class = SwitchDeviceClass.SWITCH
-    _attr_icon = "mdi:ev-station"
-    _attr_name = "Charging"
-    _attr_available = False
-
     def __init__(
             self,
             coordinator: VehicleCoordinator,
     ):
-        super().__init__(coordinator)
-        self._attr_unique_id = f"{DOMAIN}-{coordinator.vehicle_id}-charging-switch"
+        super().__init__(coordinator, SwitchEntityDescription(
+            key="ev_battery_charging",
+            name="Charging",
+            icon="mdi:ev-station",
+            device_class=SwitchDeviceClass.SWITCH,
+        ))
 
     @property
     def available(self) -> bool:

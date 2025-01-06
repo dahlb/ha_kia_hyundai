@@ -127,15 +127,6 @@ async def async_setup_entry(
 
 
 class InstrumentSensor(VehicleCoordinatorBaseEntity, SensorEntity, RestoreEntity):
-    def __init__(
-            self,
-            coordinator: VehicleCoordinator,
-            description: KiaSensorEntityDescription,
-    ):
-        super().__init__(coordinator)
-        self.entity_description: KiaSensorEntityDescription = description
-        self._attr_unique_id = f"{DOMAIN}-{coordinator.vehicle_id}-{description.key}"
-
     @property
     def native_value(self):
         value = getattr(self.coordinator, self.entity_description.key)
@@ -165,10 +156,11 @@ class InstrumentSensor(VehicleCoordinatorBaseEntity, SensorEntity, RestoreEntity
 
 class APIActionInProgress(VehicleCoordinatorBaseEntity, SensorEntity):
     def __init__(self, coordinator: VehicleCoordinator):
-        super().__init__(coordinator)
-        self._attr_unique_id = f"{DOMAIN}-{coordinator.vehicle_id}-API-action-in-progress"
-        self._attr_device_class = SensorDeviceClass.ENUM
-        self._attr_name = "API Action In Progress"
+        super().__init__(coordinator, SensorEntityDescription(
+            key="last_action_name",
+            name="API Action In Progress",
+            device_class=SensorDeviceClass.ENUM,
+        ))
 
     @property
     def icon(self):

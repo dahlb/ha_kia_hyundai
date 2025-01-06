@@ -158,9 +158,7 @@ class InstrumentSensor(VehicleCoordinatorBaseEntity, BinarySensorEntity):
             coordinator: VehicleCoordinator,
             description: KiaBinarySensorEntityDescription,
     ):
-        super().__init__(coordinator)
-        self.entity_description: KiaBinarySensorEntityDescription = description
-        self._attr_unique_id = f"{DOMAIN}-{coordinator.vehicle_id}-{description.key}"
+        super().__init__(coordinator, description)
 
     @property
     def icon(self):
