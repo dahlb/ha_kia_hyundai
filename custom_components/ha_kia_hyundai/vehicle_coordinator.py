@@ -171,12 +171,13 @@ class VehicleCoordinator(DataUpdateCoordinator):
         temperature = safely_get_json_value(
             self.data,
             "lastVehicleInfo.vehicleStatusRpt.vehicleStatus.climate.airTemp.value",
-            int
         )
         if temperature == "LOW":
             return TEMPERATURE_MIN
         if temperature == "HIGH":
             return TEMPERATURE_MAX
+        if temperature is not None:
+            temperature = int(temperature)
         return temperature
 
     @property
