@@ -41,7 +41,10 @@ async def async_setup_entry(
     vehicle_id = config_entry.data[CONF_VEHICLE_ID]
     coordinator: VehicleCoordinator = hass.data[DOMAIN][vehicle_id]
     if coordinator.can_remote_climate:
+        _LOGGER.debug("Adding climate entity")
         async_add_entities([Thermostat(coordinator)])
+    else:
+        _LOGGER.debug("Skipping climate entity, can not remote start?")
 
 
 class Thermostat(VehicleCoordinatorBaseEntity, ClimateEntity):

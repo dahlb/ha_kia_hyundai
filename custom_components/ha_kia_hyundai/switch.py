@@ -21,11 +21,16 @@ async def async_setup_entry(
     vehicle_id = config_entry.unique_id
     coordinator: VehicleCoordinator = hass.data[DOMAIN][vehicle_id]
 
-    async_add_entities([
-        ClimateDesiredDefrostSwitch(coordinator=coordinator),
-        ClimateDesiredHeatingAccSwitch(coordinator=coordinator),
+    switches: [SwitchEntity] = [
         ChargingSwitch(coordinator=coordinator),
-    ])
+    ]
+    if coordinator.can_remote_climate:
+        _LOGGER.debug("Adding climate related switch entities")
+        switches.append(ClimateDesiredDefrostSwitch(coordinator=coordinator))
+        switches.append(ClimateDesiredHeatingAccSwitch(coordinator=coordinator))
+    else:
+        _LOGGER.debug("skipping climate related switch entities")
+    async_add_entities(switches)
 
 
 class ClimateDesiredDefrostSwitch(VehicleCoordinatorBaseEntity, SwitchEntity, RestoreEntity):
