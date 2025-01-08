@@ -116,7 +116,9 @@ async def async_setup_entry(
         APIActionInProgress(coordinator=coordinator),
     ]
     for sensor_description in SENSOR_DESCRIPTIONS:
+        _LOGGER.debug(f"Adding sensor {sensor_description.key}? preserve_state:{sensor_description.preserve_state == True} or value:{getattr(coordinator, sensor_description.key)} is not None:{getattr(coordinator, sensor_description.key) is not None}")
         if sensor_description.preserve_state or getattr(coordinator, sensor_description.key) is not None:
+            _LOGGER.debug(f"added {sensor_description.key}")
             sensors.append(
                 InstrumentSensor(
                     coordinator,
@@ -137,6 +139,7 @@ class InstrumentSensor(VehicleCoordinatorBaseEntity, SensorEntity, RestoreEntity
     @property
     def available(self) -> bool:
         """Return if entity is available."""
+        _LOGGER.debug(f"{self.entity_description.key}; entity available? super:{super().available} and {self.native_value} is not None")
         return super().available and self.native_value is not None
 
     async def async_internal_added_to_hass(self) -> None:
