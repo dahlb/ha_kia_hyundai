@@ -116,7 +116,7 @@ async def async_setup_entry(
         APIActionInProgress(coordinator=coordinator),
     ]
     for sensor_description in SENSOR_DESCRIPTIONS:
-        _LOGGER.debug(f"Adding sensor {sensor_description.key}? preserve_state:{sensor_description.preserve_state == True} or value:{getattr(coordinator, sensor_description.key)} is not None:{getattr(coordinator, sensor_description.key) is not None}")
+        _LOGGER.debug(f"Adding sensor {sensor_description.key}? preserve_state:{sensor_description.preserve_state is True} or value:{getattr(coordinator, sensor_description.key)} is not None:{getattr(coordinator, sensor_description.key) is not None}")
         if sensor_description.preserve_state or getattr(coordinator, sensor_description.key) is not None:
             _LOGGER.debug(f"added {sensor_description.key}")
             sensors.append(
