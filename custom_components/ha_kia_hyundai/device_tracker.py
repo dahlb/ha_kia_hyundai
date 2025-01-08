@@ -4,6 +4,7 @@ from homeassistant.components.device_tracker import SourceType, TrackerEntityDes
 from homeassistant.components.device_tracker.config_entry import TrackerEntity
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from .const import DOMAIN, CONF_VEHICLE_ID
 from .vehicle_coordinator import VehicleCoordinator
@@ -14,12 +15,12 @@ PARALLEL_UPDATES: int = 1
 
 
 async def async_setup_entry(
-    hass: HomeAssistant, config_entry: ConfigEntry, async_add_entities
+    hass: HomeAssistant, config_entry: ConfigEntry, async_add_entities: AddEntitiesCallback
 ):
     vehicle_id = config_entry.data[CONF_VEHICLE_ID]
     coordinator: VehicleCoordinator = hass.data[DOMAIN][vehicle_id]
 
-    async_add_entities([LocationTracker(coordinator)], True)
+    async_add_entities([LocationTracker(coordinator)])
 
 
 class LocationTracker(VehicleCoordinatorBaseEntity, TrackerEntity):

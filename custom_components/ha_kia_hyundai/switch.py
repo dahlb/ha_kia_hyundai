@@ -4,6 +4,7 @@ from homeassistant.components.switch import SwitchEntity, SwitchDeviceClass, Swi
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import STATE_UNAVAILABLE, STATE_ON
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.restore_state import RestoreEntity
 
 from . import VehicleCoordinator
@@ -15,7 +16,7 @@ PARALLEL_UPDATES: int = 1
 
 
 async def async_setup_entry(
-    hass: HomeAssistant, config_entry: ConfigEntry, async_add_entities
+    hass: HomeAssistant, config_entry: ConfigEntry, async_add_entities: AddEntitiesCallback
 ):
     vehicle_id = config_entry.unique_id
     coordinator: VehicleCoordinator = hass.data[DOMAIN][vehicle_id]
@@ -24,7 +25,7 @@ async def async_setup_entry(
         ClimateDesiredDefrostSwitch(coordinator=coordinator),
         ClimateDesiredHeatingAccSwitch(coordinator=coordinator),
         ChargingSwitch(coordinator=coordinator),
-    ], True)
+    ])
 
 
 class ClimateDesiredDefrostSwitch(VehicleCoordinatorBaseEntity, SwitchEntity, RestoreEntity):

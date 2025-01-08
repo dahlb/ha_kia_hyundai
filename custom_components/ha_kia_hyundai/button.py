@@ -3,6 +3,7 @@ from logging import getLogger
 from homeassistant.components.button import ButtonEntity, ButtonDeviceClass, ButtonEntityDescription
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from . import VehicleCoordinator
 from .const import (
@@ -16,14 +17,14 @@ PARALLEL_UPDATES: int = 1
 
 
 async def async_setup_entry(
-    hass: HomeAssistant, config_entry: ConfigEntry, async_add_entities
+    hass: HomeAssistant, config_entry: ConfigEntry, async_add_entities: AddEntitiesCallback
 ):
     vehicle_id = config_entry.data[CONF_VEHICLE_ID]
     coordinator: VehicleCoordinator = hass.data[DOMAIN][vehicle_id]
 
     async_add_entities([
         RequestUpdateFromCarButton(coordinator=coordinator),
-    ], True)
+    ])
 
 
 class RequestUpdateFromCarButton(VehicleCoordinatorBaseEntity, ButtonEntity):

@@ -16,6 +16,7 @@ from homeassistant.const import (
     UnitOfTemperature,
     PRECISION_WHOLE,
 )
+from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from . import VehicleCoordinator
 from .vehicle_coordinator_base_entity import VehicleCoordinatorBaseEntity
@@ -35,12 +36,12 @@ SUPPORT_FLAGS = (
 
 
 async def async_setup_entry(
-    hass: HomeAssistant, config_entry: ConfigEntry, async_add_entities
+    hass: HomeAssistant, config_entry: ConfigEntry, async_add_entities: AddEntitiesCallback
 ):
     vehicle_id = config_entry.data[CONF_VEHICLE_ID]
     coordinator: VehicleCoordinator = hass.data[DOMAIN][vehicle_id]
     if coordinator.can_remote_climate:
-        async_add_entities([Thermostat(coordinator)], True)
+        async_add_entities([Thermostat(coordinator)])
 
 
 class Thermostat(VehicleCoordinatorBaseEntity, ClimateEntity):
