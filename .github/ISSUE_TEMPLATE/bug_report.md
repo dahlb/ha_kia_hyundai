@@ -7,7 +7,7 @@ assignees: ''
 
 ---
 
-Please check Services, Known Bug / Issues and Troubleshooting over here first: https://github.com/dahlb/ha_kia_hyundai/blob/master/README.md
+Please check Services, Known Bug / Issues and Troubleshooting over here first: https://github.com/dahlb/ha_kia_hyundai/blob/main/README.md
 **Region and Brand of car**
 
 
@@ -16,7 +16,7 @@ A clear and concise description of what the bug is.
 
 **Debug logs if an error occurred**
 
-Outlined here: https://github.com/dahlb/ha_kia_hyundai/blob/master/README.m
+Outlined here: https://github.com/dahlb/ha_kia_hyundai/blob/main/README.md
 
 
 **To Reproduce**

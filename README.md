@@ -23,11 +23,11 @@ A custom integration for Kia Uvo in the USA region. This implementation focuses 
 - Tracking results of asynchronous vehicle APIs through to conclusion.
 
 ## Installation ##
-You can install this either manually copying files or using HACS. Configuration can be done on UI, you need to enter your username and password, (I know, translations are missing!).
+You can install this either manually copying files or using HACS. Configuration can be done on UI, you need to enter your username and password.
 
 - It will allow selection during setup of which vehicle to fetch values for.
 - To set up two vehicles add the integration through HA UI twice.
-- refresh - It will fetch the cached information every 30 minutes from Kia Servers. **Now Configurable**
+- refresh - It will fetch the cached information every 10 minutes from Kia Servers. **Now Configurable**
 
 ## Supported entities ##
 - Air Conditioner Status, Defroster Status, Set Temperature
@@ -50,20 +50,17 @@ You can install this either manually copying files or using HACS. Configuration 
 ## Supported services ##
 this integration aims to automate what you can do in the official app, if you can't do it in the app because your subscription is expired then this integration won't be able to do it either.
 
-device id is optional unless you have two vehicles setup then it becomes required, this is for common convenience but if you plan to add a second vehicle use the device_id parameter always.
 - start_climate / stop_climate: Control the HVAC car services
 - set_charge_limits: You can control your charging capacity limits using this services
 
 ## Troubleshooting ##
-If you receive an error while trying to login, please go through these steps;
-1. You can enable logging for this integration specifically and share your logs, so I can have a deep dive investigation. To enable logging, update your `configuration.yaml` like this, we can get more information in Configuration -> Logs page
-```
-logger:
-  default: warning
-  logs:
-    custom_components.ha_kia_hyundai: debug
-    kia_hyundai_api: debug
-```
+If you receive an error, please go through these steps;
+1. Enabled Debug Logging, at /config/integrations/integration/ha_kia_hyundai
+2. Restart you home assistant to capture initialization with debug logging, then try to do what your having trouble with
+3. Disable Debug Logging, at /config/integrations/integration/ha_kia_hyundai (which will download the logs)
+4. Click the three dots menu for your vehicle, at /config/integrations/integration/ha_kia_hyundai
+5. Click Download Diagnostics
+6. Attach both logs and diagnostics to your issue ticket.
 
 ***
 
