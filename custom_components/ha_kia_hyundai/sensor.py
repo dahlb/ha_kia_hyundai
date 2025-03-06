@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from logging import getLogger
 from typing import Final
 
-from homeassistant.components.sensor import SensorDeviceClass, SensorEntity, SensorEntityDescription
+from homeassistant.components.sensor import SensorDeviceClass, SensorEntity, SensorEntityDescription, SensorStateClass
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import PERCENTAGE, UnitOfLength, UnitOfTemperature, STATE_UNAVAILABLE, UnitOfTime
 from homeassistant.core import HomeAssistant
@@ -32,14 +32,16 @@ SENSOR_DESCRIPTIONS: Final[tuple[KiaSensorEntityDescription, ...]] = (
         icon="mdi:car-electric",
         device_class=SensorDeviceClass.BATTERY,
         native_unit_of_measurement=PERCENTAGE,
+        state_class=SensorStateClass.MEASUREMENT,
         preserve_state=True,
     ),
     KiaSensorEntityDescription(
         key="odometer_value",
         name="Odometer",
         icon="mdi:speedometer",
-        device_class=None,
+        device_class=SensorDeviceClass.DISTANCE,
         native_unit_of_measurement=UnitOfLength.MILES,
+        state_class=SensorStateClass.MEASUREMENT,
     ),
     KiaSensorEntityDescription(
         key="last_synced_to_cloud",
@@ -59,9 +61,10 @@ SENSOR_DESCRIPTIONS: Final[tuple[KiaSensorEntityDescription, ...]] = (
         key="next_service_mile_value",
         name="Next Service Mile",
         icon="mdi:car-wrench",
-        device_class=None,
+        device_class=SensorDeviceClass.DISTANCE,
         suggested_display_precision=0,
         native_unit_of_measurement=UnitOfLength.MILES,
+        state_class=SensorStateClass.TOTAL,
     ),
     KiaSensorEntityDescription(
         key="climate_temperature_value",
@@ -75,6 +78,7 @@ SENSOR_DESCRIPTIONS: Final[tuple[KiaSensorEntityDescription, ...]] = (
         device_class=SensorDeviceClass.DURATION,
         icon="mdi:ev-station",
         native_unit_of_measurement=UnitOfTime.MINUTES,
+        state_class=SensorStateClass.MEASUREMENT,
     ),
     KiaSensorEntityDescription(
         key="ev_remaining_range_value",
@@ -82,12 +86,14 @@ SENSOR_DESCRIPTIONS: Final[tuple[KiaSensorEntityDescription, ...]] = (
         device_class=SensorDeviceClass.DISTANCE,
         icon="mdi:road-variant",
         native_unit_of_measurement=UnitOfLength.MILES,
+        state_class=SensorStateClass.MEASUREMENT,
     ),
     KiaSensorEntityDescription(
         key="fuel_level",
         name="Fuel Level",
         icon="mdi:fuel",
         native_unit_of_measurement=PERCENTAGE,
+        state_class=SensorStateClass.MEASUREMENT,
     ),
     KiaSensorEntityDescription(
         key="fuel_remaining_range_value",
@@ -95,6 +101,7 @@ SENSOR_DESCRIPTIONS: Final[tuple[KiaSensorEntityDescription, ...]] = (
         device_class=SensorDeviceClass.DISTANCE,
         icon="mdi:road-variant",
         native_unit_of_measurement=UnitOfLength.MILES,
+        state_class=SensorStateClass.MEASUREMENT,
     ),
     KiaSensorEntityDescription(
         key="total_remaining_range_value",
@@ -102,6 +109,7 @@ SENSOR_DESCRIPTIONS: Final[tuple[KiaSensorEntityDescription, ...]] = (
         device_class=SensorDeviceClass.DISTANCE,
         icon="mdi:road-variant",
         native_unit_of_measurement=UnitOfLength.MILES,
+        state_class=SensorStateClass.MEASUREMENT,
     ),
     KiaSensorEntityDescription(
         key="car_battery_level",
@@ -109,6 +117,7 @@ SENSOR_DESCRIPTIONS: Final[tuple[KiaSensorEntityDescription, ...]] = (
         device_class=None,
         icon="mdi:car-battery",
         native_unit_of_measurement=PERCENTAGE,
+        state_class=SensorStateClass.MEASUREMENT,
         preserve_state=True
     ),
 )
