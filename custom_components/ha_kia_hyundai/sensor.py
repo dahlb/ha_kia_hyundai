@@ -140,7 +140,6 @@ class InstrumentSensor(VehicleCoordinatorBaseEntity, SensorEntity, RestoreEntity
     @property
     def available(self) -> bool:
         """Return if entity is available."""
-        _LOGGER.debug(f"{self.entity_description.key}; entity available? super:{super().available} and {self.native_value} is not None")
         return super().available and self.native_value is not None
 
     async def async_internal_added_to_hass(self) -> None:
