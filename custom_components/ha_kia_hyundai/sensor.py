@@ -84,6 +84,12 @@ SENSOR_DESCRIPTIONS: Final[tuple[KiaSensorEntityDescription, ...]] = (
         native_unit_of_measurement=UnitOfLength.MILES,
     ),
     KiaSensorEntityDescription(
+        key="fuel_level",
+        name="Fuel Level",
+        icon="mdi:fuel",
+        native_unit_of_measurement=PERCENTAGE,
+    ),
+    KiaSensorEntityDescription(
         key="fuel_remaining_range_value",
         name="Range by Fuel",
         device_class=SensorDeviceClass.DISTANCE,

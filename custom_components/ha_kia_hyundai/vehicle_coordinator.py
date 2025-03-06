@@ -285,6 +285,14 @@ class VehicleCoordinator(DataUpdateCoordinator):
         )
 
     @property
+    def fuel_level(self) -> float:
+        return safely_get_json_value(
+            self.data,
+            "lastVehicleInfo.vehicleStatusRpt.vehicleStatus.fuelLevel",
+            float
+        )
+
+    @property
     def ev_battery_charging(self) -> bool:
         return safely_get_json_value(
             self.data,
