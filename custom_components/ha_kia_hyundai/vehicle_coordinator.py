@@ -367,6 +367,7 @@ class VehicleCoordinator(DataUpdateCoordinator):
             self.data,
             "lastVehicleInfo.vehicleStatusRpt.vehicleStatus.distanceToEmpty.value",
             int
+        )
 
     @property
     def front_seat_options(self) -> dict:
