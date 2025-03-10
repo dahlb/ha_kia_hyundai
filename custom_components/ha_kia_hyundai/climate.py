@@ -90,6 +90,10 @@ class Thermostat(VehicleCoordinatorBaseEntity, ClimateEntity):
                     set_temp=int(self.target_temperature),
                     defrost=self.coordinator.climate_desired_defrost,
                     heating=self.coordinator.climate_desired_heating_acc,
+                    driver_seat=self.coordinator.desired_driver_seat_comfort,
+                    passenger_seat=self.coordinator.desired_passenger_seat_comfort,
+                    left_rear_seat=self.coordinator.desired_left_rear_seat_comfort,
+                    right_rear_seat=self.coordinator.desired_right_rear_seat_comfort,
                 )
         self.coordinator.async_update_listeners()
         await self.coordinator.async_request_refresh()
