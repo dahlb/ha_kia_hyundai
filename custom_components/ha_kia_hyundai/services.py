@@ -16,6 +16,10 @@ SERVICE_ATTRIBUTE_CLIMATE = "climate"
 SERVICE_ATTRIBUTE_TEMPERATURE = "temperature"
 SERVICE_ATTRIBUTE_DEFROST = "defrost"
 SERVICE_ATTRIBUTE_HEATING = "heating"
+SERVICE_ATTRIBUTE_DRIVER_SEAT = "driver_seat"
+SERVICE_ATTRIBUTE_PASSENGER_SEAT = "passenger_seat"
+SERVICE_ATTRIBUTE_LEFT_REAR_SEAT = "left_rear_seat"
+SERVICE_ATTRIBUTE_RIGHT_REAR_SEAT = "right_rear_seat"
 
 SUPPORTED_SERVICES = (
     SERVICE_START_CLIMATE,
@@ -24,6 +28,7 @@ SUPPORTED_SERVICES = (
 
 _LOGGER = getLogger(__name__)
 
+
 def async_setup_services(hass: HomeAssistant):
     async def async_handle_start_climate(call: ServiceCall):
         coordinator: VehicleCoordinator = _get_coordinator_from_device(hass, call)
@@ -31,6 +36,10 @@ def async_setup_services(hass: HomeAssistant):
         set_temp = call.data.get(SERVICE_ATTRIBUTE_TEMPERATURE)
         defrost = call.data.get(SERVICE_ATTRIBUTE_DEFROST)
         heating = call.data.get(SERVICE_ATTRIBUTE_HEATING)
+        driver_seat = call.data.get(SERVICE_ATTRIBUTE_DRIVER_SEAT, 0)
+        passenger_seat = call.data.get(SERVICE_ATTRIBUTE_PASSENGER_SEAT, 0)
+        left_rear_seat = call.data.get(SERVICE_ATTRIBUTE_LEFT_REAR_SEAT, 0)
+        right_rear_seat = call.data.get(SERVICE_ATTRIBUTE_RIGHT_REAR_SEAT, 0)
 
         if set_temp is not None:
             set_temp = int(set_temp)
@@ -41,6 +50,10 @@ def async_setup_services(hass: HomeAssistant):
             set_temp=set_temp,
             defrost=bool(defrost),
             heating=bool(heating),
+            driver_seat=int(driver_seat),
+            passenger_seat=int(passenger_seat),
+            left_rear_seat=int(left_rear_seat),
+            right_rear_seat=int(right_rear_seat),
         )
         coordinator.async_update_listeners()
         await coordinator.async_request_refresh()

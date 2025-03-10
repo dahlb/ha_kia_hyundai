@@ -38,7 +38,7 @@
   "services": {
     "start_climate": {
       "name": "Start Climate",
-      "description": "Start climate control.",
+      "description": "Start climate control. Not all options may be available for your vehicle.",
       "fields": {
         "device_id": {
           "name": "Vehicle Device",
@@ -46,7 +46,7 @@
         },
         "temperature": {
           "name": "Temperature",
-          "description": "The speed to set."
+          "description": "The temperature to set."
         },
         "defrost": {
           "name": "Defrost",
@@ -59,6 +59,22 @@
         "heating": {
           "name": "Heating Accessories",
           "description": "Turn on heating accessories."
+        },
+        "driver_seat": {
+          "name": "Driver's Seat",
+          "description": "Driver's seat controls. In YAML, Heat options are 6-5-4, Cool are 3-2-1."
+        },
+        "passenger_seat": {
+          "name": "Passenger's Seat",
+          "description": "Passenger's seat controls. In YAML, Heat options are 6-5-4, Cool are 3-2-1."
+        },
+        "left_rear_seat": {
+          "name": "Left Rear Seat",
+          "description": "Left Rear seat controls. In YAML, Heat options are 6-5-4, Cool are 3-2-1."
+        },
+        "right_rear_seat": {
+          "name": "Right Rear Seat",
+          "description": "Right Rear seat controls. In YAML, Heat options are 6-5-4, Cool are 3-2-1."
         }
       }
     },

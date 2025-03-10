@@ -1,3 +1,4 @@
+from collections.abc import Callable
 from dataclasses import dataclass
 from logging import getLogger
 from typing import Final
@@ -14,15 +15,20 @@ from .vehicle_coordinator_base_entity import VehicleCoordinatorBaseEntity
 from .const import (
     CONF_VEHICLE_ID,
     DOMAIN,
+    SEAT_STATUS,
 )
 
 _LOGGER = getLogger(__name__)
 PARALLEL_UPDATES: int = 1
+HEAT_VENT_TYPE = "heatVentType"
+
 
 @dataclass(frozen=True)
 class KiaSensorEntityDescription(SensorEntityDescription):
     """A class that describes custom sensor entities."""
+
     preserve_state: bool = False
+    exists_fn: Callable[[VehicleCoordinatorBaseEntity], bool] = lambda _: True
 
 
 SENSOR_DESCRIPTIONS: Final[tuple[KiaSensorEntityDescription, ...]] = (
@@ -122,6 +128,30 @@ SENSOR_DESCRIPTIONS: Final[tuple[KiaSensorEntityDescription, ...]] = (
     ),
 )
 
+SEAT_SENSOR_DESCRIPTIONS: Final[tuple[KiaSensorEntityDescription, ...]] = (
+    KiaSensorEntityDescription(
+        key="heated_driver_seat",
+        name="Seat-Driver",
+        exists_fn=lambda seat: bool(seat.front_seat_options[HEAT_VENT_TYPE]),
+    ),
+    KiaSensorEntityDescription(
+        key="heated_passenger_seat",
+        name="Seat-Passenger",
+        exists_fn=lambda seat: bool(seat.front_seat_options[HEAT_VENT_TYPE]),
+    ),
+    KiaSensorEntityDescription(
+        key="heated_left_rear_seat",
+        name="Seat-Left Rear",
+        exists_fn=lambda seat: bool(seat.rear_seat_options[HEAT_VENT_TYPE]),
+    ),
+    KiaSensorEntityDescription(
+        key="heated_right_rear_seat",
+        name="Seat-Right Rear",
+        exists_fn=lambda seat: bool(seat.rear_seat_options[HEAT_VENT_TYPE]),
+    ),
+)
+
+
 async def async_setup_entry(
     hass: HomeAssistant, config_entry: ConfigEntry, async_add_entities: AddEntitiesCallback
 ):
@@ -141,6 +171,12 @@ async def async_setup_entry(
                     sensor_description,
                 )
             )
+    sensors.extend(
+        SeatSensor(coordinator, seat_description)
+        for seat_description in SEAT_SENSOR_DESCRIPTIONS
+        if seat_description.exists_fn(coordinator)
+    )
+
     async_add_entities(sensors)
 
 
@@ -170,6 +206,29 @@ class InstrumentSensor(VehicleCoordinatorBaseEntity, SensorEntity, RestoreEntity
         # Invalidate the cache of the cached property
         self.__dict__.pop("state", None)
         self._attr_native_value = state
+
+
+class SeatSensor(VehicleCoordinatorBaseEntity, SensorEntity):
+    """Class for seat sensors."""
+
+    @property
+    def native_value(self) -> str:
+        """Return the state of the seat."""
+        return SEAT_STATUS[getattr(self.coordinator, self.entity_description.key)]
+
+    @property
+    def available(self) -> bool:
+        """Return if the sensor is available."""
+        return super().available and self.native_value is not None
+
+    @property
+    def icon(self) -> str:
+        """Return an icon based on the seat state."""
+        if "Heat" in self.native_value:
+            return "mdi:car-seat-heater"
+        if "Cool" in self.native_value:
+            return "mdi:car-seat-cooler"
+        return "mdi:car-seat"
 
 
 class APIActionInProgress(VehicleCoordinatorBaseEntity, SensorEntity):

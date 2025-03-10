@@ -22,8 +22,13 @@ _LOGGER = getLogger(__name__)
 
 class VehicleCoordinator(DataUpdateCoordinator):
     """Kia Us device object."""
+
     climate_desired_defrost: bool = False
     climate_desired_heating_acc: bool = False
+    desired_driver_seat_comfort: int | None = None
+    desired_passenger_seat_comfort: int | None = None
+    desired_left_rear_seat_comfort: int | None = None
+    desired_right_rear_seat_comfort: int | None = None
 
     def __init__(
             self,
@@ -362,4 +367,65 @@ class VehicleCoordinator(DataUpdateCoordinator):
             self.data,
             "lastVehicleInfo.vehicleStatusRpt.vehicleStatus.distanceToEmpty.value",
             int
+
+    @property
+    def front_seat_options(self) -> dict:
+        """Return front seat options."""
+        return safely_get_json_value(
+            self.data,
+            "vehicleConfig.heatVentSeat.driverSeat",
+            dict,
+        )
+
+    @property
+    def rear_seat_options(self) -> dict:
+        """Return rear seat options."""
+        return safely_get_json_value(
+            self.data,
+            "vehicleConfig.heatVentSeat.rearLeftSeat",
+            dict,
+        )
+
+    @property
+    def heated_driver_seat(self) -> tuple:
+        """Get the status of the left front seat."""
+        return tuple(
+            safely_get_json_value(
+                self.data,
+                "lastVehicleInfo.vehicleStatusRpt.vehicleStatus.climate.heatVentSeat.driverSeat",
+                dict,
+            ).values()
+        )
+
+    @property
+    def heated_passenger_seat(self) -> tuple:
+        """Get the status of the right front seat."""
+        return tuple(
+            safely_get_json_value(
+                self.data,
+                "lastVehicleInfo.vehicleStatusRpt.vehicleStatus.climate.heatVentSeat.passengerSeat",
+                dict,
+            ).values()
+        )
+
+    @property
+    def heated_left_rear_seat(self) -> tuple:
+        """Get the status of the left rear seat."""
+        return tuple(
+            safely_get_json_value(
+                self.data,
+                "lastVehicleInfo.vehicleStatusRpt.vehicleStatus.climate.heatVentSeat.rearLeftSeat",
+                dict,
+            ).values()
+        )
+
+    @property
+    def heated_right_rear_seat(self) -> tuple:
+        """Get the status of the right rear seat."""
+        return tuple(
+            safely_get_json_value(
+                self.data,
+                "lastVehicleInfo.vehicleStatusRpt.vehicleStatus.climate.heatVentSeat.rearRightSeat",
+                dict,
+            ).values()
         )
