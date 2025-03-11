@@ -11,15 +11,17 @@ from custom_components.ha_kia_hyundai.vehicle_coordinator_base_entity import (
 
 from homeassistant.components.select import SelectEntity, SelectEntityDescription
 from homeassistant.config_entries import ConfigEntry
+from homeassistant.const import STATE_UNKNOWN, STATE_UNAVAILABLE
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.restore_state import RestoreEntity
 
 from .const import CONF_VEHICLE_ID, DOMAIN, SEAT_STATUS, STR_TO_NUMBER
 
+OFF = ["Off"]
 HEAT_OPTIONS = {
-    3: ["Off", "High Heat", "Medium Heat", "Low Heat"],
-    2: ["Off", "High Heat", "Low Heat"],
+    3: ["High Heat", "Medium Heat", "Low Heat"],
+    2: ["High Heat", "Low Heat"],
 }
 COOL_OPTIONS = {
     3: ["High Cool", "Medium Cool", "Low Cool"],
@@ -101,10 +103,13 @@ class SeatSelect(VehicleCoordinatorBaseEntity, SelectEntity, RestoreEntity):
         installed_options = self.entity_description.options_fn(self.coordinator)
         if installed_options[HEAT_TYPE] == 3:
             return (
-                HEAT_OPTIONS[installed_options[STEPS]]
+                OFF
+                + HEAT_OPTIONS[installed_options[STEPS]]
                 + COOL_OPTIONS[installed_options[STEPS]]
             )
-        return HEAT_OPTIONS[installed_options[STEPS]]
+        if installed_options[HEAT_TYPE] == 2:
+            return OFF + COOL_OPTIONS[installed_options[STEPS]]
+        return OFF + HEAT_OPTIONS[installed_options[STEPS]]
 
     @property
     def available(self) -> bool:
@@ -120,11 +125,16 @@ class SeatSelect(VehicleCoordinatorBaseEntity, SelectEntity, RestoreEntity):
     async def async_added_to_hass(self) -> None:
         """Restore preivous state when added to Hass."""
         previous_state = await self.async_get_last_state()
-        self._attr_current_option = (
-            previous_state.state
-            if previous_state
-            else self.entity_description.value_fn(self.coordinator)
-        )
+        if previous_state is not None and previous_state.state not in (
+            STATE_UNKNOWN,
+            STATE_UNAVAILABLE,
+        ):
+            self._attr_current_option = previous_state.state
+        else:
+            self._attr_current_option = self.entity_description.value_fn(
+                self.coordinator
+            )
+
         setattr(
             self.coordinator,
             self.entity_description.key,

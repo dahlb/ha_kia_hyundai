@@ -376,6 +376,10 @@ class VehicleCoordinator(DataUpdateCoordinator):
             self.data,
             "vehicleConfig.vehicleFeature.remoteFeature.heatedSeat",
             bool,
+        ) or safely_get_json_value(
+            self.data,
+            "vehicleConfig.vehicleFeature.remoteFeature.ventSeat",
+            bool,
         )
 
     @property
