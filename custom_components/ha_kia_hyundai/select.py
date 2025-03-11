@@ -45,28 +45,28 @@ SEAT_SELECTIONS: Final[tuple[KiaSelectEntityDescription, ...]] = (
         key="desired_driver_seat_comfort",
         name="Seat-Driver with Climate",
         exists_fn=lambda seat: bool(seat.front_seat_options[HEAT_TYPE]),
-        value_fn=lambda seat: SEAT_STATUS[seat.heated_driver_seat],
+        value_fn=lambda seat: SEAT_STATUS[seat.climate_driver_seat],
         options_fn=lambda seat: seat.front_seat_options,
     ),
     KiaSelectEntityDescription(
         key="desired_passenger_seat_comfort",
         name="Seat-Passenger with Climate",
         exists_fn=lambda seat: bool(seat.front_seat_options[HEAT_TYPE]),
-        value_fn=lambda seat: SEAT_STATUS[seat.heated_passenger_seat],
+        value_fn=lambda seat: SEAT_STATUS[seat.climate_passenger_seat],
         options_fn=lambda seat: seat.front_seat_options,
     ),
     KiaSelectEntityDescription(
         key="desired_left_rear_seat_comfort",
         name="Seat-Left Rear with Climate",
         exists_fn=lambda seat: bool(seat.rear_seat_options[HEAT_TYPE]),
-        value_fn=lambda seat: SEAT_STATUS[seat.heated_left_rear_seat],
+        value_fn=lambda seat: SEAT_STATUS[seat.climate_left_rear_seat],
         options_fn=lambda seat: seat.rear_seat_options,
     ),
     KiaSelectEntityDescription(
         key="desired_right_rear_seat_comfort",
         name="Seat-Right Rear with Climate",
         exists_fn=lambda seat: bool(seat.rear_seat_options[HEAT_TYPE]),
-        value_fn=lambda seat: SEAT_STATUS[seat.heated_right_rear_seat],
+        value_fn=lambda seat: SEAT_STATUS[seat.climate_right_rear_seat],
         options_fn=lambda seat: seat.rear_seat_options,
     ),
 )
@@ -84,6 +84,7 @@ async def async_setup_entry(
     async_add_entities(
         SeatSelect(coordinator, select_description)
         for select_description in SEAT_SELECTIONS
+        if coordinator.has_climate_seats
         if select_description.exists_fn(coordinator)
     )
 

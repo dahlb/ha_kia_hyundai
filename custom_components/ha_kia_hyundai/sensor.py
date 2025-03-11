@@ -130,22 +130,22 @@ SENSOR_DESCRIPTIONS: Final[tuple[KiaSensorEntityDescription, ...]] = (
 
 SEAT_SENSOR_DESCRIPTIONS: Final[tuple[KiaSensorEntityDescription, ...]] = (
     KiaSensorEntityDescription(
-        key="heated_driver_seat",
+        key="climate_driver_seat",
         name="Seat-Driver",
         exists_fn=lambda seat: bool(seat.front_seat_options[HEAT_VENT_TYPE]),
     ),
     KiaSensorEntityDescription(
-        key="heated_passenger_seat",
+        key="climate_passenger_seat",
         name="Seat-Passenger",
         exists_fn=lambda seat: bool(seat.front_seat_options[HEAT_VENT_TYPE]),
     ),
     KiaSensorEntityDescription(
-        key="heated_left_rear_seat",
+        key="climate_left_rear_seat",
         name="Seat-Left Rear",
         exists_fn=lambda seat: bool(seat.rear_seat_options[HEAT_VENT_TYPE]),
     ),
     KiaSensorEntityDescription(
-        key="heated_right_rear_seat",
+        key="climate_right_rear_seat",
         name="Seat-Right Rear",
         exists_fn=lambda seat: bool(seat.rear_seat_options[HEAT_VENT_TYPE]),
     ),
@@ -174,6 +174,7 @@ async def async_setup_entry(
     sensors.extend(
         SeatSensor(coordinator, seat_description)
         for seat_description in SEAT_SENSOR_DESCRIPTIONS
+        if coordinator.has_climate_seats
         if seat_description.exists_fn(coordinator)
     )
 

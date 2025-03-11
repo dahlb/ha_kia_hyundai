@@ -370,6 +370,15 @@ class VehicleCoordinator(DataUpdateCoordinator):
         )
 
     @property
+    def has_climate_seats(self) -> bool:
+        """Return true if heated or cooled seats installed."""
+        return safely_get_json_value(
+            self.data,
+            "vehicleConfig.vehicleFeature.remoteFeature.heatedSeat",
+            bool,
+        )
+
+    @property
     def front_seat_options(self) -> dict:
         """Return front seat options."""
         return safely_get_json_value(
@@ -388,7 +397,7 @@ class VehicleCoordinator(DataUpdateCoordinator):
         )
 
     @property
-    def heated_driver_seat(self) -> tuple:
+    def climate_driver_seat(self) -> tuple:
         """Get the status of the left front seat."""
         return tuple(
             safely_get_json_value(
@@ -399,7 +408,7 @@ class VehicleCoordinator(DataUpdateCoordinator):
         )
 
     @property
-    def heated_passenger_seat(self) -> tuple:
+    def climate_passenger_seat(self) -> tuple:
         """Get the status of the right front seat."""
         return tuple(
             safely_get_json_value(
@@ -410,7 +419,7 @@ class VehicleCoordinator(DataUpdateCoordinator):
         )
 
     @property
-    def heated_left_rear_seat(self) -> tuple:
+    def climate_left_rear_seat(self) -> tuple:
         """Get the status of the left rear seat."""
         return tuple(
             safely_get_json_value(
@@ -421,7 +430,7 @@ class VehicleCoordinator(DataUpdateCoordinator):
         )
 
     @property
-    def heated_right_rear_seat(self) -> tuple:
+    def climate_right_rear_seat(self) -> tuple:
         """Get the status of the right rear seat."""
         return tuple(
             safely_get_json_value(
