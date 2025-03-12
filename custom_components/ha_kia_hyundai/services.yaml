@@ -34,6 +34,82 @@ start_climate:
       default: false
       selector:
         boolean:
+    driver_seat:
+      required: false
+      example: 6
+      selector:
+        select:
+          mode: dropdown
+          options:
+            - label: High Heat
+              value: 6
+            - label: Medium Heat
+              value: 5
+            - label: Low Heat
+              value: 4
+            - label: High Cool
+              value: 3
+            - label: Medium Cool
+              value: 2
+            - label: Low Cool
+              value: 1
+    passenger_seat:
+      required: false
+      example: 6
+      selector:
+        select:
+          mode: dropdown
+          options:
+            - label: High Heat
+              value: 6
+            - label: Medium Heat
+              value: 5
+            - label: Low Heat
+              value: 4
+            - label: High Cool
+              value: 3
+            - label: Medium Cool
+              value: 2
+            - label: Low Cool
+              value: 1
+    left_rear_seat:
+      required: false
+      example: 6
+      selector:
+        select:
+          mode: dropdown
+          options:
+            - label: High Heat
+              value: 6
+            - label: Medium Heat
+              value: 5
+            - label: Low Heat
+              value: 4
+            - label: High Cool
+              value: 3
+            - label: Medium Cool
+              value: 2
+            - label: Low Cool
+              value: 1
+    right_rear_seat:
+      required: false
+      example: 6
+      selector:
+        select:
+          mode: dropdown
+          options:
+            - label: High Heat
+              value: 6
+            - label: Medium Heat
+              value: 5
+            - label: Low Heat
+              value: 4
+            - label: High Cool
+              value: 3
+            - label: Medium Cool
+              value: 2
+            - label: Low Cool
+              value: 1
 set_charge_limits:
   fields:
     device_id:
