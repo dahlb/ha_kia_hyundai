@@ -32,5 +32,7 @@ def safely_get_json_value(json, key, callable_to_cast=None):
                 except (TypeError, KeyError, ValueError):
                     value = None
     if callable_to_cast is not None and value is not None:
+        if callable_to_cast == bool and isinstance(value, str) and value.isdigit():
+            value = int(value)
         value = callable_to_cast(value)
     return value
