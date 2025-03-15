@@ -13,14 +13,14 @@ TEMPERATURE_MAX = 82
 # Integration Setting Constants
 CONFIG_FLOW_VERSION: int = 3
 PLATFORMS = [
-    Platform.BUTTON,
     Platform.BINARY_SENSOR,
+    Platform.BUTTON,
     Platform.CLIMATE,
     Platform.DEVICE_TRACKER,
     Platform.LOCK,
     Platform.NUMBER,
-    Platform.SENSOR,
     Platform.SELECT,
+    Platform.SENSOR,
     Platform.SWITCH,
 ]
 

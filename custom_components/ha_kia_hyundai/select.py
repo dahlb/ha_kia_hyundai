@@ -4,19 +4,18 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from typing import Final
 
-from custom_components.ha_kia_hyundai import VehicleCoordinator
-from custom_components.ha_kia_hyundai.vehicle_coordinator_base_entity import (
-    VehicleCoordinatorBaseEntity,
-)
+from kia_hyundai_api.const import SeatSettings
 
 from homeassistant.components.select import SelectEntity, SelectEntityDescription
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import STATE_UNKNOWN, STATE_UNAVAILABLE
+from homeassistant.const import STATE_UNAVAILABLE, STATE_UNKNOWN
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.restore_state import RestoreEntity
 
+from . import VehicleCoordinator
 from .const import CONF_VEHICLE_ID, DOMAIN, SEAT_STATUS, STR_TO_NUMBER
+from .vehicle_coordinator_base_entity import VehicleCoordinatorBaseEntity
 
 OFF = ["Off"]
 HEAT_OPTIONS = {
@@ -46,30 +45,30 @@ SEAT_SELECTIONS: Final[tuple[KiaSelectEntityDescription, ...]] = (
     KiaSelectEntityDescription(
         key="desired_driver_seat_comfort",
         name="Seat-Driver with Climate",
-        exists_fn=lambda seat: bool(seat.front_seat_options[HEAT_TYPE]),
-        value_fn=lambda seat: SEAT_STATUS[seat.climate_driver_seat],
-        options_fn=lambda seat: seat.front_seat_options,
+        exists_fn=lambda coordinator: bool(coordinator.front_seat_options[HEAT_TYPE]),
+        value_fn=lambda coordinator: SEAT_STATUS[coordinator.climate_driver_seat],
+        options_fn=lambda coordinator: coordinator.front_seat_options,
     ),
     KiaSelectEntityDescription(
         key="desired_passenger_seat_comfort",
         name="Seat-Passenger with Climate",
-        exists_fn=lambda seat: bool(seat.front_seat_options[HEAT_TYPE]),
-        value_fn=lambda seat: SEAT_STATUS[seat.climate_passenger_seat],
-        options_fn=lambda seat: seat.front_seat_options,
+        exists_fn=lambda coordinator: bool(coordinator.front_seat_options[HEAT_TYPE]),
+        value_fn=lambda coordinator: SEAT_STATUS[coordinator.climate_passenger_seat],
+        options_fn=lambda coordinator: coordinator.front_seat_options,
     ),
     KiaSelectEntityDescription(
         key="desired_left_rear_seat_comfort",
         name="Seat-Left Rear with Climate",
-        exists_fn=lambda seat: bool(seat.rear_seat_options[HEAT_TYPE]),
-        value_fn=lambda seat: SEAT_STATUS[seat.climate_left_rear_seat],
-        options_fn=lambda seat: seat.rear_seat_options,
+        exists_fn=lambda coordinator: bool(coordinator.rear_seat_options[HEAT_TYPE]),
+        value_fn=lambda coordinator: SEAT_STATUS[coordinator.climate_left_rear_seat],
+        options_fn=lambda coordinator: coordinator.rear_seat_options,
     ),
     KiaSelectEntityDescription(
         key="desired_right_rear_seat_comfort",
         name="Seat-Right Rear with Climate",
-        exists_fn=lambda seat: bool(seat.rear_seat_options[HEAT_TYPE]),
-        value_fn=lambda seat: SEAT_STATUS[seat.climate_right_rear_seat],
-        options_fn=lambda seat: seat.rear_seat_options,
+        exists_fn=lambda coordinator: bool(coordinator.rear_seat_options[HEAT_TYPE]),
+        value_fn=lambda coordinator: SEAT_STATUS[coordinator.climate_right_rear_seat],
+        options_fn=lambda coordinator: coordinator.rear_seat_options,
     ),
 )
 
@@ -118,12 +117,17 @@ class SeatSelect(VehicleCoordinatorBaseEntity, SelectEntity, RestoreEntity):
 
     async def async_select_option(self, option: str) -> None:
         """Change the select option."""
-        setattr(self.coordinator, self.entity_description.key, STR_TO_NUMBER[option])
+        setattr(
+            self.coordinator,
+            self.entity_description.key,
+            SeatSettings(STR_TO_NUMBER[option]),
+        )
         self._attr_current_option = option
         self.async_write_ha_state()
 
     async def async_added_to_hass(self) -> None:
-        """Restore preivous state when added to Hass."""
+        """Restore previous state when added to Hass."""
+        await super().async_added_to_hass()
         previous_state = await self.async_get_last_state()
         if previous_state is not None and previous_state.state not in (
             STATE_UNKNOWN,
@@ -138,5 +142,5 @@ class SeatSelect(VehicleCoordinatorBaseEntity, SelectEntity, RestoreEntity):
         setattr(
             self.coordinator,
             self.entity_description.key,
-            STR_TO_NUMBER[self._attr_current_option],
+            SeatSettings(STR_TO_NUMBER[self._attr_current_option]),
         )

@@ -25,10 +25,10 @@ class VehicleCoordinator(DataUpdateCoordinator):
 
     climate_desired_defrost: bool = False
     climate_desired_heating_acc: bool = False
-    desired_driver_seat_comfort: int | None = None
-    desired_passenger_seat_comfort: int | None = None
-    desired_left_rear_seat_comfort: int | None = None
-    desired_right_rear_seat_comfort: int | None = None
+    desired_driver_seat_comfort: SeatSettings | None = None
+    desired_passenger_seat_comfort: SeatSettings | None = None
+    desired_left_rear_seat_comfort: SeatSettings | None = None
+    desired_right_rear_seat_comfort: SeatSettings | None = None
 
     def __init__(
             self,

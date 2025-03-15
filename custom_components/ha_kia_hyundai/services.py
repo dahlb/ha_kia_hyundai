@@ -36,10 +36,10 @@ def async_setup_services(hass: HomeAssistant):
         set_temp = call.data.get(SERVICE_ATTRIBUTE_TEMPERATURE)
         defrost = call.data.get(SERVICE_ATTRIBUTE_DEFROST)
         heating = call.data.get(SERVICE_ATTRIBUTE_HEATING)
-        driver_seat = call.data.get(SERVICE_ATTRIBUTE_DRIVER_SEAT, 0)
-        passenger_seat = call.data.get(SERVICE_ATTRIBUTE_PASSENGER_SEAT, 0)
-        left_rear_seat = call.data.get(SERVICE_ATTRIBUTE_LEFT_REAR_SEAT, 0)
-        right_rear_seat = call.data.get(SERVICE_ATTRIBUTE_RIGHT_REAR_SEAT, 0)
+        driver_seat = call.data.get(SERVICE_ATTRIBUTE_DRIVER_SEAT, None)
+        passenger_seat = call.data.get(SERVICE_ATTRIBUTE_PASSENGER_SEAT, None)
+        left_rear_seat = call.data.get(SERVICE_ATTRIBUTE_LEFT_REAR_SEAT, None)
+        right_rear_seat = call.data.get(SERVICE_ATTRIBUTE_RIGHT_REAR_SEAT, None)
 
         if set_temp is not None:
             set_temp = int(set_temp)
@@ -50,10 +50,10 @@ def async_setup_services(hass: HomeAssistant):
             set_temp=set_temp,
             defrost=bool(defrost),
             heating=bool(heating),
-            driver_seat=int(driver_seat),
-            passenger_seat=int(passenger_seat),
-            left_rear_seat=int(left_rear_seat),
-            right_rear_seat=int(right_rear_seat),
+            driver_seat=driver_seat,
+            passenger_seat=passenger_seat,
+            left_rear_seat=left_rear_seat,
+            right_rear_seat=right_rear_seat,
         )
         coordinator.async_update_listeners()
         await coordinator.async_request_refresh()
