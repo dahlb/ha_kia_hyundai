@@ -16,6 +16,7 @@ from custom_components.ha_kia_hyundai.const import (
     TEMPERATURE_MIN
 )
 from custom_components.ha_kia_hyundai.util import safely_get_json_value, convert_last_updated_str_to_datetime
+from kia_hyundai_api.const import SeatSettings
 
 _LOGGER = getLogger(__name__)
 
