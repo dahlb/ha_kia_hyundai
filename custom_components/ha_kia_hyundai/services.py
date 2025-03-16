@@ -6,6 +6,8 @@ from homeassistant.const import ATTR_DEVICE_ID
 from homeassistant.core import HomeAssistant, ServiceCall, callback
 from homeassistant.helpers import device_registry
 
+from kia_hyundai_api.const import SeatSettings
+
 from .vehicle_coordinator import VehicleCoordinator
 from .const import DOMAIN
 
@@ -43,6 +45,14 @@ def async_setup_services(hass: HomeAssistant):
 
         if set_temp is not None:
             set_temp = int(set_temp)
+        if driver_seat is not None:
+            driver_seat = SeatSettings(driver_seat)
+        if passenger_seat is not None:
+            passenger_seat = SeatSettings(passenger_seat)
+        if left_rear_seat is not None:
+            left_rear_seat = SeatSettings(left_rear_seat)
+        if right_rear_seat is not None:
+            right_rear_seat = SeatSettings(right_rear_seat)
 
         await coordinator.api_connection.start_climate(
             vehicle_id=coordinator.vehicle_id,
