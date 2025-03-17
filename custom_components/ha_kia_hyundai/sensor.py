@@ -3,20 +3,27 @@ from dataclasses import dataclass
 from logging import getLogger
 from typing import Final
 
-from homeassistant.components.sensor import SensorDeviceClass, SensorEntity, SensorEntityDescription, SensorStateClass
+from homeassistant.components.sensor import (
+    SensorDeviceClass,
+    SensorEntity,
+    SensorEntityDescription,
+    SensorStateClass,
+)
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import PERCENTAGE, UnitOfLength, UnitOfTemperature, STATE_UNAVAILABLE, UnitOfTime
+from homeassistant.const import (
+    PERCENTAGE,
+    STATE_UNAVAILABLE,
+    UnitOfLength,
+    UnitOfTemperature,
+    UnitOfTime,
+)
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.restore_state import RestoreEntity
 
 from . import VehicleCoordinator
+from .const import CONF_VEHICLE_ID, DOMAIN, SEAT_STATUS
 from .vehicle_coordinator_base_entity import VehicleCoordinatorBaseEntity
-from .const import (
-    CONF_VEHICLE_ID,
-    DOMAIN,
-    SEAT_STATUS,
-)
 
 _LOGGER = getLogger(__name__)
 PARALLEL_UPDATES: int = 1
@@ -28,7 +35,7 @@ class KiaSensorEntityDescription(SensorEntityDescription):
     """A class that describes custom sensor entities."""
 
     preserve_state: bool = False
-    exists_fn: Callable[[VehicleCoordinatorBaseEntity], bool] = lambda _: True
+    exists_fn: Callable[[VehicleCoordinator], bool] = lambda _: True
 
 
 SENSOR_DESCRIPTIONS: Final[tuple[KiaSensorEntityDescription, ...]] = (
@@ -154,11 +161,11 @@ SEAT_SENSOR_DESCRIPTIONS: Final[tuple[KiaSensorEntityDescription, ...]] = (
 
 async def async_setup_entry(
     hass: HomeAssistant, config_entry: ConfigEntry, async_add_entities: AddEntitiesCallback
-):
+) -> None:
     vehicle_id = config_entry.data[CONF_VEHICLE_ID]
     coordinator: VehicleCoordinator = hass.data[DOMAIN][vehicle_id]
 
-    sensors = [
+    sensors: list[SensorEntity] = [
         APIActionInProgress(coordinator=coordinator),
     ]
     for sensor_description in SENSOR_DESCRIPTIONS:

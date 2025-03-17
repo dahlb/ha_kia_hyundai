@@ -35,9 +35,9 @@ STEPS = "heatVentStep"
 class KiaSelectEntityDescription(SelectEntityDescription):
     """Class for Kia select entities."""
 
-    exists_fn: Callable[[VehicleCoordinatorBaseEntity], bool] = lambda _: True
-    value_fn: Callable[[VehicleCoordinatorBaseEntity], str | None]
-    options_fn: Callable[[VehicleCoordinatorBaseEntity], int | None]
+    exists_fn: Callable[[VehicleCoordinator], bool] = lambda _: True
+    value_fn: Callable[[VehicleCoordinator], str | None]
+    options_fn: Callable[[VehicleCoordinator], dict[str, int] | None]
     icon = "mdi:car-seat"
 
 
@@ -77,7 +77,7 @@ async def async_setup_entry(
     hass: HomeAssistant,
     config_entry: ConfigEntry,
     async_add_entities: AddEntitiesCallback,
-):
+) -> None:
     """Set up the entity."""
     vehicle_id = config_entry.data[CONF_VEHICLE_ID]
     coordinator: VehicleCoordinator = hass.data[DOMAIN][vehicle_id]
@@ -98,17 +98,18 @@ class SeatSelect(VehicleCoordinatorBaseEntity, SelectEntity, RestoreEntity):
     @property
     def options(self) -> list[str]:
         """Return the available options."""
-        # Making the assumption that any seat that offers cooling offers heat as well.
         installed_options = self.entity_description.options_fn(self.coordinator)
-        if installed_options[HEAT_TYPE] == 3:
-            return (
-                OFF
-                + HEAT_OPTIONS[installed_options[STEPS]]
-                + COOL_OPTIONS[installed_options[STEPS]]
-            )
-        if installed_options[HEAT_TYPE] == 2:
-            return OFF + COOL_OPTIONS[installed_options[STEPS]]
-        return OFF + HEAT_OPTIONS[installed_options[STEPS]]
+        if installed_options:
+            if installed_options[HEAT_TYPE] == 3:
+                return (
+                    OFF
+                    + HEAT_OPTIONS[installed_options[STEPS]]
+                    + COOL_OPTIONS[installed_options[STEPS]]
+                )
+            if installed_options[HEAT_TYPE] == 2:
+                return OFF + COOL_OPTIONS[installed_options[STEPS]]
+            return OFF + HEAT_OPTIONS[installed_options[STEPS]]
+        return OFF
 
     @property
     def available(self) -> bool:
@@ -142,5 +143,5 @@ class SeatSelect(VehicleCoordinatorBaseEntity, SelectEntity, RestoreEntity):
         setattr(
             self.coordinator,
             self.entity_description.key,
-            SeatSettings(STR_TO_NUMBER[self._attr_current_option]),
+            SeatSettings(STR_TO_NUMBER[self._attr_current_option or "Off"]),
         )
