@@ -36,80 +36,56 @@ start_climate:
         boolean:
     driver_seat:
       required: false
-      example: 6
+      example: High Heat
       selector:
         select:
           mode: dropdown
           options:
-            - label: High Heat
-              value: 6
-            - label: Medium Heat
-              value: 5
-            - label: Low Heat
-              value: 4
-            - label: High Cool
-              value: 3
-            - label: Medium Cool
-              value: 2
-            - label: Low Cool
-              value: 1
+            - High Heat
+            - Medium Heat
+            - Low Heat
+            - High Cool
+            - Medium Cool
+            - Low Cool
     passenger_seat:
       required: false
-      example: 6
+      example: High Heat
       selector:
         select:
           mode: dropdown
           options:
-            - label: High Heat
-              value: 6
-            - label: Medium Heat
-              value: 5
-            - label: Low Heat
-              value: 4
-            - label: High Cool
-              value: 3
-            - label: Medium Cool
-              value: 2
-            - label: Low Cool
-              value: 1
+            - High Heat
+            - Medium Heat
+            - Low Heat
+            - High Cool
+            - Medium Cool
+            - Low Cool
     left_rear_seat:
       required: false
-      example: 6
+      example: High Heat
       selector:
         select:
           mode: dropdown
           options:
-            - label: High Heat
-              value: 6
-            - label: Medium Heat
-              value: 5
-            - label: Low Heat
-              value: 4
-            - label: High Cool
-              value: 3
-            - label: Medium Cool
-              value: 2
-            - label: Low Cool
-              value: 1
+            - High Heat
+            - Medium Heat
+            - Low Heat
+            - High Cool
+            - Medium Cool
+            - Low Cool
     right_rear_seat:
       required: false
-      example: 6
+      example: High Heat
       selector:
         select:
           mode: dropdown
           options:
-            - label: High Heat
-              value: 6
-            - label: Medium Heat
-              value: 5
-            - label: Low Heat
-              value: 4
-            - label: High Cool
-              value: 3
-            - label: Medium Cool
-              value: 2
-            - label: Low Cool
-              value: 1
+            - High Heat
+            - Medium Heat
+            - Low Heat
+            - High Cool
+            - Medium Cool
+            - Low Cool
 set_charge_limits:
   fields:
     device_id:

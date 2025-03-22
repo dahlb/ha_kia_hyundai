@@ -62,19 +62,19 @@
         },
         "driver_seat": {
           "name": "Driver's Seat",
-          "description": "Driver's seat controls. In YAML, Heat options are 6-5-4, Cool are 3-2-1."
+          "description": "Driver's seat controls."
         },
         "passenger_seat": {
           "name": "Passenger's Seat",
-          "description": "Passenger's seat controls. In YAML, Heat options are 6-5-4, Cool are 3-2-1."
+          "description": "Passenger's seat controls."
         },
         "left_rear_seat": {
           "name": "Left Rear Seat",
-          "description": "Left Rear seat controls. In YAML, Heat options are 6-5-4, Cool are 3-2-1."
+          "description": "Left Rear seat controls."
         },
         "right_rear_seat": {
           "name": "Right Rear Seat",
-          "description": "Right Rear seat controls. In YAML, Heat options are 6-5-4, Cool are 3-2-1."
+          "description": "Right Rear seat controls."
         }
       }
     },

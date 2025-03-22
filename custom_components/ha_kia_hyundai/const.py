@@ -1,4 +1,6 @@
 # Configuration Constants
+from kia_hyundai_api.const import SeatSettings
+
 from homeassistant.const import Platform
 
 DOMAIN: str = "ha_kia_hyundai"
@@ -37,12 +39,12 @@ SEAT_STATUS = {
     (2, 2): "Low Cool",
 }
 
-STR_TO_NUMBER = {
-    "Off": 0,
-    "High Heat": 6,
-    "Medium Heat": 5,
-    "Low Heat": 4,
-    "High Cool": 3,
-    "Medium Cool": 2,
-    "Low Cool": 1,
+STR_TO_ENUM = {
+    "Off": SeatSettings.NONE,
+    "High Heat": SeatSettings.HeatHigh,
+    "Medium Heat": SeatSettings.HeatMedium,
+    "Low Heat": SeatSettings.HeatLow,
+    "High Cool": SeatSettings.CoolHigh,
+    "Medium Cool": SeatSettings.CoolMedium,
+    "Low Cool": SeatSettings.CoolLow,
 }

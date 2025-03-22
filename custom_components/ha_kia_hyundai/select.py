@@ -4,8 +4,6 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from typing import Final
 
-from kia_hyundai_api.const import SeatSettings
-
 from homeassistant.components.select import SelectEntity, SelectEntityDescription
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import STATE_UNAVAILABLE, STATE_UNKNOWN
@@ -14,7 +12,7 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.restore_state import RestoreEntity
 
 from . import VehicleCoordinator
-from .const import CONF_VEHICLE_ID, DOMAIN, SEAT_STATUS, STR_TO_NUMBER
+from .const import CONF_VEHICLE_ID, DOMAIN, SEAT_STATUS, STR_TO_ENUM
 from .vehicle_coordinator_base_entity import VehicleCoordinatorBaseEntity
 
 OFF = ["Off"]
@@ -121,7 +119,7 @@ class SeatSelect(VehicleCoordinatorBaseEntity, SelectEntity, RestoreEntity):
         setattr(
             self.coordinator,
             self.entity_description.key,
-            SeatSettings(STR_TO_NUMBER[option]),
+            STR_TO_ENUM[option],
         )
         self._attr_current_option = option
         self.async_write_ha_state()
@@ -143,5 +141,5 @@ class SeatSelect(VehicleCoordinatorBaseEntity, SelectEntity, RestoreEntity):
         setattr(
             self.coordinator,
             self.entity_description.key,
-            SeatSettings(STR_TO_NUMBER[self._attr_current_option or "Off"]),
+            STR_TO_ENUM[self._attr_current_option or "Off"],
         )
