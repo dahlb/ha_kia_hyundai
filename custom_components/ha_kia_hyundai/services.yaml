@@ -34,6 +34,58 @@ start_climate:
       default: false
       selector:
         boolean:
+    driver_seat:
+      required: false
+      example: High Heat
+      selector:
+        select:
+          mode: dropdown
+          options:
+            - High Heat
+            - Medium Heat
+            - Low Heat
+            - High Cool
+            - Medium Cool
+            - Low Cool
+    passenger_seat:
+      required: false
+      example: High Heat
+      selector:
+        select:
+          mode: dropdown
+          options:
+            - High Heat
+            - Medium Heat
+            - Low Heat
+            - High Cool
+            - Medium Cool
+            - Low Cool
+    left_rear_seat:
+      required: false
+      example: High Heat
+      selector:
+        select:
+          mode: dropdown
+          options:
+            - High Heat
+            - Medium Heat
+            - Low Heat
+            - High Cool
+            - Medium Cool
+            - Low Cool
+    right_rear_seat:
+      required: false
+      example: High Heat
+      selector:
+        select:
+          mode: dropdown
+          options:
+            - High Heat
+            - Medium Heat
+            - Low Heat
+            - High Cool
+            - Medium Cool
+            - Low Cool
 set_charge_limits:
   fields:
     device_id:

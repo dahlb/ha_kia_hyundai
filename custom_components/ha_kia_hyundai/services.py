@@ -6,8 +6,8 @@ from homeassistant.const import ATTR_DEVICE_ID
 from homeassistant.core import HomeAssistant, ServiceCall, callback
 from homeassistant.helpers import device_registry
 
+from .const import DOMAIN, STR_TO_ENUM
 from .vehicle_coordinator import VehicleCoordinator
-from .const import DOMAIN
 
 SERVICE_START_CLIMATE = "start_climate"
 SERVICE_SET_CHARGE_LIMIT = "set_charge_limits"
@@ -16,6 +16,10 @@ SERVICE_ATTRIBUTE_CLIMATE = "climate"
 SERVICE_ATTRIBUTE_TEMPERATURE = "temperature"
 SERVICE_ATTRIBUTE_DEFROST = "defrost"
 SERVICE_ATTRIBUTE_HEATING = "heating"
+SERVICE_ATTRIBUTE_DRIVER_SEAT = "driver_seat"
+SERVICE_ATTRIBUTE_PASSENGER_SEAT = "passenger_seat"
+SERVICE_ATTRIBUTE_LEFT_REAR_SEAT = "left_rear_seat"
+SERVICE_ATTRIBUTE_RIGHT_REAR_SEAT = "right_rear_seat"
 
 SUPPORTED_SERVICES = (
     SERVICE_START_CLIMATE,
@@ -24,6 +28,7 @@ SUPPORTED_SERVICES = (
 
 _LOGGER = getLogger(__name__)
 
+
 def async_setup_services(hass: HomeAssistant):
     async def async_handle_start_climate(call: ServiceCall):
         coordinator: VehicleCoordinator = _get_coordinator_from_device(hass, call)
@@ -31,9 +36,21 @@ def async_setup_services(hass: HomeAssistant):
         set_temp = call.data.get(SERVICE_ATTRIBUTE_TEMPERATURE)
         defrost = call.data.get(SERVICE_ATTRIBUTE_DEFROST)
         heating = call.data.get(SERVICE_ATTRIBUTE_HEATING)
+        driver_seat = call.data.get(SERVICE_ATTRIBUTE_DRIVER_SEAT, None)
+        passenger_seat = call.data.get(SERVICE_ATTRIBUTE_PASSENGER_SEAT, None)
+        left_rear_seat = call.data.get(SERVICE_ATTRIBUTE_LEFT_REAR_SEAT, None)
+        right_rear_seat = call.data.get(SERVICE_ATTRIBUTE_RIGHT_REAR_SEAT, None)
 
         if set_temp is not None:
             set_temp = int(set_temp)
+        if driver_seat is not None:
+            driver_seat = STR_TO_ENUM[driver_seat]
+        if passenger_seat is not None:
+            passenger_seat = STR_TO_ENUM[passenger_seat]
+        if left_rear_seat is not None:
+            left_rear_seat = STR_TO_ENUM[left_rear_seat]
+        if right_rear_seat is not None:
+            right_rear_seat = STR_TO_ENUM[right_rear_seat]
 
         await coordinator.api_connection.start_climate(
             vehicle_id=coordinator.vehicle_id,
@@ -41,6 +58,10 @@ def async_setup_services(hass: HomeAssistant):
             set_temp=set_temp,
             defrost=bool(defrost),
             heating=bool(heating),
+            driver_seat=driver_seat,
+            passenger_seat=passenger_seat,
+            left_rear_seat=left_rear_seat,
+            right_rear_seat=right_rear_seat,
         )
         coordinator.async_update_listeners()
         await coordinator.async_request_refresh()
