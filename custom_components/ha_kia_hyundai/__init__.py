@@ -10,6 +10,7 @@ from homeassistant.const import (
 )
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.exceptions import ConfigEntryAuthFailed, ConfigEntryError
+from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
 from kia_hyundai_api import UsKia, AuthError
 
@@ -62,9 +63,11 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry):
         )
     )
 
+    client_session = async_get_clientsession(hass)
     api_connection = UsKia(
         username=username,
         password=password,
+        client_session=client_session,
     )
     try:
         await api_connection.get_vehicles()

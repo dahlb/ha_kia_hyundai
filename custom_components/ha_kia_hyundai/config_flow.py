@@ -11,6 +11,7 @@ from homeassistant.const import (
     CONF_SCAN_INTERVAL,
 )
 from homeassistant.core import callback
+from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from kia_hyundai_api import UsKia
 
 from .const import (
@@ -73,9 +74,11 @@ class KiaUvoConfigFlowHandler(config_entries.ConfigFlow):
             password = user_input[CONF_PASSWORD]
 
             try:
+                client_session = async_get_clientsession(self.hass)
                 api_connection = UsKia(
                     username=username,
                     password=password,
+                    client_session=client_session,
                 )
                 await api_connection.login()
                 self.data.update(user_input)
