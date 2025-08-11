@@ -97,7 +97,7 @@ class KiaUvoConfigFlowHandler(config_entries.ConfigFlow):
     ):
         vehicle_map = {}
         for vehicle in self.data[CONFIG_FLOW_TEMP_VEHICLES]:
-            vehicle_map[vehicle["vehicleIdentifier"]] = f"{vehicle["nickName"]} ({vehicle["modelName"]})"
+            vehicle_map[vehicle["vehicleIdentifier"]] = f"{vehicle['nickName']} ({vehicle['modelName']})"
 
         errors: dict[str, str] = {}
         data_schema = {
