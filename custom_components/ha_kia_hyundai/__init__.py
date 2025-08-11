@@ -78,6 +78,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry):
         if vehicle_id == vehicle["vehicleIdentifier"]:
             coordinator = VehicleCoordinator(
                 hass=hass,
+                config_entry=config_entry,
                 vehicle_id=vehicle["vehicleIdentifier"],
                 vehicle_name=vehicle["nickName"],
                 vehicle_model=vehicle["modelName"],

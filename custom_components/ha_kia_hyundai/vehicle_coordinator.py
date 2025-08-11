@@ -3,6 +3,7 @@ from datetime import timedelta, datetime
 from logging import getLogger
 
 from aiohttp import ClientError
+from homeassistant.config_entries import ConfigEntry
 from homeassistant.util import dt as dt_util
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.debounce import Debouncer
@@ -34,6 +35,7 @@ class VehicleCoordinator(DataUpdateCoordinator):
     def __init__(
             self,
             hass: HomeAssistant,
+            config_entry: ConfigEntry,
             vehicle_id: str,
             vehicle_name: str,
             vehicle_model: str,
@@ -75,6 +77,7 @@ class VehicleCoordinator(DataUpdateCoordinator):
         super().__init__(
             hass,
             _LOGGER,
+            config_entry=config_entry,
             name=f"{DOMAIN}-{self.vehicle_name}",
             update_interval=scan_interval,
             update_method=refresh,
