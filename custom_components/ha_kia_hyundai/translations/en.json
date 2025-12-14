@@ -29,6 +29,9 @@
         "description": "The Kia US integration needs to re-authenticate your account."
       }
     },
+    "abort": {
+      "reauth_successful": "[%key:common::config_flow::abort::reauth_successful%]"
+    },
     "error": {
       "auth": "Login failed into Kia US. Please use official Kia US app to logout and log back in and try again."
     }

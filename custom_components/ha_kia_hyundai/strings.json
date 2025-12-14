@@ -6,7 +6,15 @@
         "description": "Configure your Credentials.",
         "data": {
           "username": "Username",
-          "password": "Password"
+          "password": "Password",
+          "otp_type": "One Time Password Type"
+        }
+      },
+      "otp_code": {
+        "title": "Kia US OTP",
+        "description": "Enter your One Time Password.",
+        "data": {
+          "otp_code": "One Time Password"
         }
       },
       "pick_vehicle": {
@@ -20,6 +28,9 @@
         "title": "[%key:common::config_flow::title::reauth%]",
         "description": "The Kia US integration needs to re-authenticate your account."
       }
+    },
+    "abort": {
+      "reauth_successful": "[%key:common::config_flow::abort::reauth_successful%]"
     },
     "error": {
       "auth": "Login failed into Kia US. Please use official Kia US app to logout and log back in and try again."
