@@ -15,6 +15,8 @@ from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from kia_hyundai_api import UsKia, AuthError
 
 from .const import (
+    CONF_DEVICE_ID,
+    CONF_REFRESH_TOKEN,
     DOMAIN,
     PLATFORMS,
     CONF_VEHICLE_ID,
@@ -56,6 +58,9 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry):
     vehicle_id = config_entry.data[CONF_VEHICLE_ID]
     username = config_entry.data[CONF_USERNAME]
     password = config_entry.data[CONF_PASSWORD]
+    device_id = config_entry.data.get(CONF_DEVICE_ID)
+    refresh_token = config_entry.data.get(CONF_REFRESH_TOKEN)
+
     scan_interval = timedelta(
         minutes=config_entry.options.get(
             CONF_SCAN_INTERVAL,
@@ -64,16 +69,23 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry):
     )
 
     client_session = async_get_clientsession(hass)
+    async def otp_callback(context: dict[str, str]):
+        raise ConfigEntryAuthFailed("otp required")
     api_connection = UsKia(
         username=username,
         password=password,
         client_session=client_session,
+        otp_callback=otp_callback,
+        device_id=device_id,
+        refresh_token=refresh_token,
     )
     try:
         await api_connection.get_vehicles()
     except AuthError as err:
         raise ConfigEntryAuthFailed(err) from err
     coordinator: VehicleCoordinator | None = None
+    if api_connection.vehicles is None:
+        raise ConfigEntryError("no vehicles found")
     for vehicle in api_connection.vehicles:
         if vehicle_id == vehicle["vehicleIdentifier"]:
             coordinator = VehicleCoordinator(

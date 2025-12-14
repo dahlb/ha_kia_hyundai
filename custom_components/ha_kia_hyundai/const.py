@@ -5,6 +5,11 @@ from homeassistant.const import Platform
 
 DOMAIN: str = "ha_kia_hyundai"
 CONF_VEHICLE_ID: str = "vehicle_id"
+CONF_OTP_TYPE: str = "otp_type"
+CONF_OTP_CODE: str = "otp_code"
+CONF_DEVICE_ID: str = "device_id"
+CONF_REFRESH_TOKEN: str = "refresh_token"
+
 CONFIG_FLOW_TEMP_VEHICLES: str = "vehicles"
 
 DEFAULT_SCAN_INTERVAL: int = 10

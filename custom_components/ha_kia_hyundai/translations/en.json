@@ -6,7 +6,15 @@
         "description": "Configure your Credentials.",
         "data": {
           "username": "Username",
-          "password": "Password"
+          "password": "Password",
+          "otp_type": "One Time Password Type"
+        }
+      },
+      "otp_code": {
+        "title": "Kia US OTP",
+        "description": "Enter your One Time Password.",
+        "data": {
+          "otp_code": "One Time Password"
         }
       },
       "pick_vehicle": {
