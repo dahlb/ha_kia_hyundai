@@ -1,3 +1,7 @@
+# HOSTILE API
+
+## Due to a hostile API this integration was archived on Dec 20th 2025.
+
 [![GitHub Release][releases-shield]][releases]
 [![GitHub Activity][commits-shield]][commits]
 [![License][license-shield]](LICENSE)
